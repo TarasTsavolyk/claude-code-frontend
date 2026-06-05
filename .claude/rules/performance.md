@@ -1,0 +1,30 @@
+---
+paths:
+  - "src/**/*.vue"
+  - "src/**/*.ts"
+  - "src/**/*.js"
+  - "vite.config.*"
+---
+
+# Performance
+
+## Loading
+- Route-level code splitting via dynamic `import()`. Lazy-load heavy, below-the-fold, or rarely-used components with `defineAsyncComponent` — give them loading/error states (or coordinate several async deps with `<Suspense>` + a fallback).
+- Keep the initial bundle lean. Question every new dependency — prefer a small util or native API over a large lib.
+- Tree-shake: import named members, never whole namespaces of large libraries.
+
+## Rendering
+- Always key `v-for` with a stable unique id (never the index for dynamic lists).
+- Virtualize long lists (hundreds+ rows) instead of rendering everything.
+- Use `computed` for derived state; avoid `watch` that recomputes what a `computed` could.
+- Reach for `v-once`/`v-memo` only on proven-expensive static subtrees.
+- Debounce/throttle high-frequency handlers (input, scroll, resize).
+- Large or deeply-nested data that doesn't need per-property reactivity → `shallowRef`/`shallowReactive`; wrap inert data (config, big lookups) with `markRaw` to skip proxying.
+
+## Assets
+- Serve appropriately sized, modern-format images; lazy-load off-screen images.
+- Avoid layout shift: reserve dimensions for images/embeds.
+
+## Budget & verify
+- Watch bundle size on changes; investigate notable regressions before merging.
+- Optimize based on measurement (build analysis / Lighthouse), not guesses.
