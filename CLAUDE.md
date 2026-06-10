@@ -48,12 +48,19 @@ No lockfile? Ask which to use. `<pm>` is the detected manager: `<pm> install`, `
 
 ## Project structure
 
+> Adapt this to your repo — an example, not a rule. Group consistently: **by type/layer** (below, the `create-vue` default) or **by feature** (`features/<name>/{components,composables,stores,api}`) for larger apps. Keep shared/cross-cutting code separate and lazy-load routes. Changing the paradigm? Adjust `architecture.md` and the scaffold skills to match.
+
 ```
 src/
-  features/<feature>/      # feature-scoped: components, composables, stores, types, api
-  shared/                  # cross-feature UI kit, utils, composables, types
-  router/                  # route definitions (lazy-loaded)
-  assets/styles/           # tailwind entry + @theme tokens
+  assets/          # static assets + styles
+  components/      # reusable UI components
+  composables/     # reusable logic (useX)
+  views/           # routed pages
+  router/          # routes, lazy-loaded
+  stores/          # Pinia stores (shared state)
+  services/        # API / data-access layer
+  utils/           # helpers
+  translations/    # i18n catalogs
 ```
 
 ## Core principles
