@@ -5,7 +5,7 @@ description: Create a new Vue 3 component the project's way — typed props/emit
 
 # Scaffold a component
 
-1. **Decide placement.** Feature-only → `src/features/<feature>/components/`. Reusable across features → `src/shared/components/`. Confirm a similar component doesn't already exist (search first; reuse beats rebuild).
+1. **Decide placement.** Put it where your layout keeps components — `src/components/` (layer-first), a feature's `components/` (feature-first), or a shared `components/` if it's reused widely. Confirm a similar component doesn't already exist (search first; reuse beats rebuild).
 2. **Create `<Name>.vue`** with `<script setup>` (add `lang="ts"` in TS projects):
    - TS: define a `Props` type and `defineProps<Props>()` (+ `withDefaults` for optionals); type emits with `defineEmits<{ ... }>()`. JS: use runtime validators — `defineProps({ ... })` with `type`/`required`/`default`/`validator` — and `defineEmits([...])`.
    - Keep it presentational: state in, events out. No data fetching here.
