@@ -84,7 +84,7 @@ This brings in the **path-scoped** rules (architecture/code-style/styling/testin
 5. Trim or extend the **Core principles** for this project.
 
 ### Step 5 — Tune `.claude/settings.json`
-- The `permissions.allow` list pre-approves your safe commands; `git push` is in `ask`; destructive commands and `.env` reads are denied. Edit to match your tooling.
+- The `permissions.allow` list pre-approves your safe commands; `git push` and `git commit` are in `ask`; destructive commands (force-push, hard reset, `rm -rf` and its variants) and `.env`/`.pem` reads are denied. Edit to match your tooling.
 - It pre-approves **npm, pnpm, and yarn** (install / run / exec) so it works whatever the repo uses. If you only ever use one, trim the others for a tighter allow-list.
 - `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` enables running the Quality Gate agents in parallel (experimental). Remove it if your Claude Code version doesn't support agent teams.
 
