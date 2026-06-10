@@ -6,7 +6,7 @@
 
 A production-ready Claude Code setup for **Vue 3 + Vite + Tailwind CSS 4 + Pinia + Vitest + Playwright** projects, with **TypeScript optional** (its conventions apply only when the project actually uses TS). It bundles 12 specialized agents, 11 rules (8 path-scoped), 6 workflow skills, and an agent pipeline — focused on what a frontend engineer actually needs.
 
-Swap the stack assumptions (package manager, framework specifics) to match your repos.
+Swap the stack assumptions (package manager, styling engine, framework specifics) to match your repos — `rules/styling.md` is written tech-neutrally (Tailwind 4 default; Sass/SCSS, CSS Modules, scoped `<style>` documented).
 
 ## Contents
 

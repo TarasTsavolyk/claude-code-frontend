@@ -8,7 +8,7 @@ The agent pipeline is defined in `.claude/rules/workflow.md`.
 
 - Vue 3 (`<script setup>`) · TypeScript **if the project uses it** (see Language)
 - Vite · Pinia · Vue Router
-- Tailwind CSS 4 (CSS-first `@theme` tokens)
+- Styling: Tailwind CSS 4 (CSS-first `@theme` tokens) by default — swap for Sass/SCSS, CSS Modules, or scoped `<style>` per project (see `rules/styling.md`)
 - Vitest + Vue Test Utils / Testing Library · Playwright (e2e)
 - ESLint + Prettier · npm / pnpm / yarn (detected from the lockfile)
 
@@ -69,6 +69,6 @@ src/
 - Components stay small and presentational. Logic lives in composables (`useX`).
 - Pinia stores hold **shared** state only; local state stays in the component.
 - No data fetching inside components — go through a composable or service layer.
-- Tailwind tokens, not magic values (see `rules/styling.md`).
+- Design tokens, not magic values (see `rules/styling.md`).
 - Accessibility is a requirement, not a nice-to-have (see `rules/accessibility.md`).
 - Respect performance budgets (see `rules/performance.md`).
