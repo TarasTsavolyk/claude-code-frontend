@@ -9,6 +9,8 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-10
+
 ### Added
 - Initial Claude Code frontend configuration:
   - `CLAUDE.md` — always-loaded project memory (Vue 3 + Vite + Tailwind CSS 4 + Pinia + Vitest/Playwright; TypeScript optional).
