@@ -9,6 +9,8 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-10
+
 ### Added
 - `.github/workflows/release.yml` — auto-tags `vX.Y.Z` and publishes a GitHub Release from the matching `CHANGELOG.md` section when it lands on `main`. Idempotent, least-privilege (`contents: write`), `actions/checkout` SHA-pinned.
 - Release badge in `README.md`.
