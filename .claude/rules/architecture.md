@@ -34,4 +34,3 @@ paths:
 - A global store holding state only one component uses.
 - `fetch`/axios calls scattered inside `.vue` files.
 - Prop drilling more than 2 levels — use provide/inject or a store instead.
-- Deeply nested `watch` chains that recompute derived state (use `computed`).
