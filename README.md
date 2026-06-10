@@ -1,6 +1,6 @@
 # Claude Code Configuration for Frontend Projects
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/TarasTsavolyk/claude-code-frontend?sort=semver)](https://github.com/TarasTsavolyk/claude-code-frontend/releases) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > A **starter template**, not an installable package: you copy `CLAUDE.md` + `.claude/` into your own repo (or your `~/.claude/`) and adapt it. See [Setup](#step-by-step-setup).
 
