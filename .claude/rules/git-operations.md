@@ -6,7 +6,7 @@
 - Never commit directly to `main`/`master`. Work on a branch.
 - Never run a destructive or history-rewriting command (`push --force`, hard reset on shared branches) without explicit human confirmation.
 - Never commit secrets, `.env`, tokens, or keys. If one is staged, stop and flag it.
-- Run the quality gate (`typecheck && lint && test`) before every commit.
+- Run the quality gate (see `CLAUDE.md`) before every commit.
 
 ## Branches
 - `feature/<short-slug>`, `fix/<short-slug>`, `chore/<short-slug>`.

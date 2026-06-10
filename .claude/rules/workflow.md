@@ -2,6 +2,8 @@
 
 Orchestration for feature work. Agents live in `.claude/agents/`. Prefer delegating bounded work to subagents to keep the main context clean.
 
+**Skills vs agents** — a `/skill` runs its checklist inline in the current session (quick, ad-hoc, can fix as it goes); the matching agent (`a11y-audit` → `accessibility-auditor`, `perf-audit` → `performance-auditor`, `debug-frontend` → `debugger`) is the isolated, least-privilege specialist the pipeline delegates to. Use the skill for solo/ad-hoc work, the agent for a gated pipeline run.
+
 ## Standard feature
 ```
 Planning  →  Developer  →  Quality Gate (parallel)  →  DocsWriter
@@ -17,9 +19,15 @@ Debugger  →  Developer  →  Verify (test-engineer + ui-reviewer)
 ```
 `debugger` reproduces and finds root cause; `frontend-developer` fixes; verification confirms with a regression test.
 
+## Refactor
+```
+refactoring-expert  →  Verify (test-engineer + ui-reviewer)
+```
+`refactoring-expert` restructures code without changing behavior — tests stay green before and after (it adds characterization tests first if the area is uncovered). Use it instead of `frontend-developer` when the goal is cleanup/structure, not new behavior.
+
 ## CI/CD
 ```
-ci-cd-engineer  →  Reviewer + Security Scanner
+ci-cd-engineer  →  ui-reviewer + security-scanner
 ```
 
 ## Severity (used by all reviewing agents)
