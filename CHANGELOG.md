@@ -26,6 +26,8 @@ app that adopts it.
 - `testing.md`: standardized network mocking on MSW; added a no-regression coverage note and an optional Storybook/visual note.
 - `frontend-developer` agent description reworded to "Vue 3 features (TypeScript when the project uses it)" to match the TS-optional stance.
 - `debugger` agent raised to `model: opus` — root-cause analysis is reasoning-heavy and a wrong diagnosis is costly; reviewing/execution agents stay `sonnet`, planning/critique stay `opus`.
+- `.claude/rules/workflow.md`: added a **Refactor** flow (`refactoring-expert → Verify (test-engineer + ui-reviewer)`) so the refactoring agent is wired into the pipeline, with an explicit boundary vs `frontend-developer` (behavior-preserving cleanup vs new behavior).
+- `.claude/rules/workflow.md` + `README.md`: documented the **skills-vs-agents** distinction (inline `/skill` vs the delegated, read-only pipeline agent) for the overlapping `a11y-audit`/`perf-audit`/`debug-frontend` pairs.
 
 ### Fixed
 - `.claude/rules/workflow.md`: the CI/CD flow now references the real agents (`ui-reviewer` + `security-scanner`) instead of a non-existent `Reviewer`.
