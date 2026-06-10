@@ -1,6 +1,6 @@
 ---
 paths:
-  - "**/*.vue"
+  - "src/**/*.vue"
 ---
 
 # Accessibility (target: WCAG 2.2 AA)
@@ -22,7 +22,6 @@ A11y is part of "done", reviewed like any other requirement.
 - Meaningful images have `alt`; decorative images have `alt=""`.
 - Don't convey meaning by color alone — pair with text/icon/shape.
 - Maintain contrast: ≥4.5:1 body text, ≥3:1 large text and UI boundaries.
-- Animations respect `prefers-reduced-motion`.
 
 ## Verify
 - Run an axe check on changed views; resolve violations before review.

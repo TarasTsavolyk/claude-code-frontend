@@ -28,6 +28,8 @@ app that adopts it.
 - `debugger` agent raised to `model: opus` — root-cause analysis is reasoning-heavy and a wrong diagnosis is costly; reviewing/execution agents stay `sonnet`, planning/critique stay `opus`.
 - `.claude/rules/workflow.md`: added a **Refactor** flow (`refactoring-expert → Verify (test-engineer + ui-reviewer)`) so the refactoring agent is wired into the pipeline, with an explicit boundary vs `frontend-developer` (behavior-preserving cleanup vs new behavior).
 - `.claude/rules/workflow.md` + `README.md`: documented the **skills-vs-agents** distinction (inline `/skill` vs the delegated, read-only pipeline agent) for the overlapping `a11y-audit`/`perf-audit`/`debug-frontend` pairs.
+- Token diet of the always-loaded context (no rules dropped): condensed `principles.md` (~25% shorter) and `CLAUDE.md` prose; the quality gate is now defined canonically in `CLAUDE.md` and referenced from `git-operations.md`/`principles.md` instead of restated.
+- Removed cross-rule duplication so co-loaded rules don't pay for the same guidance twice: `prefers-reduced-motion` now lives only in `styling.md`, and `watch`-vs-`computed` only in `performance.md`. Tightened `accessibility.md`/`styling.md` path scopes to `src/`.
 
 ### Fixed
 - `.claude/rules/workflow.md`: the CI/CD flow now references the real agents (`ui-reviewer` + `security-scanner`) instead of a non-existent `Reviewer`.
