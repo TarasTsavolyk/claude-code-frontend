@@ -19,7 +19,7 @@ Debugger  →  Developer  →  Verify (test-engineer + ui-reviewer)
 
 ## CI/CD
 ```
-ci-cd-engineer  →  Reviewer + Security Scanner
+ci-cd-engineer  →  ui-reviewer + security-scanner
 ```
 
 ## Severity (used by all reviewing agents)
