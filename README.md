@@ -123,6 +123,7 @@ These are third-party and stack-agnostic — install only if you want them:
 - **A pipeline, not a free-for-all** — planning → build → quality gate (review + a11y + tests + perf + security, in parallel) → docs, with a read-only `devil` advocate challenging plans before code is written.
 - **Frontend-native concerns are first-class** — accessibility, performance, and styling each get a dedicated rule and (for the first two) a dedicated auditor agent.
 - **Bilingual triggers** — every agent has EN + UA trigger words; add more languages by extending `description`.
+- **Release automation** — a CHANGELOG-driven workflow ships in `.github/workflows/release.yml`; [`docs/release-automation.md`](docs/release-automation.md) documents it plus a Changesets alternative for adopters.
 
 ## Contributing
 PRs welcome — new rules, agents, and skills especially. See [CONTRIBUTING.md](CONTRIBUTING.md) for conventions (keep it generic, TypeScript optional, package-manager-agnostic, least-privilege agent tools) and the templates for [issues](.github/ISSUE_TEMPLATE) and [PRs](.github/PULL_REQUEST_TEMPLATE.md).

@@ -12,6 +12,7 @@ app that adopts it.
 ### Added
 - `.github/workflows/release.yml` — auto-tags `vX.Y.Z` and publishes a GitHub Release from the matching `CHANGELOG.md` section when it lands on `main`. Idempotent, least-privilege (`contents: write`), `actions/checkout` SHA-pinned.
 - Release badge in `README.md`.
+- `docs/release-automation.md` — worked examples of both release patterns (CHANGELOG-driven + Changesets) for adopters; linked from `README.md`.
 
 ### Changed
 - `ci-cd-engineer` agent now carries release-automation guidance — match the project's mechanism (Changesets, semantic-release/release-please, or a CHANGELOG-driven tag + Release) with shared hardening (least-privilege perms, full-SHA-pinned actions, `--notes-file`, no `run:` interpolation). Its action-pinning rule now specifies full commit SHAs.
