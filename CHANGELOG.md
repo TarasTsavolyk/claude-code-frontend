@@ -30,6 +30,7 @@ app that adopts it.
 - `.claude/rules/workflow.md` + `README.md`: documented the **skills-vs-agents** distinction (inline `/skill` vs the delegated, read-only pipeline agent) for the overlapping `a11y-audit`/`perf-audit`/`debug-frontend` pairs.
 - Token diet of the always-loaded context (no rules dropped): condensed `principles.md` (~25% shorter) and `CLAUDE.md` prose; the quality gate is now defined canonically in `CLAUDE.md` and referenced from `git-operations.md`/`principles.md` instead of restated.
 - Removed cross-rule duplication so co-loaded rules don't pay for the same guidance twice: `prefers-reduced-motion` now lives only in `styling.md`, and `watch`-vs-`computed` only in `performance.md`. Tightened `accessibility.md`/`styling.md` path scopes to `src/`.
+- Made the **project-structure** guidance paradigm-neutral instead of hard-assuming feature-first: `CLAUDE.md` shows a layer-first example (the `create-vue` default) framed as an adaptable example, with feature-first as the scale-up option; `architecture.md`'s organization section, `scaffold-component`, and `scaffold-feature` now read for both layer-first and feature-first layouts.
 
 ### Fixed
 - `.claude/rules/workflow.md`: the CI/CD flow now references the real agents (`ui-reviewer` + `security-scanner`) instead of a non-existent `Reviewer`.
