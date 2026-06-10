@@ -56,7 +56,7 @@ monorepos or npm-published packages) and want PR-based version bumps + automated
              fetch-depth: 0
          - uses: actions/setup-node@v4      # ← pin to a full commit SHA
            with:
-             node-version: 20
+             node-version: 24      # current Active LTS — or node-version-file: .nvmrc to avoid hardcoding
          - run: npm ci                      # or: <pm> install --frozen-lockfile
          - uses: changesets/action@v1       # ← pin to a full commit SHA
            with:

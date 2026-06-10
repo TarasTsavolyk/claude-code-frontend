@@ -9,6 +9,9 @@ app that adopts it.
 
 ## [Unreleased]
 
+### Fixed
+- Bumped Node references off end-of-life releases: `README.md` prerequisite `18+` → `22+` (LTS), and the Changesets example in `docs/release-automation.md` `node-version: 20` → `24` (current Active LTS), with a note to read the version from `node-version-file` instead of hardcoding. Node 18 (EOL 2025-04-30) and 20 (EOL 2026-04-30) are no longer supported.
+
 ## [0.2.0] - 2026-06-10
 
 ### Added
