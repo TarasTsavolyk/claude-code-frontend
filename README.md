@@ -44,7 +44,7 @@ Don't copy everything into every repo. Split it:
 
 ### Step 1 — Prerequisites
 - Claude Code CLI installed and authenticated (`claude`).
-- Node.js 18+.
+- Node.js 22+ (LTS — Node 18 and 20 are end-of-life).
 - A frontend project (ideally with the stack above; adjust otherwise).
 
 ### Step 2 — Install your personal (user-scope) defaults — once per machine
