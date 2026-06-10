@@ -9,10 +9,10 @@ paths:
 
 # Architecture
 
-## Feature-first organization
-- Group by feature, not by file type: `src/features/<feature>/{components,composables,stores,api,types}`.
-- Truly shared building blocks go in `src/shared/`. If something is used by exactly one feature, it lives in that feature.
-- A feature must not import from another feature's internals. Cross-feature reuse goes through `src/shared/`.
+## Code organization
+- Pick one layout and keep it consistent: by **type/layer** (`components/`, `composables/`, `stores/`, `views/`, `services/`…) or by **feature** (`features/<feature>/{components,composables,stores,api,types}`) for larger apps.
+- Keep shared/cross-cutting code separate (a top-level `shared/`, or the shared layer of your layout). If something belongs to exactly one feature/module, it lives there.
+- Don't reach across sibling boundaries — a feature/module must not import another's internals; share through the shared layer.
 
 ## Component responsibilities
 - Components are presentational: render state and emit events. Keep them under ~150 lines; split when they grow.
