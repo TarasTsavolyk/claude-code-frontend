@@ -84,7 +84,7 @@ This brings in the **path-scoped** rules (architecture/code-style/styling/testin
 5. Trim or extend the **Core principles** for this project.
 
 ### Step 5 — Tune `.claude/settings.json`
-- The `permissions.allow` list pre-approves your safe commands; `git push` is in `ask`; destructive commands and `.env` reads are denied. Edit to match your tooling.
+- The `permissions.allow` list pre-approves your safe commands; `git push` and `git commit` are in `ask`; destructive commands (force-push, hard reset, `rm -rf` and its variants) and `.env`/`.pem` reads are denied. Edit to match your tooling.
 - It pre-approves **npm, pnpm, and yarn** (install / run / exec) so it works whatever the repo uses. If you only ever use one, trim the others for a tighter allow-list.
 - `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` enables running the Quality Gate agents in parallel (experimental). Remove it if your Claude Code version doesn't support agent teams.
 
@@ -118,7 +118,7 @@ These are third-party and stack-agnostic — install only if you want them:
 
 ## Design notes
 - **Path-scoped rules** — each rule loads only for the files it matches (via `paths:` globs), so the model's context stays lean instead of carrying every convention all the time.
-- **Skills are procedures** — scaffold/debug/audit *workflows* (numbered, actionable steps), not knowledge dumps.
+- **Skills are procedures** — scaffold/debug/audit *workflows* (numbered, actionable steps), not knowledge dumps. Where a skill overlaps a same-named agent (`a11y-audit`, `perf-audit`, `debug-frontend`), it's deliberate: the **skill** runs inline in your session for quick/solo use; the **agent** (e.g. `accessibility-auditor`) is the isolated, read-only specialist the pipeline delegates to in the Quality Gate.
 - **Least-privilege agents** — every subagent declares an explicit `tools:` list. Review agents are read-only (`ui-reviewer` and `devil` get only Read/Glob/Grep); the auditors that need a shell for axe/build/`audit` get a narrow `Bash` but still can't edit files.
 - **A pipeline, not a free-for-all** — planning → build → quality gate (review + a11y + tests + perf + security, in parallel) → docs, with a read-only `devil` advocate challenging plans before code is written.
 - **Frontend-native concerns are first-class** — accessibility, performance, and styling each get a dedicated rule and (for the first two) a dedicated auditor agent.
