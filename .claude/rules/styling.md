@@ -2,26 +2,27 @@
 paths:
   - "src/**/*.vue"
   - "src/**/*.css"
+  - "src/**/*.scss"
+  - "src/**/*.sass"
+  - "src/**/*.module.css"
 ---
 
-# Styling — Tailwind CSS 4
+# Styling
 
-## Tokens over magic values
-- Tailwind 4 is CSS-first: theme tokens are declared in `@theme { ... }` in the CSS entry, not in a JS config.
-- Use semantic tokens (`bg-surface`, `text-muted`, `text-brand`) rather than raw palette values scattered in markup.
-- Stick to the spacing/size/radius scale. No arbitrary values like `mt-[13px]` unless there is a documented reason.
-- Color, spacing, typography and radii changes happen in `@theme`, in one place — not per-component.
+Default approach: **Tailwind CSS 4** (CSS-first `@theme` tokens). The principles below hold for any styling system — if the project uses Sass/SCSS, CSS Modules, or scoped `<style>`, apply the equivalent mechanic from *Your styling approach*.
 
-## Composition
-- Extract repeated utility clusters into a component, not into `@apply` soup. Reserve `@apply` for genuinely shared primitives.
-- Mobile-first: base styles unprefixed, layer up with `sm: md: lg:`.
-- Prefer `flex`/`grid` utilities over absolute positioning for layout.
+## Principles (any approach)
+- **Design tokens, not magic values** — reference semantic/named tokens (`surface`, `muted`, `brand`), never raw palette or off-scale numbers in markup.
+- **One source of truth** for color/spacing/type/radius tokens — change them in one place, not per-component.
+- Stick to the spacing/size/radius scale; no one-off values (a stray `13px`) without a documented reason. Don't mix raw hex with tokenized colors or ship near-duplicates that shadow an existing token.
+- **Extract repeated style patterns into a component** — reserve shared-style mechanisms for genuine primitives; don't build `@apply`/`@mixin`/`composes` soup.
+- **Mobile-first**: unprefixed base styles, layered up at larger breakpoints.
+- Prefer `flex`/`grid` over absolute positioning for layout.
+- One dark-mode strategy (class or `prefers-color-scheme`), applied consistently — never inline both palettes.
+- Honor `prefers-reduced-motion` for all non-trivial animation.
+- No inline `style=""` for what your classes/stylesheet can express; reserve it for genuinely dynamic computed values.
 
-## Theming & motion
-- Dark mode via the project's chosen strategy (class or `prefers-color-scheme`) — be consistent; never hardcode both palettes inline.
-- All non-trivial animation respects `motion-reduce:` / `prefers-reduced-motion`.
-- No inline `style=""` for things Tailwind can express. Inline style is only for truly dynamic computed values.
-
-## Don't
-- Mix raw hex colors with token-based ones in the same view.
-- Ship one-off utility values that duplicate an existing token at a slightly different number.
+## Your styling approach
+- **Tailwind 4 (default)** — tokens in `@theme { … }` in the CSS entry; semantic utilities (`bg-surface`, `text-muted`); responsive `sm: md: lg:`; `motion-reduce:`; reserve `@apply` for shared primitives.
+- **Sass/SCSS** — tokens as variables/maps (`$color-surface`, `$space-*`) in `variables.scss`/`_tokens.scss`, shared via `@use`; reuse via `@mixin`/`@include` or `%placeholder`/`@extend`; responsive via `@media (min-width …)`.
+- **CSS Modules / scoped `<style>`** — tokens as `:root { --color-surface; --space-* }` custom properties used via `var(--token)`; reuse via `composes` (Modules) or a shared component; reduced-motion via `@media (prefers-reduced-motion: reduce)`.

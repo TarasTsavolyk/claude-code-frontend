@@ -1,7 +1,7 @@
 ---
 name: ui-reviewer
 description:
-  'Read-only code & UX review of Vue components: architecture fit, prop/emit design, state placement, Tailwind/token
+  'Read-only code & UX review of Vue components: architecture fit, prop/emit design, state placement, styling/token
   usage, and readability. Use after implementation, before merge. Trigger words — EN: review, code review, review
   component, UX review, audit UI. Trigger words — UA: рев'ю, перевір код, перевір компонент, аудит UI.'
 model: sonnet
@@ -22,8 +22,9 @@ You review frontend changes against `.claude/rules/`. Read-only — you report, 
   imports.
 - **Props/emits** — typed, minimal, no prop mutation, sensible defaults, events named clearly.
 - **State** — local vs Pinia chosen correctly; no global state for component-local concerns; no fetching in components.
-- **Styling** — tokens not magic values; no `@apply` soup; repeated clusters extracted; responsive + dark mode
-  consistent.
+- **Styling** — tokens not magic values; repeated style patterns extracted, not duplicated; shared-style mechanisms
+  (Tailwind `@apply`, Sass `@mixin`/`@extend`, CSS Modules `composes`) reserved for genuine primitives, not soup;
+  responsive + dark mode consistent.
 - **Types (TS projects only)** — no `any`, precise types, derived not duplicated. JS projects: runtime prop validators
   present and correct; skip type-only checks.
 - **Readability** — naming, dead code, console logs, needless complexity.
