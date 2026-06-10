@@ -1,7 +1,7 @@
 ---
 paths:
-  - "**/*.vue"
-  - "**/*.css"
+  - "src/**/*.vue"
+  - "src/**/*.css"
 ---
 
 # Styling — Tailwind CSS 4

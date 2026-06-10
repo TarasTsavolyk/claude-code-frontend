@@ -24,7 +24,7 @@ Detect from the lockfile and use that one **consistently** — never mix:
 - `pnpm-lock.yaml` → **pnpm**
 - `yarn.lock` → **yarn**
 
-If there's no lockfile, ask which to use. Below, `<pm>` is the detected manager: install with `<pm> install`, run scripts with `<pm> run <script>` (the explicit `run` form works for npm, pnpm, and yarn), and run one-off binaries with `<pm> exec <bin>` (or `npx <bin>`).
+No lockfile? Ask which to use. `<pm>` is the detected manager: `<pm> install`, `<pm> run <script>` (the explicit `run` form works for npm/pnpm/yarn), `<pm> exec <bin>` (or `npx <bin>`).
 
 ## Commands
 
@@ -65,10 +65,10 @@ src/
 
 ## Core principles
 
-- TypeScript when the project uses it: `strict: true`, no `any` (use `unknown` + narrowing). Plain-JS projects keep the same discipline without type syntax.
+- TypeScript when used: `strict: true`, no `any` (use `unknown` + narrowing). JS projects keep the discipline without type syntax.
 - Components stay small and presentational. Logic lives in composables (`useX`).
 - Pinia stores hold **shared** state only; local state stays in the component.
 - No data fetching inside components — go through a composable or service layer.
-- Tailwind tokens, not magic values. Repeated utility clusters become components.
+- Tailwind tokens, not magic values (see `rules/styling.md`).
 - Accessibility is a requirement, not a nice-to-have (see `rules/accessibility.md`).
 - Respect performance budgets (see `rules/performance.md`).
