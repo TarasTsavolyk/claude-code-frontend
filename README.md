@@ -8,7 +8,7 @@
 
 A production-ready Claude Code setup for **Vue 3 + Vite + Tailwind CSS 4 + Pinia + Vitest + Playwright** projects, with
 **TypeScript optional** (its conventions apply only when the project actually uses TS). It bundles 12 specialized
-agents, 11 rules (8 path-scoped), 6 workflow skills, and an agent pipeline — focused on what a frontend engineer
+agents, 12 rules (8 path-scoped), 6 workflow skills, and an agent pipeline — focused on what a frontend engineer
 actually needs.
 
 Swap the stack assumptions (package manager, styling engine, framework specifics) to match your repos —
@@ -19,11 +19,12 @@ Swap the stack assumptions (package manager, styling engine, framework specifics
 ```
 CLAUDE.md                     # always-loaded project memory (the template)
 .claude/
-  settings.json               # permissions + agent-teams flag
-  rules/                      # conventions, loaded per matching file (8 path-scoped + 3 global)
+  settings.json               # permissions + agent-teams flag + status line
+  statusline.mjs              # status-line script (model · branch · folder)
+  rules/                      # conventions, loaded per matching file (8 path-scoped + 4 global)
     architecture.md  code-style.md  styling.md  testing.md  forms.md
     accessibility.md  performance.md  i18n.md
-    principles.md  git-operations.md  workflow.md
+    principles.md  git-operations.md  workflow.md  response-header.md
   agents/                     # 12 subagents, least-privilege tools
     planner  devil  frontend-developer  ui-reviewer  accessibility-auditor
     test-engineer  performance-auditor  refactoring-expert  debugger
@@ -65,9 +66,13 @@ These apply to every project you open.
 mkdir -p ~/.claude/rules ~/.claude/agents ~/.claude/skills
 
 # Global rules that aren't path-specific (your personal way of working)
-cp .claude/rules/principles.md     ~/.claude/rules/
-cp .claude/rules/git-operations.md ~/.claude/rules/
-cp .claude/rules/workflow.md       ~/.claude/rules/
+cp .claude/rules/principles.md      ~/.claude/rules/
+cp .claude/rules/git-operations.md  ~/.claude/rules/
+cp .claude/rules/workflow.md        ~/.claude/rules/
+cp .claude/rules/response-header.md ~/.claude/rules/
+
+# Optional: the status line everywhere (also copy the script + reference it in ~/.claude/settings.json)
+cp .claude/statusline.mjs ~/.claude/
 
 # Agents you always want available
 cp .claude/agents/*.md ~/.claude/agents/
@@ -165,6 +170,10 @@ These are third-party and stack-agnostic — install only if you want them:
 - **Frontend-native concerns are first-class** — accessibility, performance, and styling each get a dedicated rule and
   (for the first two) a dedicated auditor agent.
 - **Bilingual triggers** — every agent has EN + UA trigger words; add more languages by extending `description`.
+- **Self-describing turns** — a status line (`.claude/statusline.mjs`, wired via `settings.json`) shows the active
+  model persistently, and the `response-header.md` rule opens each reply with a one-line header listing the model + the
+  rules/agents/skills that turn used. The header is model-reported — no hook can know mid-turn which rule applies — so
+  it's a convention, not a hard guarantee.
 - **Release automation** — a CHANGELOG-driven workflow ships in `.github/workflows/release.yml`;
   [`docs/release-automation.md`](docs/release-automation.md) documents it plus a Changesets alternative for adopters.
 

@@ -40,5 +40,9 @@
       "Read(./.env.*)",
       "Read(./**/*.pem)"
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node .claude/statusline.mjs"
   }
 }
