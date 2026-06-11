@@ -10,6 +10,7 @@ app that adopts it.
 ## [Unreleased]
 
 ### Added
+- **Session transparency**: a status line (`.claude/statusline.mjs`, wired via `statusLine` in `.claude/settings.json`) shows the active model · git branch · folder persistently, and a new global rule `response-header.md` opens each response with a one-line header listing the model + the rules/agents/skills that turn used. The header is model-reported (self-describing convention, not a hook-enforced guarantee). Rule count 11 → 12 (4 global); `README` Step 2 copies the new rule into user scope.
 - `git-operations.md`: an explicit **approval gate before committing or opening a PR** — surface the changed files and the full commit message / PR title+description verbatim, then wait for the user to approve, edit, or append before running `git commit` / `gh pr create`. Defines what to show at the `ask` stop already configured for `git commit`/`git push` in `.claude/settings.json`.
 
 ### Fixed
