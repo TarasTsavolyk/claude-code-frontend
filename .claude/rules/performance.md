@@ -26,5 +26,6 @@ paths:
 - Avoid layout shift: reserve dimensions for images/embeds.
 
 ## Budget & verify
-- Watch bundle size on changes; investigate notable regressions before merging.
-- Optimize based on measurement (build analysis / Lighthouse), not guesses.
+- Targets (Core Web Vitals): LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1.
+- Set a per-project initial-route JS budget and treat a notable bundle-size regression as a blocker; watch size on every change.
+- Optimize based on measurement (build analysis / Lighthouse / field RUM), not guesses.
