@@ -35,6 +35,8 @@
       "Bash(rm -r -f:*)",
       "Read(./.env)",
       "Read(./.env.*)",
+      "Read(./**/.env)",
+      "Read(./**/.env.*)",
       "Read(./**/*.pem)"
     ]
   }
