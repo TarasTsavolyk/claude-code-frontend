@@ -12,5 +12,5 @@ description: Write a Playwright end-to-end test for a critical user flow. Use fo
    - Assert on user-visible outcomes (URL, visible text, element state).
    - Keep the test independent and idempotent — it must pass alone and in any order.
 4. **Edge of the flow** — include at least one failure/validation path if the flow has one (e.g. invalid login).
-5. **Run** `<pm> run test:e2e` (ensure required browsers are installed). Confirm it's stable across a couple of runs, not flaky.
+5. **Run** `<pm> run test:e2e` (browsers missing? `<pm> exec playwright install`). Confirm stability with `--repeat-each=3` on the new spec — not flaky.
 6. **Keep it lean** — a few robust e2e tests beat many brittle ones.
