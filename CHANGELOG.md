@@ -10,7 +10,7 @@ app that adopts it.
 ## [Unreleased]
 
 ### Added
-- A `release` skill (`.claude/skills/release/SKILL.md`) — the manual half of the CHANGELOG-driven release (derive notes from `git log`, classify, pick the SemVer bump, write the version section, run the gate, then the approval flow).
+- A `release` skill (`.claude/skills/release/SKILL.md`) — cuts a release on either track: **CHANGELOG-driven** (derive notes from `git log`, pick the SemVer bump, write the version section) or **Changesets** (`changeset version` + `publish`), detecting which the repo uses; runs the gate, then the approval flow.
 - `SECURITY.md` and `.github/ISSUE_TEMPLATE/config.yml` (`blank_issues_enabled: false`) for the now-public repo.
 - CI workflow (`.github/workflows/ci.yml`) — on every PR, validates that all JSON parses and every agent/rule/skill YAML frontmatter parses (mirrors the CONTRIBUTING / PR-template checklist). Least-privilege (`contents: read`), `actions/checkout` SHA-pinned.
 - `git-operations.md`: an explicit **approval gate before committing or opening a PR** — surface the changed files and the full commit message / PR title+description verbatim, then wait for the user to approve, edit, or append before running `git commit` / `gh pr create`. Defines what to show at the `ask` stop already configured for `git commit`/`git push` in `.claude/settings.json`.
