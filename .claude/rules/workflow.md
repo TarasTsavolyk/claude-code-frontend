@@ -8,10 +8,12 @@ Orchestration for feature work. Agents live in `.claude/agents/`. Prefer delegat
 ```
 Planning  →  Developer  →  Quality Gate (parallel)  →  DocsWriter
 ```
-1. **Planning** — `planner` turns the request into a short plan (scope, components, state, edge cases, test plan). For anything with real UX/architecture trade-offs, `devil` challenges the plan (read-only, via SendMessage) before code is written. Trivial changes skip straight to Developer.
+1. **Planning** — `planner` turns the request into a short plan (scope, components, state, edge cases, test plan). For anything with real UX/architecture trade-offs, the lead runs `devil` against the plan (read-only) and folds the critique back into planning before code is written. Trivial changes skip straight to Developer.
 2. **Developer** — `frontend-developer` implements against the plan and the rules. Writes/updates unit tests as it goes.
-3. **Quality Gate (run in parallel)** — `ui-reviewer`, `accessibility-auditor`, `test-engineer`, `performance-auditor`, and `security-scanner`. If any returns a Critical/Important finding, it routes back to `frontend-developer` and the gate reruns.
+3. **Quality Gate (run in parallel)** — `ui-reviewer`, `accessibility-auditor`, `test-engineer`, `performance-auditor`, and `security-scanner`. If any returns a Critical/Important finding, it routes back to `frontend-developer`; then only the auditors that flagged rerun. After two fix-and-rerun cycles, stop and surface any remaining findings to the user for a decision.
 4. **DocsWriter** — `docs-writer` updates README/component docs/changelog if public behavior changed.
+
+> **Execution model.** The lead (main session) spawns each agent with the context it needs and relays results between steps — subagents report back to the lead, not to each other. `SendMessage` between agents applies only when the pipeline runs as an experimental agent **team** (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in `settings.json`).
 
 ## Bug fix
 ```

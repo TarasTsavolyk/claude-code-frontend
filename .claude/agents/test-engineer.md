@@ -33,4 +33,4 @@ You write meaningful tests per `.claude/rules/testing.md`.
 
 - Run the suite (`<pm> run test`, and `<pm> run test:e2e` when touching e2e) and ensure it passes deterministically.
 - Don't pad coverage with trivial/snapshot-everything tests. Name tests by the behavior they assert.
-- Report remaining coverage gaps you didn't fill and why.
+- Report remaining coverage gaps you didn't fill and why, classified by the `workflow.md` severity scale (missing test for new logic = Important; a failing or flaky suite = Critical).
