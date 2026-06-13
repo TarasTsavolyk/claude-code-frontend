@@ -10,9 +10,20 @@ app that adopts it.
 ## [Unreleased]
 
 ### Added
+- CI workflow (`.github/workflows/ci.yml`) — on every PR, validates that all JSON parses and every agent/rule/skill YAML frontmatter parses (mirrors the CONTRIBUTING / PR-template checklist). Least-privilege (`contents: read`), `actions/checkout` SHA-pinned.
 - `git-operations.md`: an explicit **approval gate before committing or opening a PR** — surface the changed files and the full commit message / PR title+description verbatim, then wait for the user to approve, edit, or append before running `git commit` / `gh pr create`. Defines what to show at the `ask` stop already configured for `git commit`/`git push` in `.claude/settings.json`.
 
+### Changed
+- **Vue 3.5 conventions** — `code-style.md` prefers reactive props destructure for optional-prop defaults (`withDefaults` only on Vue ≤3.4); `architecture.md` composable inputs are `MaybeRefOrGetter<T>` (refs *and* getters via `toValue`) and Pinia guidance picks setup-style stores + `storeToRefs`. `scaffold-component`/`scaffold-feature` follow suit and stay TS-optional.
+- **a11y rule matches its WCAG 2.2 AA claim** — added the 2.2 criteria (target size ≥24×24, focus-not-obscured, redundant entry) and SPA route-change focus management (axe can't catch it).
+- **Performance rule names Core Web Vitals** — LCP/INP/CLS targets + a per-project bundle budget, so the `CLAUDE.md` "respect performance budgets" pointer now resolves.
+- **Quality Gate loop is bounded** — only auditors that flagged rerun; after two fix-and-rerun cycles the rest go to the user. Documented the execution model (the lead spawns/relays; `SendMessage` is teams-mode only) and fixed `planner`/`test-engineer` wiring.
+- **Typecheck command** — documented `vue-tsc --build` (create-vue's solution-style default); `--noEmit` (which checks zero files there and passes silently) only for single-tsconfig repos.
+- `release.yml`: bumped `actions/checkout` v4.2.2 → v5.0.1 (Node 24 runtime) ahead of the June 2026 Node 20 runner deprecation.
+
 ### Fixed
+- **Path-scope globs** — `i18n.md` now loads for `src/**/*.js` (was `.vue`/`.ts` only → silent no-load in JS projects) and `forms.md` for `src/**/composables/**` (its form-logic guidance lives in composables, not just SFCs).
+- **Permission deny + docs** — denied nested `.env` files (`Read(./**/.env)`, `Read(./**/.env.*)`, matching the recursive `.pem` rule); README Step 5 notes deny matching is prefix-based (defense-in-depth behind the `ask` gates), and Step 3 strips a leaked `.claude/settings.local.json` on copy and tells adopters to gitignore it and `.claude/worktrees/`.
 - **Permission allow-list hardened** — removed blanket package-runner allows (`npx:*`, `npm`/`pnpm`/`yarn exec:*`, `pnpm`/`yarn dlx:*`) that prefix-matched any command and auto-approved running arbitrary unreviewed packages, nullifying the deny list; replaced with narrow `npx vitest`/`playwright`/`eslint` allows (anything else falls to the default `ask`; scripted runs via `<pm> run` stay covered).
 - **Invalid agent YAML** — escaped literal apostrophes in the single-quoted `description` frontmatter of `frontend-developer.md` (`project's`) and `ui-reviewer.md` (`рев'ю`); the unescaped form fails strict YAML parsing and silently disabled the primary builder and a Quality Gate reviewer.
 - Bumped Node references off end-of-life releases: `README.md` prerequisite `18+` → `22+` (LTS), and the Changesets example in `docs/release-automation.md` `node-version: 20` → `24` (current Active LTS), with a note to read the version from `node-version-file` instead of hardcoding. Node 18 (EOL 2025-04-30) and 20 (EOL 2026-04-30) are no longer supported.
