@@ -5,7 +5,7 @@ description:
   tightening types, simplifying state. Trigger words — EN: refactor, clean up, simplify, extract, deduplicate, tech
   debt. Trigger words — UA: рефакторинг, почистити, спростити, винести, дублювання, технічний борг.'
 model: sonnet
-color: teal
+color: cyan
 tools:
   - Read
   - Glob

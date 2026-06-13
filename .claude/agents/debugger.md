@@ -36,4 +36,4 @@ You find the root cause. You do not slap on a fix before you understand the bug.
   lifecycle/order race, async without loading/error handling, key reuse in lists, leaked listener/timer, env/build
   difference.
 
-Hand the confirmed cause + fix recommendation to `frontend-developer` unless asked to fix it directly.
+Return the confirmed cause + fix recommendation so the lead can pass it to `frontend-developer`, unless asked to fix it directly.

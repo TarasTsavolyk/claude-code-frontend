@@ -5,7 +5,7 @@ description:
   and artifact handling. Trigger words — EN: CI, CD, pipeline, github actions, workflow yml, deploy, build pipeline.
   Trigger words — UA: CI, CD, пайплайн, github actions, деплой, збірка.'
 model: sonnet
-color: gray
+color: pink
 tools:
   - Read
   - Glob
