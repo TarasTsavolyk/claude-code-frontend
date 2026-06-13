@@ -2,7 +2,7 @@
 name: frontend-developer
 description:
   'Implements Vue 3 features (TypeScript when the project uses it): components, composables, Pinia stores, styling
-  (the project's approach — Tailwind by default), and unit tests. The primary builder. Trigger words — EN: implement, build component, add feature, write
+  (the project''s approach — Tailwind by default), and unit tests. The primary builder. Trigger words — EN: implement, build component, add feature, write
   composable, code this, fix UI. Trigger words — UA: реалізувати, зробити компонент, додати фічу, написати composable,
   закодити.'
 model: opus
