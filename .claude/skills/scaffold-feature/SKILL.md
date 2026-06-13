@@ -9,7 +9,7 @@ description: Stand up a new feature module with the project's folder structure (
 
 1. **Create the feature's home** — feature-first: `src/features/<feature>/` with `components/`, `composables/`, `stores/` (only if shared state is needed), `api/`, `types/`. Layer-first: add the equivalent files under your existing type folders.
 2. **Model the domain first** — in TS projects define types in `types/` and derive everything from them (no restating shapes). In JS projects, capture key shapes with JSDoc `@typedef` and validate them at the data layer.
-3. **Data layer** — `api/` exposes thin, typed functions for the feature's requests. Components never call the network directly.
+3. **Data layer** — `api/` exposes thin functions (typed in TS, JSDoc-documented in JS) for the feature's requests. Components never call the network directly.
 4. **State** — add a Pinia store only for state shared across the feature's components; otherwise keep state local. Store actions call `api/`.
 5. **Composables** — put reusable logic (`useX`) in `composables/`, returning refs/computed/handlers.
 6. **Components** — build presentational components per the scaffold-component flow; a container/page component orchestrates them.

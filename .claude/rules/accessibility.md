@@ -17,11 +17,17 @@ A11y is part of "done", reviewed like any other requirement.
 - Visible focus styles — never remove the outline without an equal-or-better replacement.
 - Modals/menus: trap focus while open, restore focus to the trigger on close, close on Escape.
 - Logical tab order; don't use positive `tabindex`.
+- On SPA route change, move focus to the new view's main heading/landmark (`tabindex="-1"` + `focus()`) or announce it via a live region — client-side navigation doesn't move focus or notify screen readers.
 
 ## Perceivable
 - Meaningful images have `alt`; decorative images have `alt=""`.
 - Don't convey meaning by color alone — pair with text/icon/shape.
 - Maintain contrast: ≥4.5:1 body text, ≥3:1 large text and UI boundaries.
+
+## WCAG 2.2 specifics
+- Interactive targets are ≥24×24 CSS px, or have equivalent spacing (2.5.8) — watch dense tables and icon buttons.
+- Keep the focused element visible — sticky headers/footers must not obscure it (2.4.11).
+- Don't make users re-enter info already provided earlier in the same flow (3.3.7).
 
 ## Verify
 - Run an axe check on changed views; resolve violations before review.

@@ -21,9 +21,9 @@ paths:
 - No business logic in templates. Compute in `computed`/composables, not inline expressions.
 
 ## Logic placement
-- Reusable stateful logic → composables (`useX`) returning refs/computed/handlers. Accept reactive inputs as `MaybeRef<T>` and read them with `toValue`; return `readonly()` refs when callers shouldn't mutate them.
-- Shared cross-component state → Pinia store. Component-only state stays local with `ref`/`reactive`.
-- Data fetching never happens directly in a component. Go through a composable or a thin `api/` service module that returns typed results.
+- Reusable stateful logic → composables (`useX`) returning refs/computed/handlers. Accept reactive inputs as `MaybeRefOrGetter<T>` (TS) and read them with `toValue` so refs *and* getters work — `useX(() => props.id)`; return `readonly()` refs when callers shouldn't mutate them.
+- Shared cross-component state → Pinia store. Prefer setup-style stores (`defineStore('x', () => {…})`); destructure store state via `storeToRefs(store)` to keep reactivity (actions destructure directly). Component-only state stays local with `ref`/`reactive`.
+- Data fetching never happens directly in a component. Go through a composable or a thin `api/` service module that returns results with an explicit shape (types in TS, JSDoc/validators in JS).
 - Side effects (subscriptions, timers, listeners) are set up in lifecycle hooks and always cleaned up — use `onScopeDispose` so cleanup also fires when a composable is used outside a component.
 
 ## Routing

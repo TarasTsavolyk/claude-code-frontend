@@ -86,10 +86,14 @@ From the root of a frontend repo:
 # from this package's directory:
 cp -r .claude /path/to/your-project/.claude
 cp CLAUDE.md  /path/to/your-project/CLAUDE.md
+
+# drop personal, machine-local overrides — cp -r copies them, but they shouldn't be shared
+rm -f /path/to/your-project/.claude/settings.local.json
 ```
 
 This brings in the **path-scoped** rules (architecture/code-style/styling/testing/forms/accessibility/performance/i18n)
-that only load when Claude touches matching files — keeping context lean.
+that only load when Claude touches matching files — keeping context lean. Then add `.claude/settings.local.json` and
+`.claude/worktrees/` to your project's `.gitignore` — this repo ignores them, but `cp -r` doesn't carry that over.
 
 ### Step 4 — Customize `CLAUDE.md` for the repo
 
@@ -106,7 +110,8 @@ that only load when Claude touches matching files — keeping context lean.
 
 - The `permissions.allow` list pre-approves your safe commands; `git push` and `git commit` are in `ask`; destructive
   commands (force-push, hard reset, `rm -rf` and its variants) and `.env`/`.pem` reads are denied. Edit to match your
-  tooling.
+  tooling. Matching is prefix-based, so treat `deny` as defense-in-depth behind the `ask` gates, not a guarantee
+  against every flag ordering.
 - It pre-approves **npm, pnpm, and yarn** (install / run / exec) so it works whatever the repo uses. If you only ever
   use one, trim the others for a tighter allow-list.
 - `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` enables running the Quality Gate agents in parallel (experimental). Remove it

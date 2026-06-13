@@ -36,7 +36,7 @@ No lockfile? Ask which to use. `<pm>` is the detected manager: `<pm> install`, `
 <pm> run test           # unit tests (Vitest)
 <pm> run test:e2e       # e2e tests (Playwright)
 <pm> run lint           # eslint --fix
-<pm> run typecheck      # vue-tsc --noEmit (TypeScript projects only)
+<pm> run typecheck      # vue-tsc --build (create-vue default; --noEmit for single-tsconfig), TS only
 <pm> run format         # prettier --write
 ```
 
