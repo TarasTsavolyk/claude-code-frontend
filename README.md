@@ -8,7 +8,7 @@
 
 A production-ready Claude Code setup for **Vue 3 + Vite + Tailwind CSS 4 + Pinia + Vitest + Playwright** projects, with
 **TypeScript optional** (its conventions apply only when the project actually uses TS). It bundles 12 specialized
-agents, 11 rules (8 path-scoped), 6 workflow skills, and an agent pipeline — focused on what a frontend engineer
+agents, 11 rules (8 path-scoped), 7 workflow skills, and an agent pipeline — focused on what a frontend engineer
 actually needs.
 
 Swap the stack assumptions (package manager, styling engine, framework specifics) to match your repos —
@@ -28,9 +28,9 @@ CLAUDE.md                     # always-loaded project memory (the template)
     planner  devil  frontend-developer  ui-reviewer  accessibility-auditor
     test-engineer  performance-auditor  refactoring-expert  debugger
     security-scanner  ci-cd-engineer  docs-writer
-  skills/                     # 6 invokable workflows
+  skills/                     # 7 invokable workflows
     scaffold-component  scaffold-feature  add-e2e-test
-    debug-frontend  a11y-audit  perf-audit
+    debug-frontend  a11y-audit  perf-audit  release
 ```
 
 ## Two scopes — set this up for ALL your projects
@@ -163,7 +163,8 @@ These are third-party and stack-agnostic — install only if you want them:
   runs inline in your session for quick/solo use; the **agent** (e.g. `accessibility-auditor`) is the isolated,
   read-only specialist the pipeline delegates to in the Quality Gate.
 - **Least-privilege agents** — every subagent declares an explicit `tools:` list. Review agents are read-only
-  (`ui-reviewer` and `devil` get only Read/Glob/Grep); the auditors that need a shell for axe/build/`audit` get a narrow
+  (`ui-reviewer` gets only Read/Glob/Grep, `devil` adds SendMessage to deliver its critique); the auditors that need a
+  shell for axe/build/`audit` get a narrow
   `Bash` but still can't edit files.
 - **A pipeline, not a free-for-all** — planning → build → quality gate (review + a11y + tests + perf + security, in
   parallel) → docs, with a read-only `devil` advocate challenging plans before code is written.

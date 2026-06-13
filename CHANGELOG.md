@@ -9,6 +9,11 @@ app that adopts it.
 
 ## [Unreleased]
 
+### Fixed
+- **README skill count drift** — bumped "6 workflow skills" → 7 and added the `release` skill (shipped in v0.3.0) to the Contents tree; the headline pitch and the directory map now match `.claude/skills/`.
+- `i18n.md`: corrected the Tailwind RTL utility names — `inset-inline-*` is a CSS logical *property*, not a Tailwind class; the logical inset *utilities* are `start-*`/`end-*` (`ms-`/`me-` and `text-start`/`text-end` were already correct).
+- `README.md`: the least-privilege note claimed `devil` gets "only Read/Glob/Grep", but its frontmatter also grants `SendMessage` (how it delivers its critique) — reworded so only `ui-reviewer` is described as Read/Glob/Grep-only.
+
 ## [0.3.0] - 2026-06-13
 
 ### Added
