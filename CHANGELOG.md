@@ -9,6 +9,8 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-13
+
 ### Added
 - A `release` skill (`.claude/skills/release/SKILL.md`) — cuts a release on either track: **CHANGELOG-driven** (derive notes from `git log`, pick the SemVer bump, write the version section) or **Changesets** (`changeset version` + `publish`), detecting which the repo uses; runs the gate, then the approval flow.
 - `SECURITY.md` and `.github/ISSUE_TEMPLATE/config.yml` (`blank_issues_enabled: false`) for the now-public repo.
@@ -77,6 +79,7 @@ app that adopts it.
 - `.gitignore` now excludes `.claude/worktrees/` so local worktree checkouts are never committed or copied into a target project.
 - `README.md`: corrected the rule count and path-scoped/global split, and the least-privilege description (review agents are read-only; only the axe/build/audit auditors get a narrow `Bash`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/TarasTsavolyk/claude-code-frontend/releases/tag/v0.1.0
