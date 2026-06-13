@@ -72,6 +72,7 @@ description: What this workflow does and when to use it.
 - Drop the config into a real Vue project and confirm with `/memory` (rules load per file type), `/agents` (your agent appears), and by invoking the skill.
 - Update `CHANGELOG.md` and, if you changed structure or counts, the `README.md`.
 - One focused change per PR. Conventional Commit titles (`feat:`, `fix:`, `docs:`…).
+- The a11y / perf / debug criteria are deliberately mirrored across the rule, the skill, and the agent (so user-scope skills stay self-contained) — change all three together.
 
 ## Reporting issues
 Use the issue templates. Include your Claude Code version, OS, and what you expected vs what happened.
