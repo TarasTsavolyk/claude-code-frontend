@@ -9,7 +9,7 @@ paths:
 # Performance
 
 ## Loading
-- Route-level code splitting via dynamic `import()`. Lazy-load heavy, below-the-fold, or rarely-used components with `defineAsyncComponent` — give them loading/error states (or coordinate several async deps with `<Suspense>` + a fallback).
+- Route-level code splitting via dynamic `import()`. Lazy-load heavy, below-the-fold, or rarely-used components with `defineAsyncComponent` — give them loading/error states (or coordinate several async deps with `<Suspense>` + a fallback — still experimental, API may change).
 - Keep the initial bundle lean. Question every new dependency — prefer a small util or native API over a large lib.
 - Tree-shake: import named members, never whole namespaces of large libraries.
 
