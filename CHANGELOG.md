@@ -10,10 +10,15 @@ app that adopts it.
 ## [Unreleased]
 
 ### Added
+- A `release` skill (`.claude/skills/release/SKILL.md`) — the manual half of the CHANGELOG-driven release (derive notes from `git log`, classify, pick the SemVer bump, write the version section, run the gate, then the approval flow).
+- `SECURITY.md` and `.github/ISSUE_TEMPLATE/config.yml` (`blank_issues_enabled: false`) for the now-public repo.
 - CI workflow (`.github/workflows/ci.yml`) — on every PR, validates that all JSON parses and every agent/rule/skill YAML frontmatter parses (mirrors the CONTRIBUTING / PR-template checklist). Least-privilege (`contents: read`), `actions/checkout` SHA-pinned.
 - `git-operations.md`: an explicit **approval gate before committing or opening a PR** — surface the changed files and the full commit message / PR title+description verbatim, then wait for the user to approve, edit, or append before running `git commit` / `gh pr create`. Defines what to show at the `ask` stop already configured for `git commit`/`git push` in `.claude/settings.json`.
 
 ### Changed
+- Minor currency notes: `useTemplateRef`/`useId` (`code-style.md`), `<Suspense>` flagged experimental (`performance.md`), Testing Library / Vitest browser-mode + jsdom note (`testing.md`), container queries (`styling.md`).
+- Agent metadata & ergonomics: valid `color` values (`ci-cd-engineer` gray→pink, `refactoring-expert` teal→cyan), `*/audit` added to the allow-list for `security-scanner`, `debugger` returns its finding to the lead instead of an impossible direct hand-off, and `add-e2e-test` names `playwright install` + `--repeat-each`.
+- `CONTRIBUTING.md`: noted the a11y/perf/debug criteria are mirrored across rule+skill+agent and must change together.
 - **Vue 3.5 conventions** — `code-style.md` prefers reactive props destructure for optional-prop defaults (`withDefaults` only on Vue ≤3.4); `architecture.md` composable inputs are `MaybeRefOrGetter<T>` (refs *and* getters via `toValue`) and Pinia guidance picks setup-style stores + `storeToRefs`. `scaffold-component`/`scaffold-feature` follow suit and stay TS-optional.
 - **a11y rule matches its WCAG 2.2 AA claim** — added the 2.2 criteria (target size ≥24×24, focus-not-obscured, redundant entry) and SPA route-change focus management (axe can't catch it).
 - **Performance rule names Core Web Vitals** — LCP/INP/CLS targets + a per-project bundle budget, so the `CLAUDE.md` "respect performance budgets" pointer now resolves.
@@ -71,3 +76,7 @@ app that adopts it.
 - `.claude/settings.json`: hardened the `deny` list against trivial bypasses (`git push -f`/`--force-with-lease`, `git reset --hard`, `git clean -fd`, `rm -fr`/`rm -r -f`) and moved `git commit` to `ask` so commits aren't auto-approved (e.g. straight to `main`).
 - `.gitignore` now excludes `.claude/worktrees/` so local worktree checkouts are never committed or copied into a target project.
 - `README.md`: corrected the rule count and path-scoped/global split, and the least-privilege description (review agents are read-only; only the axe/build/audit auditors get a narrow `Bash`).
+
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/TarasTsavolyk/claude-code-frontend/releases/tag/v0.1.0

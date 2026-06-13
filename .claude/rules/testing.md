@@ -17,6 +17,7 @@ paths:
 - Do NOT test: framework internals, trivial passthrough props, exact class strings, or snapshot-everything.
 
 ## Unit / component (Vitest)
+- Accessible queries come from `@testing-library/vue` or Vitest browser-mode locators (`vitest-browser-vue`); in plain Vue Test Utils projects, still prefer role/label selection. Component tests run in jsdom or Vitest browser mode per the project's config — don't mix.
 - Query by accessible role/label/text (`getByRole`, `getByLabelText`), not by CSS selectors or test-id unless nothing else works.
 - Arrange–Act–Assert. One behavior per test; descriptive names ("emits `submit` with form data when valid").
 - Mock only at boundaries (network, time, modules). Don't mock the thing under test. Mock the network at the HTTP layer with MSW — shared request handlers, not hand-stubbed fetch/axios — so tests exercise real serialization.

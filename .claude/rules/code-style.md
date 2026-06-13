@@ -33,6 +33,7 @@ ESLint + Prettier are the source of truth for formatting — never hand-format a
 - TS: type props/emits with the generic form — `defineProps<Props>()`, `defineEmits<{ change: [value: string] }>()`. JS: use the runtime form with validators — `defineProps({ value: { type: String, required: true } })`, `defineEmits(['change'])`.
 - Optional-prop defaults: on Vue 3.5+ prefer reactive props destructure — `const { size = 'md' } = defineProps<Props>()`; use `withDefaults` only on Vue ≤3.4. Required props get no default.
 - Two-way binding: prefer `defineModel()` (Vue 3.4+) over a manual `modelValue` prop + `update:modelValue` emit.
+- Template refs: `useTemplateRef('name')` (Vue 3.5+). Generate stable ids for label/input wiring with `useId()`.
 - One component per file. Filename matches the component name.
 
 ## Naming

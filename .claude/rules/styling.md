@@ -17,6 +17,7 @@ Default approach: **Tailwind CSS 4** (CSS-first `@theme` tokens). The principles
 - Stick to the spacing/size/radius scale; no one-off values (a stray `13px`) without a documented reason. Don't mix raw hex with tokenized colors or ship near-duplicates that shadow an existing token.
 - **Extract repeated style patterns into a component** — reserve shared-style mechanisms for genuine primitives; don't build `@apply`/`@mixin`/`composes` soup.
 - **Mobile-first**: unprefixed base styles, layered up at larger breakpoints.
+- Reusable components respond to their **container** (`@container` queries), not the viewport; reserve viewport breakpoints (`sm: md: lg:`) for page-level layout.
 - Prefer `flex`/`grid` over absolute positioning for layout.
 - One dark-mode strategy (class or `prefers-color-scheme`), applied consistently — never inline both palettes.
 - Honor `prefers-reduced-motion` for all non-trivial animation.
