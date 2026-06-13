@@ -3,7 +3,7 @@ name: ui-reviewer
 description:
   'Read-only code & UX review of Vue components: architecture fit, prop/emit design, state placement, styling/token
   usage, and readability. Use after implementation, before merge. Trigger words — EN: review, code review, review
-  component, UX review, audit UI. Trigger words — UA: рев'ю, перевір код, перевір компонент, аудит UI.'
+  component, UX review, audit UI. Trigger words — UA: рев''ю, перевір код, перевір компонент, аудит UI.'
 model: sonnet
 color: cyan
 tools:

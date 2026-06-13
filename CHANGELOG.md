@@ -13,6 +13,7 @@ app that adopts it.
 - `git-operations.md`: an explicit **approval gate before committing or opening a PR** — surface the changed files and the full commit message / PR title+description verbatim, then wait for the user to approve, edit, or append before running `git commit` / `gh pr create`. Defines what to show at the `ask` stop already configured for `git commit`/`git push` in `.claude/settings.json`.
 
 ### Fixed
+- **Invalid agent YAML** — escaped literal apostrophes in the single-quoted `description` frontmatter of `frontend-developer.md` (`project's`) and `ui-reviewer.md` (`рев'ю`); the unescaped form fails strict YAML parsing and silently disabled the primary builder and a Quality Gate reviewer.
 - Bumped Node references off end-of-life releases: `README.md` prerequisite `18+` → `22+` (LTS), and the Changesets example in `docs/release-automation.md` `node-version: 20` → `24` (current Active LTS), with a note to read the version from `node-version-file` instead of hardcoding. Node 18 (EOL 2025-04-30) and 20 (EOL 2026-04-30) are no longer supported.
 
 ## [0.2.0] - 2026-06-10
