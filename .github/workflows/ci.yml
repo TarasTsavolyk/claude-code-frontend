@@ -1,0 +1,41 @@
+name: CI
+
+# Validate config integrity on every PR — mirrors the CONTRIBUTING / PR-template
+# checklist: all JSON parses, and every agent/rule/skill YAML frontmatter parses.
+on:
+  pull_request:
+
+# Least privilege: validation only reads the checkout.
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+
+      - name: JSON parses
+        run: |
+          set -euo pipefail
+          for f in $(git ls-files '*.json'); do
+            jq empty "$f"
+            echo "ok  $f"
+          done
+
+      - name: YAML frontmatter parses
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for f in .claude/agents/*.md .claude/rules/*.md .claude/skills/*/SKILL.md; do
+            ruby -ryaml -e '
+              c = File.read(ARGV[0])
+              unless c.start_with?("---")
+                puts "skip #{ARGV[0]} (no frontmatter)"
+                exit 0
+              end
+              fm = c.split(/^---\s*$/)[1]
+              YAML.safe_load(fm)
+              puts "ok   #{ARGV[0]}"
+            ' "$f"
+          done
