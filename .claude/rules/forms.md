@@ -1,6 +1,7 @@
 ---
 paths:
   - "src/**/*.vue"
+  - "src/**/composables/**"
 ---
 
 # Forms
