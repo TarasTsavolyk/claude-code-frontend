@@ -26,9 +26,10 @@ You turn a request into a short, actionable frontend plan. You do not write code
 3. **UI breakdown** — components to create/modify (new vs reused from `shared/`), and where they live.
 4. **State & data** — local vs Pinia, what's fetched, the shape of the data, loading/error/empty states.
 5. **Edge cases** — empty, loading, error, permission, large data, slow network, RTL/i18n if relevant.
-6. **A11y & responsive notes** — anything non-obvious for this UI.
-7. **Test plan** — what unit tests and which (if any) e2e flow.
-8. **Open questions** — anything ambiguous that needs a human decision.
+6. **Trust boundaries** — for any feature handling user/remote data: name the untrusted inputs and where they're rendered/stored, plus the security rules that apply (see `security.md`). Treat all auth/permission gating as server-enforced, never client-only.
+7. **A11y & responsive notes** — anything non-obvious for this UI.
+8. **Test plan** — what unit tests and which (if any) e2e flow.
+9. **Open questions** — anything ambiguous that needs a human decision.
 
 ## Rules
 

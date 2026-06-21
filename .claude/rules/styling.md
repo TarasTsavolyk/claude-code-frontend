@@ -21,7 +21,7 @@ Default approach: **Tailwind CSS 4** (CSS-first `@theme` tokens). The principles
 - Prefer `flex`/`grid` over absolute positioning for layout.
 - One dark-mode strategy (class or `prefers-color-scheme`), applied consistently — never inline both palettes.
 - Honor `prefers-reduced-motion` for all non-trivial animation.
-- No inline `style=""` for what your classes/stylesheet can express; reserve it for genuinely dynamic computed values.
+- No inline `style=""` for what your classes/stylesheet can express; reserve it for genuinely dynamic computed values — and never bind a raw user-supplied string to `:style` (CSS injection; see `security.md`).
 
 ## Your styling approach
 - **Tailwind 4 (default)** — tokens in `@theme { … }` in the CSS entry; semantic utilities (`bg-surface`, `text-muted`); responsive `sm: md: lg:`; `motion-reduce:`; reserve `@apply` for shared primitives.

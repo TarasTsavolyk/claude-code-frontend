@@ -72,3 +72,4 @@ src/
 - Design tokens, not magic values (see `rules/styling.md`).
 - Accessibility is a requirement, not a nice-to-have (see `rules/accessibility.md`).
 - Respect performance budgets (see `rules/performance.md`).
+- Security is a requirement: the server is the only trust boundary, client controls are defense-in-depth (see `rules/security.md`).

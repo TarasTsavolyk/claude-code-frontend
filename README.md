@@ -8,7 +8,7 @@
 
 A production-ready Claude Code setup for **Vue 3 + Vite + Tailwind CSS 4 + Pinia + Vitest + Playwright** projects, with
 **TypeScript optional** (its conventions apply only when the project actually uses TS). It bundles 12 specialized
-agents, 11 rules (8 path-scoped), 7 workflow skills, and an agent pipeline — focused on what a frontend engineer
+agents, 12 rules (9 path-scoped), 7 workflow skills, and an agent pipeline — focused on what a frontend engineer
 actually needs.
 
 Swap the stack assumptions (package manager, styling engine, framework specifics) to match your repos —
@@ -20,9 +20,9 @@ Swap the stack assumptions (package manager, styling engine, framework specifics
 CLAUDE.md                     # always-loaded project memory (the template)
 .claude/
   settings.json               # permissions + agent-teams flag
-  rules/                      # conventions, loaded per matching file (8 path-scoped + 3 global)
+  rules/                      # conventions, loaded per matching file (9 path-scoped + 3 global)
     architecture.md  code-style.md  styling.md  testing.md  forms.md
-    accessibility.md  performance.md  i18n.md
+    accessibility.md  performance.md  i18n.md  security.md
     principles.md  git-operations.md  workflow.md
   agents/                     # 12 subagents, least-privilege tools
     planner  devil  frontend-developer  ui-reviewer  accessibility-auditor
@@ -91,7 +91,7 @@ cp CLAUDE.md  /path/to/your-project/CLAUDE.md
 rm -f /path/to/your-project/.claude/settings.local.json
 ```
 
-This brings in the **path-scoped** rules (architecture/code-style/styling/testing/forms/accessibility/performance/i18n)
+This brings in the **path-scoped** rules (architecture/code-style/styling/testing/forms/accessibility/performance/i18n/security)
 that only load when Claude touches matching files — keeping context lean. Then add `.claude/settings.local.json` and
 `.claude/worktrees/` to your project's `.gitignore` — this repo ignores them, but `cp -r` doesn't carry that over.
 
@@ -168,8 +168,8 @@ These are third-party and stack-agnostic — install only if you want them:
   `Bash` but still can't edit files.
 - **A pipeline, not a free-for-all** — planning → build → quality gate (review + a11y + tests + perf + security, in
   parallel) → docs, with a read-only `devil` advocate challenging plans before code is written.
-- **Frontend-native concerns are first-class** — accessibility, performance, and styling each get a dedicated rule and
-  (for the first two) a dedicated auditor agent.
+- **Frontend-native concerns are first-class** — accessibility, performance, styling, and security each get a dedicated
+  rule, and most a dedicated auditor/scanner agent.
 - **Bilingual triggers** — every agent has EN + UA trigger words; add more languages by extending `description`.
 - **Release automation** — a CHANGELOG-driven workflow ships in `.github/workflows/release.yml`;
   [`docs/release-automation.md`](docs/release-automation.md) documents it plus a Changesets alternative for adopters.

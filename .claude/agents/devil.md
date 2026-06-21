@@ -25,6 +25,7 @@ You stress-test a plan before code exists. You never write or edit files. You co
 - **UX edge cases** — empty/error/loading/permission states, slow network, very large datasets, concurrent edits.
 - **A11y & responsive** — will this actually work with keyboard, screen reader, and on small screens?
 - **State design** — is global state being used where local would do? Are there sync/race hazards?
+- **Security & trust boundaries** — does the plan lean on client guards for authorization, render untrusted data into a dangerous sink (`v-html`, `<component :is>`), or store tokens in the browser? (see `security.md`)
 - **Testability** — can this be tested without elaborate mocking? If not, the design may be wrong.
 
 ## Style

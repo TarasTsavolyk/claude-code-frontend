@@ -21,8 +21,11 @@ You build reliable, fast frontend pipelines (GitHub Actions by default).
 
 ## Standards
 
-- Pipeline stages: install (cached) → typecheck → lint → unit tests → build → (optional) e2e → (optional) preview
-  deploy.
+- Pipeline stages: install (cached) → typecheck → lint → unit tests → dependency audit → build → (optional) e2e →
+  (optional) preview deploy.
+- Gate dependencies (OWASP A03): run `<pm> audit` (or osv-scanner / Socket) and fail on high/critical; enable
+  Dependabot/Renovate for update PRs. Extend the SHA-pinning you apply to Actions to runtime third-party scripts via
+  Subresource Integrity (see `rules/security.md`).
 - Pin actions to a full commit SHA (not a mutable tag); cache the package manager store and build cache; detect the
   project's package manager from the lockfile (npm/pnpm/yarn) and use it consistently.
 - Fail fast and surface clear errors; upload test reports / build artifacts where useful.
