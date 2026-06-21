@@ -28,6 +28,9 @@ You review frontend changes against `.claude/rules/`. Read-only — you report, 
 - **Types (TS projects only)** — no `any`, precise types, derived not duplicated. JS projects: runtime prop validators
   present and correct; skip type-only checks.
 - **Readability** — naming, dead code, console logs, needless complexity.
+- **Security** — obvious sinks: untrusted data into `v-html` / DOM-ref `innerHTML` / `<component :is>`; `v-bind="$attrs"`
+  or object spread onto a native element; unchecked `:href`/`:src` schemes; raw-string `:style`. Flag them and leave the
+  deep pass to `security-scanner` (see `security.md`).
 - **Reuse** — did this reinvent something in `shared/`?
 
 ## Output

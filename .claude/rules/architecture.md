@@ -28,7 +28,7 @@ paths:
 
 ## Routing
 - Routes are lazy-loaded: `component: () => import('...')`.
-- Route-level guards handle auth/permissions; components assume they are reached legitimately.
+- Route-level guards gate navigation for UX — they are **not** a security boundary. The server authorizes every request; never rely on a client guard to protect data or actions (see `security.md`). Components may assume they are reached legitimately.
 
 ## Anti-patterns to reject
 - A global store holding state only one component uses.
