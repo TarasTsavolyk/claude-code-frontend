@@ -9,7 +9,18 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-24
+
+### Added
+- **Onboarding wizard** — a first-run flow that adapts the kit to the host project. A `SessionStart` hook (`.claude/hooks/session-start.mjs`) detects an un-onboarded clone (CLAUDE.md still has the `<PROJECT_NAME>` placeholder) and offers the new `/wizard` skill, which detects the stack (`.claude/hooks/detect-stack.mjs` — package manager, TS/JS, styling, layer- vs feature-first, pinia/router/i18n, e2e), confirms it, and fills in `CLAUDE.md`. `<pm>` stays a package-manager-agnostic runtime token (the wizard records the detected manager rather than hardcoding it) and `.claude/.wizard/` is added to the project's `.gitignore`. A committed `.claude/.onboarded` marker keeps teammates from being re-prompted. Fail-open: the hook never blocks a session.
+- **`/prune` skill + reference checker** — a manual, graph-aware command to remove kit capabilities a project won't use (agents/skills/rules) and fix every cross-reference left behind. Capabilities are tiered: safe opt-outs (e2e, CI/release, i18n, forms, devil, docs-writer, refactoring-expert) vs high-blast-radius ones (security, performance, accessibility, behind an explicit warning); the pipeline spine is never removable. `.claude/hooks/check-refs.mjs` verifies no dangling reference survives (it skips `CHANGELOG.md` history and the prune catalog). Runs behind a git-clean gate and commits on a branch.
+- **`security.md` rule (OWASP Top 10:2025)** — the one cross-cutting concern that lacked a path-scoped rule. Covers Vue-native sinks (`v-html`, render-fn/JSX `innerHTML`, custom directives, `<component :is>`, `v-bind="$attrs"`, `:href`/`:src`, `:style`, vue-i18n `v-html`), token storage, CSP/SRI, supply chain, CSRF, prototype pollution, `postMessage`, CORS, and conditional SSR notes — so the builder and reviewers get secure-coding guidance instead of it all sitting in the late, read-only scanner.
+
+### Changed
+- **Security shifted left through the pipeline** — `security-scanner` rewritten with OWASP/CWE mapping + a concrete sink checklist (and raised `sonnet` → `opus` to match the builder); a trust-boundary step added to `planner`, a security lens to `devil`, a sink check to `ui-reviewer`, and a dependency-audit/SCA stage to `ci-cd-engineer`; security cross-references woven into `performance.md`/`styling.md`/`i18n.md` and `CLAUDE.md`.
+
 ### Fixed
+- **`architecture.md` taught a security anti-pattern** — it framed route guards as the auth boundary (CWE-602); corrected to "guards are UX; the server is authoritative."
 - **README skill count drift** — bumped "6 workflow skills" → 7 and added the `release` skill (shipped in v0.3.0) to the Contents tree; the headline pitch and the directory map now match `.claude/skills/`.
 - `i18n.md`: corrected the Tailwind RTL utility names — `inset-inline-*` is a CSS logical *property*, not a Tailwind class; the logical inset *utilities* are `start-*`/`end-*` (`ms-`/`me-` and `text-start`/`text-end` were already correct).
 - `README.md`: the least-privilege note claimed `devil` gets "only Read/Glob/Grep", but its frontmatter also grants `SendMessage` (how it delivers its critique) — reworded so only `ui-reviewer` is described as Read/Glob/Grep-only.
@@ -84,7 +95,8 @@ app that adopts it.
 - `.gitignore` now excludes `.claude/worktrees/` so local worktree checkouts are never committed or copied into a target project.
 - `README.md`: corrected the rule count and path-scoped/global split, and the least-privilege description (review agents are read-only; only the axe/build/audit auditors get a narrow `Bash`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/TarasTsavolyk/claude-code-frontend/releases/tag/v0.1.0
