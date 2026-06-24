@@ -8,8 +8,8 @@
 
 A production-ready Claude Code setup for **Vue 3 + Vite + Tailwind CSS 4 + Pinia + Vitest + Playwright** projects, with
 **TypeScript optional** (its conventions apply only when the project actually uses TS). It bundles 12 specialized
-agents, 12 rules (9 path-scoped), 7 workflow skills, and an agent pipeline — focused on what a frontend engineer
-actually needs.
+agents, 12 rules (9 path-scoped), 9 workflow skills (including a first-run onboarding wizard), and an agent
+pipeline — focused on what a frontend engineer actually needs.
 
 Swap the stack assumptions (package manager, styling engine, framework specifics) to match your repos —
 `rules/styling.md` is written tech-neutrally (Tailwind 4 default; Sass/SCSS, CSS Modules, scoped `<style>` documented).
@@ -19,7 +19,8 @@ Swap the stack assumptions (package manager, styling engine, framework specifics
 ```
 CLAUDE.md                     # always-loaded project memory (the template)
 .claude/
-  settings.json               # permissions + agent-teams flag
+  settings.json               # permissions + agent-teams flag + onboarding hook
+  hooks/                      # node helpers: stack detector · SessionStart hook · ref checker
   rules/                      # conventions, loaded per matching file (9 path-scoped + 3 global)
     architecture.md  code-style.md  styling.md  testing.md  forms.md
     accessibility.md  performance.md  i18n.md  security.md
@@ -28,9 +29,10 @@ CLAUDE.md                     # always-loaded project memory (the template)
     planner  devil  frontend-developer  ui-reviewer  accessibility-auditor
     test-engineer  performance-auditor  refactoring-expert  debugger
     security-scanner  ci-cd-engineer  docs-writer
-  skills/                     # 7 invokable workflows
+  skills/                     # 9 invokable workflows
     scaffold-component  scaffold-feature  add-e2e-test
     debug-frontend  a11y-audit  perf-audit  release
+    wizard  prune
 ```
 
 ## Two scopes — set this up for ALL your projects
@@ -93,9 +95,14 @@ rm -f /path/to/your-project/.claude/settings.local.json
 
 This brings in the **path-scoped** rules (architecture/code-style/styling/testing/forms/accessibility/performance/i18n/security)
 that only load when Claude touches matching files — keeping context lean. Then add `.claude/settings.local.json` and
-`.claude/worktrees/` to your project's `.gitignore` — this repo ignores them, but `cp -r` doesn't carry that over.
+`.claude/worktrees/`, and `.claude/.wizard/` to your project's `.gitignore` — this repo ignores them, but `cp -r`
+doesn't carry that over. (`/wizard` also adds `.claude/.wizard/` for you on first run.)
 
 ### Step 4 — Customize `CLAUDE.md` for the repo
+
+On first launch in the repo, a `SessionStart` hook offers **`/wizard`** — it detects the stack (package manager,
+TS/JS, styling, layer- vs feature-first) and fills the items below in for you, then writes a `.claude/.onboarded`
+marker. Run it, or do it by hand:
 
 1. Set `<PROJECT_NAME>` and adjust the stack list if it differs.
 2. **Set the Language flag** (TypeScript or JavaScript). TS conventions and the `typecheck` step apply only to TS
@@ -173,6 +180,9 @@ These are third-party and stack-agnostic — install only if you want them:
 - **Bilingual triggers** — every agent has EN + UA trigger words; add more languages by extending `description`.
 - **Release automation** — a CHANGELOG-driven workflow ships in `.github/workflows/release.yml`;
   [`docs/release-automation.md`](docs/release-automation.md) documents it plus a Changesets alternative for adopters.
+- **Onboarding & pruning** — a `SessionStart` hook + `/wizard` adapt the kit to a freshly-cloned project (detect the
+  stack, fill `CLAUDE.md`); `/prune` then removes capabilities the project won't use and fixes every cross-reference,
+  verified by `.claude/hooks/check-refs.mjs`. Both keep `<pm>` as a package-manager-agnostic token.
 
 ## Contributing
 

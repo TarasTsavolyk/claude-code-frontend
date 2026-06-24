@@ -19,4 +19,8 @@ node_modules/
 # Claude Code local worktree checkouts — scratch, never committed or copied into a project.
 .claude/worktrees/
 
+# Wizard detection cache — regenerated each session, holds machine-local absolute paths.
+# (The .claude/.onboarded marker is NOT ignored: it IS committed so teammates aren't re-prompted.)
+.claude/.wizard/
+
 # IMPORTANT: do not ignore the .claude/ directory — it is the contents of this repo.
