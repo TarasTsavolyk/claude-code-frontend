@@ -1,6 +1,8 @@
 ---
 paths:
   - "src/**/*.vue"
+  - "src/**/*.tsx"
+  - "src/**/*.jsx"
   - "src/**/*.css"
   - "src/**/*.scss"
   - "src/**/*.sass"

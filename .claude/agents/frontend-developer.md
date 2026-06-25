@@ -37,6 +37,6 @@ You implement frontend features against the plan and the project rules (`.claude
 - After meaningful changes, run `<pm> run lint && <pm> run test` (add `<pm> run typecheck` in TS projects) and fix what
   you broke.
 - Keep diffs focused on the task. If you spot unrelated issues, note them rather than expanding scope.
-- If the plan turns out wrong while implementing, surface it via SendMessage instead of silently improvising a large
-  redesign.
+- If the plan turns out wrong while implementing, surface it back to the lead (via `SendMessage` under agent teams;
+  otherwise in your returned result) instead of silently improvising a large redesign.
 - Never invent API contracts — confirm shapes against types/services or ask.
