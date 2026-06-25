@@ -3,193 +3,148 @@
 [![Release](https://img.shields.io/github/v/release/TarasTsavolyk/claude-code-frontend?sort=semver)](https://github.com/TarasTsavolyk/claude-code-frontend/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> A **starter template**, not an installable package: you copy `CLAUDE.md` + `.claude/` into your own repo (or your
-> `~/.claude/`) and adapt it. See [Setup](#step-by-step-setup).
+> Copy-and-adapt config — **not** an npm package. Drop it into a frontend repo, run `/wizard`, and Claude Code works as
+> a teammate that already knows your stack and conventions.
 
-A production-ready Claude Code setup for **Vue 3 + Vite + Tailwind CSS 4 + Pinia + Vitest + Playwright** projects, with
-**TypeScript optional** (its conventions apply only when the project actually uses TS). It bundles 12 specialized
-agents, 12 rules (9 path-scoped), 9 workflow skills (including a first-run onboarding wizard), and an agent
-pipeline — focused on what a frontend engineer actually needs.
+A Claude Code configuration for **frontend projects** — **12 agents, 12 rules (9 path-scoped), and 9 skills** wired into
+a review pipeline. The architecture is framework-agnostic; swap the framework, package manager, and styling specifics per
+project.
 
-Swap the stack assumptions (package manager, styling engine, framework specifics) to match your repos —
-`rules/styling.md` is written tech-neutrally (Tailwind 4 default; Sass/SCSS, CSS Modules, scoped `<style>` documented).
+> **Reference stack:** the shipped rules and scaffolds target **Vue 3** today (Vite · Pinia · Vitest · Playwright,
+> TypeScript optional). Other frameworks are on the roadmap — the rules/agents/skills structure already supports them.
+
+## How it works
+
+| Block | Lives in | What it is |
+| --- | --- | --- |
+| **Rules** | `.claude/rules/` | Conventions Claude follows. Path-scoped — each loads only for matching files, so context stays lean. |
+| **Agents** | `.claude/agents/` | Specialist subagents (planner, builder, reviewers, auditors), each with least-privilege tools. |
+| **Skills** | `.claude/skills/` | Invokable `/procedures` — scaffold, audit, debug, release, onboard. |
+| **Pipeline** | `rules/workflow.md` | How they combine: **plan → build → quality gate (review · a11y · tests · perf · security) → docs**. |
+
+In practice: you ask for a feature, the pipeline plans it, builds it, runs the quality gate, and updates docs — and the
+rules keep every step on your conventions.
+
+## Quick start
+
+**Requirements:** Claude Code CLI (installed + authenticated) · Node 18+ (the hooks are plain ESM) · a frontend repo.
+
+1. **Get the kit:**
+   ```bash
+   git clone https://github.com/TarasTsavolyk/claude-code-frontend.git
+   cd claude-code-frontend
+   ```
+2. **Copy it into your repo:**
+   ```bash
+   cp -r .claude /path/to/your-app/.claude   # ⚠ overwrites an existing .claude/ — merge by hand if you have one
+   cp CLAUDE.md  /path/to/your-app/CLAUDE.md
+   rm -f /path/to/your-app/.claude/settings.local.json   # machine-local, don't share
+   ```
+   Then add `.claude/settings.local.json`, `.claude/worktrees/`, and `.claude/.wizard/` to your repo's `.gitignore`
+   (`cp -r` doesn't carry this repo's ignore rules; the wizard cache holds machine-local paths). Keep
+   `.claude/.onboarded` **tracked**.
+3. **Open your repo in Claude Code.** A first-run hook offers **`/wizard`** — run it: it detects your stack and fills in `CLAUDE.md`.
+4. **Commit** `.claude/` + `CLAUDE.md` on a branch.
+
+This installs **project scope** (the common case). For personal defaults shared across all your repos, see
+[Two scopes](#two-scopes-optional).
+
+## Onboarding & pruning
+
+**`/wizard`** runs automatically on the first session and is re-runnable anytime (re-sync after a stack change). It
+guards your git tree (won't touch uncommitted work), keeps `<pm>` as a token — Claude substitutes your package manager
+from the lockfile, so the config never hardcodes npm/pnpm/yarn — and writes a committed `.claude/.onboarded` marker so
+teammates aren't re-prompted.
+
+**`/prune`** removes agents/skills/rules a project won't use. It's **destructive** (commits on a branch, so git is the
+undo), tiered (safe opt-outs vs. warned essentials like security/a11y), and fixes every cross-reference — verified by
+`.claude/hooks/check-refs.mjs`. Run it once you're settled, not blind on first setup.
+
+## Daily use
+
+- **Feature** — ask for a plan → `planner` (+ `devil`, a devil's-advocate review of the plan, for tricky UX) → `frontend-developer` → quality gate → `docs-writer`.
+- **Bug** — ask to debug → `debugger` finds root cause → fix → verify with a regression test.
+- **Scaffold / audit** — `/scaffold-component`, `/scaffold-feature`, `/add-e2e-test`, `/a11y-audit`, `/perf-audit`, `/release`.
+- **Check what loaded** — `/memory` (open a component and a test file to watch path-scoped rules activate) · `/agents`.
 
 ## Contents
 
 ```
-CLAUDE.md                     # always-loaded project memory (the template)
+CLAUDE.md                       # always-loaded project memory (the template)
 .claude/
-  settings.json               # permissions + agent-teams flag + onboarding hook
-  hooks/                      # node helpers: stack detector · SessionStart hook · ref checker
-  rules/                      # conventions, loaded per matching file (9 path-scoped + 3 global)
-    architecture.md  code-style.md  styling.md  testing.md  forms.md
-    accessibility.md  performance.md  i18n.md  security.md
-    principles.md  git-operations.md  workflow.md
-  agents/                     # 12 subagents, least-privilege tools
+  settings.json                 # permissions + agent-teams flag + onboarding hook
+  hooks/                        # node helpers: detect-stack · session-start · check-refs
+  rules/                        # 9 path-scoped + 3 global
+    architecture  code-style  styling  testing  forms
+    accessibility  performance  i18n  security        # path-scoped
+    principles  git-operations  workflow              # global
+  agents/                       # 12 least-privilege subagents
     planner  devil  frontend-developer  ui-reviewer  accessibility-auditor
     test-engineer  performance-auditor  refactoring-expert  debugger
     security-scanner  ci-cd-engineer  docs-writer
-  skills/                     # 9 invokable workflows
+  skills/                       # 9 invokable workflows
+    wizard  prune                                     # onboarding
     scaffold-component  scaffold-feature  add-e2e-test
     debug-frontend  a11y-audit  perf-audit  release
-    wizard  prune
 ```
 
-## Two scopes — set this up for ALL your projects
+## Two scopes (optional)
 
-Don't copy everything into every repo. Split it:
-
-| What                                                                 | Where                                             | Why                                                                |
-| -------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------ |
-| Your personal defaults (code-style, git, your workflow, your agents) | **User scope** `~/.claude/`                       | Auto-applies in every project, not committed.                      |
-| Project stack specifics + path-scoped rules                          | **Project scope** `<repo>/.claude/` + `CLAUDE.md` | Committed, shared with the team, path-scoping works reliably here. |
-
-> **Known gotcha:** path-scoped rules (`paths:` frontmatter) in **user scope** `~/.claude/rules/` are currently ignored
-> by the parser. So in `~/.claude/` keep rules **global** (no `paths:`), and put anything path-scoped in the project's
-> `.claude/`. Verify what loaded with `/memory` inside Claude Code. If a path-scoped rule still won't load, try swapping
-> `paths:` → `globs:` (a parser quirk some versions prefer).
-
----
-
-## Step-by-step setup
-
-### Step 1 — Prerequisites
-
-- Claude Code CLI installed and authenticated (`claude`).
-- Node.js 22+ (LTS — Node 18 and 20 are end-of-life).
-- A frontend project (ideally with the stack above; adjust otherwise).
-
-### Step 2 — Install your personal (user-scope) defaults — once per machine
-
-These apply to every project you open.
+Split the config: stack specifics + path-scoped rules in **project scope** `<repo>/.claude/` + `CLAUDE.md` (committed,
+shared); personal defaults in **user scope** `~/.claude/` (auto-applies everywhere, not committed):
 
 ```bash
 mkdir -p ~/.claude/rules ~/.claude/agents ~/.claude/skills
-
-# Global rules that aren't path-specific (your personal way of working)
-cp .claude/rules/principles.md     ~/.claude/rules/
-cp .claude/rules/git-operations.md ~/.claude/rules/
-cp .claude/rules/workflow.md       ~/.claude/rules/
-
-# Agents you always want available
+cp .claude/rules/principles.md .claude/rules/git-operations.md .claude/rules/workflow.md ~/.claude/rules/  # global only
 cp .claude/agents/*.md ~/.claude/agents/
-
-# Workflow skills you always want
-cp -r .claude/skills/* ~/.claude/skills/
+cp -r .claude/skills/*  ~/.claude/skills/
 ```
 
-Open any project and run `/agents` and `/memory` to confirm they're picked up.
+> **Gotcha:** path-scoped rules (`paths:` frontmatter) are ignored in user scope `~/.claude/rules/` — copy only the
+> **global** rules there (above) and keep path-scoped rules in the project. If one still won't load, try `paths:` → `globs:`.
 
-### Step 3 — Install the project-scope config — per repo
+## Manual setup (only if you skip the wizard)
 
-From the root of a frontend repo:
+Edit `CLAUDE.md` by hand:
 
-```bash
-# from this package's directory:
-cp -r .claude /path/to/your-project/.claude
-cp CLAUDE.md  /path/to/your-project/CLAUDE.md
+1. Set `<PROJECT_NAME>` and the stack list.
+2. Set the **Language** flag (TypeScript / JavaScript) — TS adds the `typecheck` step; JS uses runtime prop validation + JSDoc.
+3. Confirm the **Commands** script names match your `package.json`. Leave `<pm>` as-is — it's your package manager, resolved from the lockfile.
+4. Adjust the **project-structure** block and **Core principles**.
 
-# drop personal, machine-local overrides — cp -r copies them, but they shouldn't be shared
-rm -f /path/to/your-project/.claude/settings.local.json
-```
+## Permissions
 
-This brings in the **path-scoped** rules (architecture/code-style/styling/testing/forms/accessibility/performance/i18n/security)
-that only load when Claude touches matching files — keeping context lean. Then add `.claude/settings.local.json` and
-`.claude/worktrees/`, and `.claude/.wizard/` to your project's `.gitignore` — this repo ignores them, but `cp -r`
-doesn't carry that over. (`/wizard` also adds `.claude/.wizard/` for you on first run.)
+`.claude/settings.json` pre-approves safe commands (npm/pnpm/yarn install·run·exec), gates `git commit`/`push` behind
+`ask`, and denies destructive commands + `.env`/`.pem` reads. Matching is prefix-based, so treat `deny` as
+defense-in-depth behind the `ask` gates, not a hard guarantee. `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` runs the quality
+gate agents in parallel — remove it if your Claude Code version lacks agent teams.
 
-### Step 4 — Customize `CLAUDE.md` for the repo
+## Design choices
 
-On first launch in the repo, a `SessionStart` hook offers **`/wizard`** — it detects the stack (package manager,
-TS/JS, styling, layer- vs feature-first) and fills the items below in for you, then writes a `.claude/.onboarded`
-marker. Run it, or do it by hand:
-
-1. Set `<PROJECT_NAME>` and adjust the stack list if it differs.
-2. **Set the Language flag** (TypeScript or JavaScript). TS conventions and the `typecheck` step apply only to TS
-   projects; JS projects get runtime prop validation + JSDoc instead. Detection is automatic from
-   `tsconfig.json`/`lang="ts"`, but stating it keeps it unambiguous.
-3. Confirm the **script names** in the **Commands** block match this repo's `package.json`. The package manager is
-   auto-detected from the lockfile (npm / pnpm / yarn) — you don't hardcode it; only the script names matter.
-4. Adjust the project-structure block to your real folder layout.
-5. Trim or extend the **Core principles** for this project.
-
-### Step 5 — Tune `.claude/settings.json`
-
-- The `permissions.allow` list pre-approves your safe commands; `git push` and `git commit` are in `ask`; destructive
-  commands (force-push, hard reset, `rm -rf` and its variants) and `.env`/`.pem` reads are denied. Edit to match your
-  tooling. Matching is prefix-based, so treat `deny` as defense-in-depth behind the `ask` gates, not a guarantee
-  against every flag ordering.
-- It pre-approves **npm, pnpm, and yarn** (install / run / exec) so it works whatever the repo uses. If you only ever
-  use one, trim the others for a tighter allow-list.
-- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` enables running the Quality Gate agents in parallel (experimental). Remove it
-  if your Claude Code version doesn't support agent teams.
-
-### Step 6 — Commit and verify
-
-```bash
-git add CLAUDE.md .claude
-git commit -m "chore: add Claude Code frontend configuration"
-```
-
-Inside Claude Code:
-
-- `/memory` — shows which CLAUDE.md/rules loaded. Open a `.vue` and a `.test.ts` file to confirm the right rules
-  activate per path.
-- `/agents` — lists the 12 agents.
-- `/scaffold-component` (or describe a component) — confirms skills are discoverable.
-
-### Step 7 — Drive it via the pipeline
-
-- New feature: ask for a **plan** first → it runs `planner` (and `devil` for non-trivial UX). Then implement →
-  `frontend-developer`. Then the **Quality Gate** (`ui-reviewer` + `accessibility-auditor` + `test-engineer` +
-  `performance-auditor` + `security-scanner`) → `docs-writer`. Details in `.claude/rules/workflow.md`.
-- Bug: ask to **debug** → `debugger` finds root cause → fix → verify.
-
----
+- **Lean context** — path-scoped rules load only for the files they match.
+- **Least-privilege agents** — each declares an explicit `tools:` list; reviewers and auditors are read-only.
+- **Skill vs agent** — same-named pairs (`a11y-audit` / `accessibility-auditor`) are deliberate: the **skill** runs
+  inline for quick/solo use; the **agent** is the isolated specialist the pipeline delegates to.
+- **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and (most) a dedicated auditor.
+- **Bilingual triggers** — every agent has EN + UA trigger words.
+- **Release automation** — CHANGELOG-driven via `.github/workflows/release.yml` (see [`docs/release-automation.md`](docs/release-automation.md)).
 
 ## Optional community add-ons
 
-These are third-party and stack-agnostic — install only if you want them:
+Third-party, stack-agnostic — install only if you want them:
 
-- **Superpowers** — structured workflows (brainstorming, planning, TDD, debugging, code review):
-  `/plugin marketplace add obra/superpowers-marketplace` then `/plugin install superpowers@superpowers-marketplace`
-- **Claude HUD** — statusline showing model, context usage, running agents:
-  `/plugin marketplace add jarrodwatts/claude-hud` then `/plugin install claude-hud` then `/claude-hud:setup`
+- **Superpowers** — structured workflows: `/plugin marketplace add obra/superpowers-marketplace` → `/plugin install superpowers@superpowers-marketplace`
+- **Claude HUD** — statusline (model, context, running agents): `/plugin marketplace add jarrodwatts/claude-hud` → `/plugin install claude-hud` → `/claude-hud:setup`
 - **skills.sh** — community skill registry: `npx skills add <owner/repo>`
-- **Mytets** — Ukrainian theatrical style à la Подерв'янський (just for fun): `/plugin marketplace add rrader/mytets`
-  then `/plugin install mytets`
 
-(Verify each is current before relying on it — the plugin ecosystem moves fast.)
-
-## Design notes
-
-- **Path-scoped rules** — each rule loads only for the files it matches (via `paths:` globs), so the model's context
-  stays lean instead of carrying every convention all the time.
-- **Skills are procedures** — scaffold/debug/audit _workflows_ (numbered, actionable steps), not knowledge dumps. Where
-  a skill overlaps a same-named agent (`a11y-audit`, `perf-audit`, `debug-frontend`), it's deliberate: the **skill**
-  runs inline in your session for quick/solo use; the **agent** (e.g. `accessibility-auditor`) is the isolated,
-  read-only specialist the pipeline delegates to in the Quality Gate.
-- **Least-privilege agents** — every subagent declares an explicit `tools:` list. Review agents are read-only
-  (`ui-reviewer` gets only Read/Glob/Grep, `devil` adds SendMessage to deliver its critique); the auditors that need a
-  shell for axe/build/`audit` get a narrow
-  `Bash` but still can't edit files.
-- **A pipeline, not a free-for-all** — planning → build → quality gate (review + a11y + tests + perf + security, in
-  parallel) → docs, with a read-only `devil` advocate challenging plans before code is written.
-- **Frontend-native concerns are first-class** — accessibility, performance, styling, and security each get a dedicated
-  rule, and most a dedicated auditor/scanner agent.
-- **Bilingual triggers** — every agent has EN + UA trigger words; add more languages by extending `description`.
-- **Release automation** — a CHANGELOG-driven workflow ships in `.github/workflows/release.yml`;
-  [`docs/release-automation.md`](docs/release-automation.md) documents it plus a Changesets alternative for adopters.
-- **Onboarding & pruning** — a `SessionStart` hook + `/wizard` adapt the kit to a freshly-cloned project (detect the
-  stack, fill `CLAUDE.md`); `/prune` then removes capabilities the project won't use and fixes every cross-reference,
-  verified by `.claude/hooks/check-refs.mjs`. Both keep `<pm>` as a package-manager-agnostic token.
+(Verify each is current before relying on it.)
 
 ## Contributing
 
-PRs welcome — new rules, agents, and skills especially. See [CONTRIBUTING.md](CONTRIBUTING.md) for conventions (keep it
-generic, TypeScript optional, package-manager-agnostic, least-privilege agent tools) and the templates for
-[issues](.github/ISSUE_TEMPLATE) and [PRs](.github/PULL_REQUEST_TEMPLATE.md).
+PRs welcome — new rules, agents, and skills especially. See [CONTRIBUTING.md](CONTRIBUTING.md) for conventions (generic,
+TypeScript-optional, package-manager-agnostic, least-privilege tools) and the
+[issue](.github/ISSUE_TEMPLATE) / [PR](.github/PULL_REQUEST_TEMPLATE.md) templates.
 
 ## License
 
-[MIT](LICENSE) — use, modify, and redistribute freely.
+[MIT](LICENSE) — use freely.
