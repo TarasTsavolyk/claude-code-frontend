@@ -9,93 +9,74 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-06-25
+
+### Changed
+- README rewritten — onboarding-first structure, ~25% shorter, framework-agnostic framing (Vue kept as a single "reference stack" note) ahead of multi-framework support.
+
 ## [0.4.0] - 2026-06-24
 
 ### Added
-- **Onboarding wizard** — a first-run flow that adapts the kit to the host project. A `SessionStart` hook (`.claude/hooks/session-start.mjs`) detects an un-onboarded clone (CLAUDE.md still has the `<PROJECT_NAME>` placeholder) and offers the new `/wizard` skill, which detects the stack (`.claude/hooks/detect-stack.mjs` — package manager, TS/JS, styling, layer- vs feature-first, pinia/router/i18n, e2e), confirms it, and fills in `CLAUDE.md`. `<pm>` stays a package-manager-agnostic runtime token (the wizard records the detected manager rather than hardcoding it) and `.claude/.wizard/` is added to the project's `.gitignore`. A committed `.claude/.onboarded` marker keeps teammates from being re-prompted. Fail-open: the hook never blocks a session.
-- **`/prune` skill + reference checker** — a manual, graph-aware command to remove kit capabilities a project won't use (agents/skills/rules) and fix every cross-reference left behind. Capabilities are tiered: safe opt-outs (e2e, CI/release, i18n, forms, devil, docs-writer, refactoring-expert) vs high-blast-radius ones (security, performance, accessibility, behind an explicit warning); the pipeline spine is never removable. `.claude/hooks/check-refs.mjs` verifies no dangling reference survives (it skips `CHANGELOG.md` history and the prune catalog). Runs behind a git-clean gate and commits on a branch.
-- **`security.md` rule (OWASP Top 10:2025)** — the one cross-cutting concern that lacked a path-scoped rule. Covers Vue-native sinks (`v-html`, render-fn/JSX `innerHTML`, custom directives, `<component :is>`, `v-bind="$attrs"`, `:href`/`:src`, `:style`, vue-i18n `v-html`), token storage, CSP/SRI, supply chain, CSRF, prototype pollution, `postMessage`, CORS, and conditional SSR notes — so the builder and reviewers get secure-coding guidance instead of it all sitting in the late, read-only scanner.
+- Onboarding wizard — `/wizard` + a `SessionStart` hook + `detect-stack.mjs` adapt the kit on first run: detect the stack, fill `CLAUDE.md` (keeps `<pm>` a token), write a committed `.onboarded` marker.
+- `/prune` — graph-aware removal of unused agents/skills/rules; `check-refs.mjs` confirms nothing is left dangling.
+- `security.md` (OWASP Top 10:2025) — Vue-native sinks, token storage, CSP/SRI, supply chain, CSRF, `postMessage`, CORS.
 
 ### Changed
-- **Security shifted left through the pipeline** — `security-scanner` rewritten with OWASP/CWE mapping + a concrete sink checklist (and raised `sonnet` → `opus` to match the builder); a trust-boundary step added to `planner`, a security lens to `devil`, a sink check to `ui-reviewer`, and a dependency-audit/SCA stage to `ci-cd-engineer`; security cross-references woven into `performance.md`/`styling.md`/`i18n.md` and `CLAUDE.md`.
+- Security shifted left — `security-scanner` rewritten (→ `opus`) with OWASP/CWE mapping; checks added to `planner`, `devil`, `ui-reviewer`, `ci-cd-engineer`.
 
 ### Fixed
-- **`architecture.md` taught a security anti-pattern** — it framed route guards as the auth boundary (CWE-602); corrected to "guards are UX; the server is authoritative."
-- **README skill count drift** — bumped "6 workflow skills" → 7 and added the `release` skill (shipped in v0.3.0) to the Contents tree; the headline pitch and the directory map now match `.claude/skills/`.
-- `i18n.md`: corrected the Tailwind RTL utility names — `inset-inline-*` is a CSS logical *property*, not a Tailwind class; the logical inset *utilities* are `start-*`/`end-*` (`ms-`/`me-` and `text-start`/`text-end` were already correct).
-- `README.md`: the least-privilege note claimed `devil` gets "only Read/Glob/Grep", but its frontmatter also grants `SendMessage` (how it delivers its critique) — reworded so only `ui-reviewer` is described as Read/Glob/Grep-only.
+- `architecture.md` — route guards are UX, not the auth boundary (CWE-602).
+- README skill count; `i18n.md` RTL utility names; `devil` tools note.
 
 ## [0.3.0] - 2026-06-13
 
 ### Added
-- A `release` skill (`.claude/skills/release/SKILL.md`) — cuts a release on either track: **CHANGELOG-driven** (derive notes from `git log`, pick the SemVer bump, write the version section) or **Changesets** (`changeset version` + `publish`), detecting which the repo uses; runs the gate, then the approval flow.
-- `SECURITY.md` and `.github/ISSUE_TEMPLATE/config.yml` (`blank_issues_enabled: false`) for the now-public repo.
-- CI workflow (`.github/workflows/ci.yml`) — on every PR, validates that all JSON parses and every agent/rule/skill YAML frontmatter parses (mirrors the CONTRIBUTING / PR-template checklist). Least-privilege (`contents: read`), `actions/checkout` SHA-pinned.
-- `git-operations.md`: an explicit **approval gate before committing or opening a PR** — surface the changed files and the full commit message / PR title+description verbatim, then wait for the user to approve, edit, or append before running `git commit` / `gh pr create`. Defines what to show at the `ask` stop already configured for `git commit`/`git push` in `.claude/settings.json`.
+- `release` skill — cuts a release on either track (CHANGELOG-driven or Changesets), runs the gate + approval flow.
+- CI (`.github/workflows/ci.yml`) — validates JSON + every agent/rule/skill YAML frontmatter on each PR; least-privilege, SHA-pinned.
+- `git-operations.md` approval gate — show changed files + full commit/PR text before `git commit` / `gh pr create`.
+- `SECURITY.md` + issue-template config (blank issues off) for the public repo.
 
 ### Changed
-- Minor currency notes: `useTemplateRef`/`useId` (`code-style.md`), `<Suspense>` flagged experimental (`performance.md`), Testing Library / Vitest browser-mode + jsdom note (`testing.md`), container queries (`styling.md`).
-- Agent metadata & ergonomics: valid `color` values (`ci-cd-engineer` gray→pink, `refactoring-expert` teal→cyan), `*/audit` added to the allow-list for `security-scanner`, `debugger` returns its finding to the lead instead of an impossible direct hand-off, and `add-e2e-test` names `playwright install` + `--repeat-each`.
-- `CONTRIBUTING.md`: noted the a11y/perf/debug criteria are mirrored across rule+skill+agent and must change together.
-- **Vue 3.5 conventions** — `code-style.md` prefers reactive props destructure for optional-prop defaults (`withDefaults` only on Vue ≤3.4); `architecture.md` composable inputs are `MaybeRefOrGetter<T>` (refs *and* getters via `toValue`) and Pinia guidance picks setup-style stores + `storeToRefs`. `scaffold-component`/`scaffold-feature` follow suit and stay TS-optional.
-- **a11y rule matches its WCAG 2.2 AA claim** — added the 2.2 criteria (target size ≥24×24, focus-not-obscured, redundant entry) and SPA route-change focus management (axe can't catch it).
-- **Performance rule names Core Web Vitals** — LCP/INP/CLS targets + a per-project bundle budget, so the `CLAUDE.md` "respect performance budgets" pointer now resolves.
-- **Quality Gate loop is bounded** — only auditors that flagged rerun; after two fix-and-rerun cycles the rest go to the user. Documented the execution model (the lead spawns/relays; `SendMessage` is teams-mode only) and fixed `planner`/`test-engineer` wiring.
-- **Typecheck command** — documented `vue-tsc --build` (create-vue's solution-style default); `--noEmit` (which checks zero files there and passes silently) only for single-tsconfig repos.
-- `release.yml`: bumped `actions/checkout` v4.2.2 → v5.0.1 (Node 24 runtime) ahead of the June 2026 Node 20 runner deprecation.
+- Vue 3.5 conventions — reactive props destructure, `MaybeRefOrGetter`/`toValue` composables, setup-style Pinia + `storeToRefs`.
+- a11y rule now fully covers WCAG 2.2 AA (target size, focus-not-obscured, redundant entry, SPA route-change focus).
+- Performance rule names Core Web Vitals (LCP/INP/CLS) + a bundle budget.
+- Quality Gate loop bounded — only flagged auditors rerun (two cycles, then the user); execution model documented.
+- Typecheck documented as `vue-tsc --build` (`--noEmit` only for single-tsconfig repos).
+- Agent ergonomics — valid `color`s, `*/audit` allow for `security-scanner`, `debugger` reports to the lead; `release.yml` checkout v4.2.2 → v5.0.1.
 
 ### Fixed
-- **Path-scope globs** — `i18n.md` now loads for `src/**/*.js` (was `.vue`/`.ts` only → silent no-load in JS projects) and `forms.md` for `src/**/composables/**` (its form-logic guidance lives in composables, not just SFCs).
-- **Permission deny + docs** — denied nested `.env` files (`Read(./**/.env)`, `Read(./**/.env.*)`, matching the recursive `.pem` rule); README Step 5 notes deny matching is prefix-based (defense-in-depth behind the `ask` gates), and Step 3 strips a leaked `.claude/settings.local.json` on copy and tells adopters to gitignore it and `.claude/worktrees/`.
-- **Permission allow-list hardened** — removed blanket package-runner allows (`npx:*`, `npm`/`pnpm`/`yarn exec:*`, `pnpm`/`yarn dlx:*`) that prefix-matched any command and auto-approved running arbitrary unreviewed packages, nullifying the deny list; replaced with narrow `npx vitest`/`playwright`/`eslint` allows (anything else falls to the default `ask`; scripted runs via `<pm> run` stay covered).
-- **Invalid agent YAML** — escaped literal apostrophes in the single-quoted `description` frontmatter of `frontend-developer.md` (`project's`) and `ui-reviewer.md` (`рев'ю`); the unescaped form fails strict YAML parsing and silently disabled the primary builder and a Quality Gate reviewer.
-- Bumped Node references off end-of-life releases: `README.md` prerequisite `18+` → `22+` (LTS), and the Changesets example in `docs/release-automation.md` `node-version: 20` → `24` (current Active LTS), with a note to read the version from `node-version-file` instead of hardcoding. Node 18 (EOL 2025-04-30) and 20 (EOL 2026-04-30) are no longer supported.
+- Path-scope globs — `i18n.md` loads for `.js`; `forms.md` for `composables/**`.
+- Permission allow-list hardened — dropped blanket package-runner allows; narrow `npx vitest`/`playwright`/`eslint`; nested `.env` denied.
+- Invalid agent YAML — escaped apostrophes in `frontend-developer`/`ui-reviewer` descriptions (were silently disabled).
+- Node references bumped off EOL (18/20 → 22/24).
 
 ## [0.2.0] - 2026-06-10
 
 ### Added
-- `.github/workflows/release.yml` — auto-tags `vX.Y.Z` and publishes a GitHub Release from the matching `CHANGELOG.md` section when it lands on `main`. Idempotent, least-privilege (`contents: write`), `actions/checkout` SHA-pinned.
-- Release badge in `README.md`.
-- `docs/release-automation.md` — worked examples of both release patterns (CHANGELOG-driven + Changesets) for adopters; linked from `README.md`.
+- `release.yml` — auto-tags `vX.Y.Z` + GitHub Release from the matching CHANGELOG section on merge to `main`; idempotent, least-privilege, SHA-pinned.
+- Release badge; `docs/release-automation.md` (both release patterns).
 
 ### Changed
-- `ci-cd-engineer` agent now carries release-automation guidance — match the project's mechanism (Changesets, semantic-release/release-please, or a CHANGELOG-driven tag + Release) with shared hardening (least-privilege perms, full-SHA-pinned actions, `--notes-file`, no `run:` interpolation). Its action-pinning rule now specifies full commit SHAs.
+- `ci-cd-engineer` gains release-automation guidance — match the mechanism + shared hardening (least-privilege, full-SHA action pinning, `--notes-file`).
 
 ## [0.1.0] - 2026-06-10
 
 ### Added
-- Initial Claude Code frontend configuration:
-  - `CLAUDE.md` — always-loaded project memory (Vue 3 + Vite + Tailwind CSS 4 + Pinia + Vitest/Playwright; TypeScript optional).
-  - `.claude/settings.json` — permissions allow-list (npm/pnpm/yarn install/run/exec), `git push` and `git commit` in `ask`, destructive commands (force-push, hard reset, `rm -rf` variants) and `.env`/`.pem` reads denied.
-  - 11 rules in `.claude/rules/` — 8 path-scoped (architecture, code-style, styling, testing, forms, accessibility, performance, i18n) + 3 global (principles, git-operations, workflow).
-  - 12 least-privilege agents in `.claude/agents/` — planner, devil, frontend-developer, ui-reviewer, accessibility-auditor, test-engineer, performance-auditor, refactoring-expert, debugger, security-scanner, ci-cd-engineer, docs-writer.
-  - 6 workflow skills in `.claude/skills/` — scaffold-component, scaffold-feature, add-e2e-test, debug-frontend, a11y-audit, perf-audit.
-  - The planning → build → quality-gate → docs agent pipeline (`.claude/rules/workflow.md`).
-- GitHub issue templates (`.github/ISSUE_TEMPLATE/`) and a pull-request template (`.github/PULL_REQUEST_TEMPLATE.md`).
-- This `CHANGELOG.md`.
+- Initial config — `CLAUDE.md`, `.claude/settings.json` (permissions allow/ask/deny), 11 rules (8 path-scoped + 3 global), 12 least-privilege agents, 6 skills, and the plan → build → quality-gate → docs pipeline.
+- GitHub issue/PR templates; this `CHANGELOG.md`.
 
 ### Changed
-- Added `principles.md` — an always-on rule (think-before-coding, simplicity-first, surgical-changes, goal-driven execution) so these apply to every change, not only when the planning pipeline runs; also copied into the user-scope install (`README` Step 2).
-- Deepened modern-Vue conventions in existing rules: `defineModel` two-way binding (`code-style.md`); `MaybeRef`/`toValue` composable inputs + `onScopeDispose` cleanup (`architecture.md`); `shallowRef`/`shallowReactive`/`markRaw` for large data and `<Suspense>` for async (`performance.md`).
-- `testing.md`: standardized network mocking on MSW; added a no-regression coverage note and an optional Storybook/visual note.
-- `frontend-developer` agent description reworded to "Vue 3 features (TypeScript when the project uses it)" to match the TS-optional stance.
-- `debugger` agent raised to `model: opus` — root-cause analysis is reasoning-heavy and a wrong diagnosis is costly; reviewing/execution agents stay `sonnet`, planning/critique stay `opus`.
-- `.claude/rules/workflow.md`: added a **Refactor** flow (`refactoring-expert → Verify (test-engineer + ui-reviewer)`) so the refactoring agent is wired into the pipeline, with an explicit boundary vs `frontend-developer` (behavior-preserving cleanup vs new behavior).
-- `.claude/rules/workflow.md` + `README.md`: documented the **skills-vs-agents** distinction (inline `/skill` vs the delegated, read-only pipeline agent) for the overlapping `a11y-audit`/`perf-audit`/`debug-frontend` pairs.
-- Token diet of the always-loaded context (no rules dropped): condensed `principles.md` (~25% shorter) and `CLAUDE.md` prose; the quality gate is now defined canonically in `CLAUDE.md` and referenced from `git-operations.md`/`principles.md` instead of restated.
-- Removed cross-rule duplication so co-loaded rules don't pay for the same guidance twice: `prefers-reduced-motion` now lives only in `styling.md`, and `watch`-vs-`computed` only in `performance.md`. Tightened `accessibility.md`/`styling.md` path scopes to `src/`.
-- Made the **project-structure** guidance paradigm-neutral instead of hard-assuming feature-first: `CLAUDE.md` shows a layer-first example (the `create-vue` default) framed as an adaptable example, with feature-first as the scale-up option; `architecture.md`'s organization section, `scaffold-component`, and `scaffold-feature` now read for both layer-first and feature-first layouts.
-- Made the **styling** guidance styling-tech-neutral: universal principles (design tokens, mobile-first, reduced-motion, no magic values) are phrased independent of engine across `styling.md`, `i18n.md` (RTL via CSS logical properties), `ui-reviewer`, `frontend-developer`, and `scaffold-component`; **Tailwind CSS 4 stays the recommended default**, with Sass/SCSS, CSS Modules, and scoped `<style>` documented as alternatives. `styling.md` path scope widened to `*.scss`/`*.sass`/`*.module.css`.
+- `principles.md` — always-on rule (think-before-coding, simplicity, surgical changes, goal-driven execution).
+- Deepened modern-Vue conventions (`defineModel`, `MaybeRef`/`toValue`, `shallowRef`/`<Suspense>`); `refactoring-expert` wired into a Refactor flow; `debugger` → `opus`.
+- Project-structure and styling guidance made paradigm- and engine-neutral (layer/feature; Tailwind default + Sass/CSS-Modules/scoped).
+- Token diet — quality gate defined canonically in `CLAUDE.md`; `principles.md` condensed, no rules dropped.
 
 ### Fixed
-- `.claude/rules/workflow.md`: the CI/CD flow now references the real agents (`ui-reviewer` + `security-scanner`) instead of a non-existent `Reviewer`.
-- `.claude/rules/git-operations.md`: resolved the quality-gate contradiction with `CLAUDE.md` — `typecheck` is conditional on TypeScript projects (it was stated unconditionally here).
-- `.claude/agents/devil.md`: severity tier `Minor` → `Nice-to-have` to match the canonical scale in `workflow.md`.
-- `.claude/settings.json`: hardened the `deny` list against trivial bypasses (`git push -f`/`--force-with-lease`, `git reset --hard`, `git clean -fd`, `rm -fr`/`rm -r -f`) and moved `git commit` to `ask` so commits aren't auto-approved (e.g. straight to `main`).
-- `.gitignore` now excludes `.claude/worktrees/` so local worktree checkouts are never committed or copied into a target project.
-- `README.md`: corrected the rule count and path-scoped/global split, and the least-privilege description (review agents are read-only; only the axe/build/audit auditors get a narrow `Bash`).
+- `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
+- `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.1.0...v0.2.0
