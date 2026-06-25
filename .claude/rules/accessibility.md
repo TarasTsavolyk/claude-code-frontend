@@ -1,6 +1,8 @@
 ---
 paths:
   - "src/**/*.vue"
+  - "src/**/*.tsx"
+  - "src/**/*.jsx"
 ---
 
 # Accessibility (target: WCAG 2.2 AA)

@@ -6,7 +6,7 @@
 > Copy-and-adapt config — **not** an npm package. Drop it into a frontend repo, run `/wizard`, and Claude Code works as
 > a teammate that already knows your stack and conventions.
 
-A Claude Code configuration for **frontend projects** — **12 agents, 12 rules (9 path-scoped), and 10 skills** wired into
+A Claude Code configuration for **frontend projects** — **12 agents, 16 rules (13 path-scoped), and 14 skills** wired into
 a review pipeline. The architecture is framework-agnostic; swap the framework, package manager, and styling specifics per
 project.
 
@@ -64,7 +64,9 @@ undo), tiered (safe opt-outs vs. warned essentials like security/a11y), and fixe
 
 - **Feature** — ask for a plan → `planner` (+ `devil`, a devil's-advocate review of the plan, for tricky UX) → `frontend-developer` → quality gate → `docs-writer`.
 - **Bug** — ask to debug → `debugger` finds root cause → fix → verify with a regression test.
-- **Scaffold / audit** — `/scaffold-component`, `/scaffold-feature`, `/add-e2e-test`, `/a11y-audit`, `/perf-audit`, `/refactor`, `/release`.
+- **Scaffold** — `/scaffold-component`, `/scaffold-feature`, `/add-tests`.
+- **Review & verify** — `/code-review`, `/a11y-audit`, `/perf-audit`, `/security-audit`, `/verify`, `/refactor`.
+- **Maintain** — `/upgrade-deps`, `/release`.
 - **Check what loaded** — `/memory` (open a component and a test file to watch path-scoped rules activate) · `/agents`.
 
 ## Contents
@@ -74,18 +76,20 @@ CLAUDE.md                       # always-loaded project memory (the template)
 .claude/
   settings.json                 # permissions + agent-teams flag + onboarding hook
   hooks/                        # node helpers: detect-stack · session-start · check-refs
-  rules/                        # 9 path-scoped + 3 global
+  rules/                        # 13 path-scoped + 3 global
     architecture  code-style  styling  testing  forms
     accessibility  performance  i18n  security        # path-scoped
+    data-fetching  error-handling  config  observability   # path-scoped
     principles  git-operations  workflow              # global
   agents/                       # 12 least-privilege subagents
     planner  devil  frontend-developer  ui-reviewer  accessibility-auditor
     test-engineer  performance-auditor  refactoring-expert  debugger
     security-scanner  ci-cd-engineer  docs-writer
-  skills/                       # 10 invokable workflows
+  skills/                       # 14 invokable workflows
     wizard  prune                                     # onboarding
-    scaffold-component  scaffold-feature  add-e2e-test
-    debug-frontend  a11y-audit  perf-audit  refactor  release
+    scaffold-component  scaffold-feature  add-tests
+    code-review  a11y-audit  perf-audit  security-audit  verify
+    debug-frontend  refactor  upgrade-deps  release
 ```
 
 ## Two scopes (optional)

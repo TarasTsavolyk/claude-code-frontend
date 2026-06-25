@@ -40,10 +40,18 @@ Split when you see a **signal**, then reach for the matching **pattern** — don
 
 **Overlay UI is a shared primitive** — modal/dialog/drawer/popover/menu share the same hard parts: focus trap, restore focus to the trigger on close, close on Escape, scroll-lock, and `aria` wiring (see `accessibility.md`). Build (or adopt) **one** base overlay that owns these, and compose specific overlays from it via slots. A feature re-implementing focus/Escape/scroll handling is a defect, not a variation.
 
+## Component API design
+Design the public surface — props, events, slots — like any API: small, predictable, hard to misuse. (Syntax lives in `code-style.md`; this is the shape.)
+- **Props in, events out, slots for markup.** Data flows down as props; the component reports up via `emit`; callers inject content through slots, not via props that carry renderable strings/HTML.
+- **Minimal surface.** Fewer, orthogonal props beat many overlapping ones. Avoid the **boolean trap** — several `is*`/`show*` flags that fork the template usually mean a `variant`/`mode` enum, separate components, or slots (a split signal — see above).
+- **Two-way via `defineModel`** for genuine v-model state; otherwise one-way prop + explicit event. Don't mutate props.
+- **Name for the consumer.** Past-tense/imperative events (`@saved`, `@close`), predicate booleans, no leaking of internal state names. Keep the API stable; changing it means updating callers (flag them).
+- **Type the contract** — props/emits/slots typed in TS, runtime validators in JS — so misuse fails loudly at the call site.
+
 ## Logic placement
 - Reusable stateful logic → composables (`useX`) returning refs/computed/handlers. Accept reactive inputs as `MaybeRefOrGetter<T>` (TS) and read them with `toValue` so refs *and* getters work — `useX(() => props.id)`; return `readonly()` refs when callers shouldn't mutate them.
 - Shared cross-component state → Pinia store. Prefer setup-style stores (`defineStore('x', () => {…})`); destructure store state via `storeToRefs(store)` to keep reactivity (actions destructure directly). Component-only state stays local with `ref`/`reactive`.
-- Data fetching never happens directly in a component. Go through a composable or a thin `api/` service module that returns results with an explicit shape (types in TS, JSDoc/validators in JS).
+- Data fetching never happens directly in a component. Go through a composable or a thin `api/` service module that returns results with an explicit shape (types in TS, JSDoc/validators in JS) — see `data-fetching.md` for how.
 - Side effects (subscriptions, timers, listeners) are set up in lifecycle hooks and always cleaned up — use `onScopeDispose` so cleanup also fires when a composable is used outside a component.
 
 ## Routing

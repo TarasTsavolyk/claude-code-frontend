@@ -9,6 +9,25 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-06-25
+
+New rules, full skill↔agent symmetry, and multi-framework readiness.
+
+### Added
+- Rules — `data-fetching.md` (where fetching lives, response validation at the boundary, loading/error/empty states, cancellation/dedup, query-library guidance, mutations, server-cache vs client-state), `error-handling.md` (expected vs unexpected, never-swallow, error boundaries, async nets, typed `catch`), `config.md` (one validated/typed env source, `VITE_`-only client exposure, `.env` hygiene, build-time vs runtime, feature flags), `observability.md` (logger wrapper, error reporting + private source maps, field Web Vitals, analytics/privacy).
+- `architecture.md` "Component API design" — minimal prop surface, boolean-trap avoidance, `defineModel`, consumer-facing naming, typed contracts.
+- Skills — `/code-review` and `/security-audit` (inline twins of `ui-reviewer` and `security-scanner`), `/verify` (quality gate + goal check), `/upgrade-deps` (batched dependency upgrades).
+- `CLAUDE.md` reference-stack note — rule/agent bodies speak the Vue reference stack; principles are framework-agnostic, translate named Vue APIs to your framework.
+
+### Changed
+- `add-e2e-test` → `add-tests` — broadened to the full pyramid (unit/component + e2e), not e2e only.
+- Path-globs canonicalized for multi-framework — `error-handling`, `observability`, `i18n`, `performance` gain `.tsx`/`.jsx`; component-scoped `accessibility`, `forms`, `styling` gain `.tsx`/`.jsx`, so rules load on JSX/TSX components, not just `.vue`.
+- `/refactor` skill defers its decomposition catalogue to `architecture.md` (single-sourced).
+- Wired throughout — `CLAUDE.md` core principles, `workflow.md` skills-vs-agents, `prune` recipes, README counts (16 rules / 13 path-scoped, 14 skills).
+
+### Fixed
+- `devil` and `frontend-developer` no longer claim `SendMessage` is the default reporting channel — they report to the lead; `SendMessage` is the agent-teams-only path (matches `workflow.md` execution model).
+
 ## [0.5.0] - 2026-06-25
 
 ### Added
@@ -85,7 +104,8 @@ app that adopts it.
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.3.0...v0.4.0
