@@ -15,10 +15,30 @@ paths:
 - Don't reach across sibling boundaries — a feature/module must not import another's internals; share through the shared layer.
 
 ## Component responsibilities
-- Components are presentational: render state and emit events. Keep them under ~150 lines; split when they grow.
+- Components are presentational: render state and emit events. Split on the signals below, not a line count (~150 lines is a hint to look, not a rule).
 - Container/page components orchestrate; leaf components stay dumb and reusable.
 - Data flows down via props, events flow up via `emit`. Do not mutate props.
 - No business logic in templates. Compute in `computed`/composables, not inline expressions.
+
+## Decomposition & reuse
+Split when you see a **signal**, then reach for the matching **pattern** — don't split on size alone.
+
+**Split signals** (any one is enough):
+- More than ~3 distinct responsibilities in one component (e.g. fetch + form + list + dialog).
+- Boolean explosion: more than ~7 props, or props like `isEditMode`/`showFooter` that fork the template into modes.
+- Template nesting `v-if`/`v-for` more than ~3 deep, or `<script>` dwarfing `<template>` (logic wants a composable).
+- A block (markup + its state) repeated across views, or copy-pasted with tweaks.
+
+**Patterns** (use when):
+- **Extract a leaf component** — a self-contained chunk of template + its local state. Use when a region has its own job and could be named (`UserAvatar`, `PriceTag`).
+- **Extract a composable** — logic, not markup, is the weight. Move stateful/reusable behavior to `useX` (see Logic placement).
+- **Slots over props** — when callers need to inject *markup*, not just data. Prefer a `<slot>` (named/scoped) to a `content`/`render`-style prop; a boolean that toggles a chunk of template is usually a slot. (see `code-style.md`)
+- **Compound components** — a set that shares implicit state (`Tabs`/`Tab`, `Accordion`/`Item`). Share it through `provide`/`inject`, not prop drilling.
+- **Headless vs styled** — when the same behavior needs different looks, split the logic (a composable or renderless unit) from the presentation.
+
+**Promote to `shared/`** — rule of two: the first reuse can copy; the **second** caller means extract. Before promoting, the unit must be presentational (no feature-specific imports), have a stable prop/emit/slot API, and earn its own name. One-off code stays local (see `principles.md`).
+
+**Overlay UI is a shared primitive** — modal/dialog/drawer/popover/menu share the same hard parts: focus trap, restore focus to the trigger on close, close on Escape, scroll-lock, and `aria` wiring (see `accessibility.md`). Build (or adopt) **one** base overlay that owns these, and compose specific overlays from it via slots. A feature re-implementing focus/Escape/scroll handling is a defect, not a variation.
 
 ## Logic placement
 - Reusable stateful logic → composables (`useX`) returning refs/computed/handlers. Accept reactive inputs as `MaybeRefOrGetter<T>` (TS) and read them with `toValue` so refs *and* getters work — `useX(() => props.id)`; return `readonly()` refs when callers shouldn't mutate them.

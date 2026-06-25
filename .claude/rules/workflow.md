@@ -2,7 +2,7 @@
 
 Orchestration for feature work. Agents live in `.claude/agents/`. Prefer delegating bounded work to subagents to keep the main context clean.
 
-**Skills vs agents** — a `/skill` runs its checklist inline in the current session (quick, ad-hoc, can fix as it goes); the matching agent (`a11y-audit` → `accessibility-auditor`, `perf-audit` → `performance-auditor`, `debug-frontend` → `debugger`) is the isolated, least-privilege specialist the pipeline delegates to. Use the skill for solo/ad-hoc work, the agent for a gated pipeline run.
+**Skills vs agents** — a `/skill` runs its checklist inline in the current session (quick, ad-hoc, can fix as it goes); the matching agent (`a11y-audit` → `accessibility-auditor`, `perf-audit` → `performance-auditor`, `debug-frontend` → `debugger`, `refactor` → `refactoring-expert`) is the isolated, least-privilege specialist the pipeline delegates to. Use the skill for solo/ad-hoc work, the agent for a gated pipeline run.
 
 ## Standard feature
 ```
@@ -25,7 +25,7 @@ Debugger  →  Developer  →  Verify (test-engineer + ui-reviewer)
 ```
 refactoring-expert  →  Verify (test-engineer + ui-reviewer)
 ```
-`refactoring-expert` restructures code without changing behavior — tests stay green before and after (it adds characterization tests first if the area is uncovered). Use it instead of `frontend-developer` when the goal is cleanup/structure, not new behavior.
+`refactoring-expert` restructures code without changing behavior — tests stay green before and after (it adds characterization tests first if the area is uncovered). Use it instead of `frontend-developer` when the goal is cleanup/structure, not new behavior. For component splits it works from the decomposition patterns and split signals in `architecture.md`; verify confirms behavior is unchanged and that extracted/promoted units keep a stable API.
 
 ## CI/CD
 ```

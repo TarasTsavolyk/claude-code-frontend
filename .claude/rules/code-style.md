@@ -34,6 +34,7 @@ ESLint + Prettier are the source of truth for formatting — never hand-format a
 - Optional-prop defaults: on Vue 3.5+ prefer reactive props destructure — `const { size = 'md' } = defineProps<Props>()`; use `withDefaults` only on Vue ≤3.4. Required props get no default.
 - Two-way binding: prefer `defineModel()` (Vue 3.4+) over a manual `modelValue` prop + `update:modelValue` emit.
 - Template refs: `useTemplateRef('name')` (Vue 3.5+). Generate stable ids for label/input wiring with `useId()`.
+- Slots are the API for injecting *markup*: expose named slots for structural regions (`#header`/`#footer`), scoped slots (`<slot :item="item" />`) to hand data back to the caller, and a default slot for the main body. Reach for a slot before a prop that carries renderable content or toggles a chunk of template. In TS, declare the contract with `defineSlots<{ default(props: { item: T }): any }>()`.
 - One component per file. Filename matches the component name.
 
 ## Naming
