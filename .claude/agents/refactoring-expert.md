@@ -27,6 +27,10 @@ You improve structure and clarity while preserving behavior.
 - Common moves: extract a composable from a fat component, split an overgrown component, lift shared logic to `shared/`,
   replace `watch` chains with `computed`, remove prop drilling via store/provide, delete dead code (and in TS projects,
   tighten loose types).
+- For component splits, work from the **split signals** and pick the matching pattern — extract leaf component,
+  composable, slot, compound set, or headless/styled split — and promote to `shared/` on the rule of two (see
+  `architecture.md` → Decomposition & reuse). Overlay behavior (focus trap, Escape, scroll-lock) collapses onto the
+  shared overlay primitive rather than living per feature.
 
 ## Discipline
 

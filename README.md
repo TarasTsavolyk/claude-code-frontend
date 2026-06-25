@@ -6,7 +6,7 @@
 > Copy-and-adapt config — **not** an npm package. Drop it into a frontend repo, run `/wizard`, and Claude Code works as
 > a teammate that already knows your stack and conventions.
 
-A Claude Code configuration for **frontend projects** — **12 agents, 12 rules (9 path-scoped), and 9 skills** wired into
+A Claude Code configuration for **frontend projects** — **12 agents, 12 rules (9 path-scoped), and 10 skills** wired into
 a review pipeline. The architecture is framework-agnostic; swap the framework, package manager, and styling specifics per
 project.
 
@@ -64,7 +64,7 @@ undo), tiered (safe opt-outs vs. warned essentials like security/a11y), and fixe
 
 - **Feature** — ask for a plan → `planner` (+ `devil`, a devil's-advocate review of the plan, for tricky UX) → `frontend-developer` → quality gate → `docs-writer`.
 - **Bug** — ask to debug → `debugger` finds root cause → fix → verify with a regression test.
-- **Scaffold / audit** — `/scaffold-component`, `/scaffold-feature`, `/add-e2e-test`, `/a11y-audit`, `/perf-audit`, `/release`.
+- **Scaffold / audit** — `/scaffold-component`, `/scaffold-feature`, `/add-e2e-test`, `/a11y-audit`, `/perf-audit`, `/refactor`, `/release`.
 - **Check what loaded** — `/memory` (open a component and a test file to watch path-scoped rules activate) · `/agents`.
 
 ## Contents
@@ -82,10 +82,10 @@ CLAUDE.md                       # always-loaded project memory (the template)
     planner  devil  frontend-developer  ui-reviewer  accessibility-auditor
     test-engineer  performance-auditor  refactoring-expert  debugger
     security-scanner  ci-cd-engineer  docs-writer
-  skills/                       # 9 invokable workflows
+  skills/                       # 10 invokable workflows
     wizard  prune                                     # onboarding
     scaffold-component  scaffold-feature  add-e2e-test
-    debug-frontend  a11y-audit  perf-audit  release
+    debug-frontend  a11y-audit  perf-audit  refactor  release
 ```
 
 ## Two scopes (optional)

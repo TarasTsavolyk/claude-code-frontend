@@ -15,4 +15,4 @@ description: Create a new Vue 3 component the project's way — props/emits cont
 6. **Verify** — `<pm> run lint && <pm> run test` (add `<pm> run typecheck` in TS projects). Run a quick axe check if interactive.
 7. **Export** if it's a shared component (barrel/index per project convention).
 
-Keep the component under ~150 lines; split if it grows past that.
+Keep it focused: split on a decomposition **signal** — ≥3 responsibilities, prop/boolean explosion, deep template nesting, logic dwarfing the template, or a repeated block — not on a line count alone (see `architecture.md` → Decomposition & reuse).

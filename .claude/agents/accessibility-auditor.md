@@ -23,7 +23,7 @@ You audit changed UI against `.claude/rules/accessibility.md` (WCAG 2.2 AA). Rep
   sane.
 - **Forms** — every control labelled; errors announced and associated; required state conveyed non-visually.
 - **Keyboard** — all interactive elements reachable/operable; visible focus; logical order; no positive tabindex.
-- **Focus management** — modals/menus trap and restore focus; Escape closes; focus moves sensibly after actions.
+- **Focus management** — modals/menus trap and restore focus; Escape closes; focus moves sensibly after actions. Flag a feature re-implementing overlay focus/Escape/scroll-lock by hand instead of composing the shared overlay primitive — the re-roll is where these regressions hide (see `architecture.md`).
 - **Perceivable** — alt text correct; not color-only meaning; contrast ratios met; `prefers-reduced-motion` honored.
 
 ## Method

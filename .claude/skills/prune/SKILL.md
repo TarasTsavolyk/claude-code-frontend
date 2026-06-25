@@ -42,7 +42,7 @@ Removes whole **capabilities** (agent + skill + rule bundles) the project doesn'
 | Capability | Delete | Fix references |
 |---|---|---|
 | **e2e tests** | `.claude/skills/add-e2e-test/` | README tree + skill count. Optional tidy: drop `test:e2e` from CLAUDE.md Commands, Playwright from the Stack line, and `npx playwright:*` from `settings.json` allow. Keep `test-engineer`/`testing.md` (they cover e2e generally — not orphaned). |
-| **refactor flow** | `.claude/agents/refactoring-expert.md` | `workflow.md`: delete the whole `## Refactor` section. README tree + agent count. |
+| **refactor flow** | `.claude/agents/refactoring-expert.md`, `.claude/skills/refactor/` | `workflow.md`: delete the whole `## Refactor` section + drop `refactor` from the skills-vs-agents line. README tree + agent & skill counts. (Keep `architecture.md` → Decomposition & reuse — it's general guidance, not refactor-only.) |
 | **devil's advocate** | `.claude/agents/devil.md` | `planner.md`: drop the "recommend a `devil` pass" bullet. `workflow.md`: remove `devil` from the Planning step. README tree + feature-flow + design-note prose + agent count. |
 | **docs agent** | `.claude/agents/docs-writer.md` | `workflow.md`: remove the DocsWriter step from Standard feature. README tree + pipeline prose + agent count. |
 | **i18n** | `.claude/rules/i18n.md` | `security.md`: drop the vue-i18n XSS bullet (if security kept). `CLAUDE.md`: remove the `translations/` line from the structure block. `planner.md`: drop the "RTL/i18n" mention. README tree + rule & path-scoped counts. |

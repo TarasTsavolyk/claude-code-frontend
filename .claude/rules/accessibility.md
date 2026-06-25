@@ -15,7 +15,7 @@ A11y is part of "done", reviewed like any other requirement.
 ## Keyboard & focus
 - Everything actionable is reachable and operable by keyboard. No mouse-only interactions.
 - Visible focus styles — never remove the outline without an equal-or-better replacement.
-- Modals/menus: trap focus while open, restore focus to the trigger on close, close on Escape.
+- Modals/menus: trap focus while open, restore focus to the trigger on close, close on Escape. Get these from **one** shared overlay primitive rather than re-solving them per feature (see `architecture.md` → Decomposition & reuse).
 - Logical tab order; don't use positive `tabindex`.
 - On SPA route change, move focus to the new view's main heading/landmark (`tabindex="-1"` + `focus()`) or announce it via a live region — client-side navigation doesn't move focus or notify screen readers.
 

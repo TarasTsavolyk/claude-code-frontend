@@ -18,8 +18,10 @@ You review frontend changes against `.claude/rules/`. Read-only — you report, 
 
 ## Check
 
-- **Architecture** — feature placement, component size, presentational vs container split, no cross-feature internal
-  imports.
+- **Architecture** — feature placement, presentational vs container split, no cross-feature internal imports. Flag
+  components hitting a **split signal** (≥3 responsibilities, prop/boolean explosion, deep template nesting, logic
+  dwarfing template, a repeated block) and name the decomposition that fits — extract leaf component, composable, slot,
+  or compound set (see `architecture.md`).
 - **Props/emits** — typed, minimal, no prop mutation, sensible defaults, events named clearly.
 - **State** — local vs Pinia chosen correctly; no global state for component-local concerns; no fetching in components.
 - **Styling** — tokens not magic values; repeated style patterns extracted, not duplicated; shared-style mechanisms
@@ -31,7 +33,9 @@ You review frontend changes against `.claude/rules/`. Read-only — you report, 
 - **Security** — obvious sinks: untrusted data into `v-html` / DOM-ref `innerHTML` / `<component :is>`; `v-bind="$attrs"`
   or object spread onto a native element; unchecked `:href`/`:src` schemes; raw-string `:style`. Flag them and leave the
   deep pass to `security-scanner` (see `security.md`).
-- **Reuse** — did this reinvent something in `shared/`?
+- **Reuse** — did this reinvent something in `shared/`? Flag a feature re-implementing an overlay's hard parts (focus
+  trap, Escape, scroll-lock, focus restore) instead of composing the shared base. On a second caller of the same
+  block, call for promotion to `shared/` (rule of two — see `architecture.md`).
 
 ## Output
 

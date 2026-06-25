@@ -9,6 +9,16 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-25
+
+### Added
+- `architecture.md` "Decomposition & reuse" — split *signals* (responsibilities, prop/boolean explosion, nesting, repeated blocks) over a line count, decomposition *patterns* (leaf component, composable, slots, compound, headless/styled), "promote to `shared/`" rule of two, and overlay-as-shared-primitive.
+- `/refactor` skill — inline twin of `refactoring-expert` for solo decomposition/cleanup work.
+- `code-style.md` — slots as the API for injecting markup (named/scoped, `defineSlots`).
+
+### Changed
+- `ui-reviewer`, `accessibility-auditor`, `refactoring-expert`, `scaffold-component`, `workflow.md`, `prune` — reference the split signals and overlay primitive; flag overlay re-implementation and missed `shared/` promotion.
+
 ## [0.4.1] - 2026-06-25
 
 ### Changed
@@ -75,7 +85,8 @@ app that adopts it.
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.2.0...v0.3.0
