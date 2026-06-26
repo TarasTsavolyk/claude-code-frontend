@@ -130,9 +130,36 @@ export function writeFacts(facts) {
   }
 }
 
+// Ensure the machine-local wizard cache is git-ignored so it can never be
+// committed — runs on every detect (hook + CLI), before /wizard is ever invoked.
+// Idempotent and fail-open; only acts inside a git repo. Returns true if it
+// appended the rule. (`<root>/.git` is a dir in a normal clone, a file in a
+// worktree — `existsSync` covers both.)
+export function ensureWizardIgnored(root) {
+  try {
+    if (!existsSync(join(root, '.git'))) return false
+    const gitignorePath = join(root, '.gitignore')
+    let content = ''
+    try {
+      content = readFileSync(gitignorePath, 'utf8')
+    } catch {
+      /* no .gitignore yet — we'll create it */
+    }
+    const already = content.split(/\r?\n/).some((line) => line.trim().replace(/\/+$/, '') === '.claude/.wizard')
+    if (already) return false
+    const sep = content && !content.endsWith('\n') ? '\n' : ''
+    writeFileSync(gitignorePath, `${content}${sep}# Wizard machine-local cache (regenerated each session)\n.claude/.wizard/\n`)
+    return true
+  } catch (err) {
+    console.error('detect-stack: could not update .gitignore:', err.message)
+    return false
+  }
+}
+
 // CLI entry: detect, write, and print to stdout (standalone testing/inspection).
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const facts = detect(resolveRoot(process.argv[2]))
   writeFacts(facts)
+  ensureWizardIgnored(facts.root)
   console.log(JSON.stringify(facts, null, 2))
 }

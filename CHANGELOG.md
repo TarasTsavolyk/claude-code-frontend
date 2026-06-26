@@ -9,6 +9,16 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-06-26
+
+Onboarding polish discovered while testing the wizard on a real project.
+
+### Added
+- `detect-stack.mjs` auto-adds `.claude/.wizard/` to the project `.gitignore` on every run (SessionStart hook + CLI) — the machine-local cache can't be committed even before `/wizard` runs. Idempotent, fail-open, git-repos only.
+
+### Changed
+- SessionStart hook now has the agent **ask** a clear yes/no — "run `/wizard` now?" — on a fresh, un-onboarded clone, instead of softly offering it. `wizard` step 5 confirms the auto-ignore rather than appending it.
+
 ## [0.5.0] - 2026-06-25
 
 Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framework readiness.
@@ -97,7 +107,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.3.0...v0.4.0
