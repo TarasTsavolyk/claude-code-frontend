@@ -25,6 +25,7 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
 
 4. **Apply to CLAUDE.md.** Edit with the confirmed values — match intent, the file may already be hand-edited:
    - Title `# <PROJECT_NAME>` → the project name.
+   - **Reference-stack note** (the callout under the title): it tells the reader the rules speak the Vue reference stack and to translate the named APIs. On a Vue project you can drop it (nothing to translate); on a non-Vue stack, keep it but name that framework as the reference.
    - **Language** section: collapse `**TypeScript** | **JavaScript** ← set one for this repo.` to the chosen one, and keep only the relevant guidance sentence.
    - **Package manager** — *keep the `<pm>` token* in the Commands block and Quality gate. The kit is PM-agnostic by design ([README] "you don't hardcode it"): the agent substitutes `<pm>` from the lockfile. In the Package-manager section, just state the detected manager (e.g. "Detected: **pnpm** (from `pnpm-lock.yaml`)") and drop the generic lockfile table. Do **not** rewrite `<pm>` to the concrete manager anywhere — in CLAUDE.md or the rules.
    - **Styling** line in Stack → state the chosen approach (drop the "swap for…" aside once decided).
@@ -36,4 +37,4 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
 
 6. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack (e.g. `2026-06-24 · pnpm · TypeScript · Tailwind · layer-first`). This stops the SessionStart hook from prompting again, and it **is** committed so teammates skip onboarding.
 
-7. **Summarize & hand off.** Tell the user exactly what changed in CLAUDE.md. Remind them the kit still ships **every** agent, skill, and rule — nothing was removed — and that pruning what this project won't use is a separate manual step (Phase 2). Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see `rules/git-operations.md`).
+7. **Summarize & hand off.** Tell the user exactly what changed in CLAUDE.md. Remind them the kit still ships **every** agent, skill, and rule — nothing was removed — and that pruning what this project won't use is a separate, deliberate step (the `/prune` skill). Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see `rules/git-operations.md`).
