@@ -40,10 +40,10 @@ rules keep every step on your conventions.
    cp CLAUDE.md  /path/to/your-app/CLAUDE.md
    rm -f /path/to/your-app/.claude/settings.local.json   # machine-local, don't share
    ```
-   Then add `.claude/settings.local.json`, `.claude/worktrees/`, and `.claude/.wizard/` to your repo's `.gitignore`
-   (`cp -r` doesn't carry this repo's ignore rules; the wizard cache holds machine-local paths). Keep
+   Then add `.claude/settings.local.json` and `.claude/worktrees/` to your repo's `.gitignore` (`cp -r` doesn't carry
+   this repo's ignore rules). The first-run hook adds `.claude/.wizard/` (the machine-local cache) automatically. Keep
    `.claude/.onboarded` **tracked**.
-3. **Open your repo in Claude Code.** A first-run hook offers **`/wizard`** — run it: it detects your stack and fills in `CLAUDE.md`.
+3. **Open your repo in Claude Code.** A first-run hook **asks whether to run `/wizard`** — say yes and it detects your stack and fills in `CLAUDE.md`.
 4. **Commit** `.claude/` + `CLAUDE.md` on a branch.
 
 This installs **project scope** (the common case). For personal defaults shared across all your repos, see
@@ -51,7 +51,7 @@ This installs **project scope** (the common case). For personal defaults shared 
 
 ## Onboarding & pruning
 
-**`/wizard`** runs automatically on the first session and is re-runnable anytime (re-sync after a stack change). It
+**`/wizard`** is offered on the first session — the hook asks whether to run it — and is re-runnable anytime (re-sync after a stack change). It
 guards your git tree (won't touch uncommitted work), keeps `<pm>` as a token — Claude substitutes your package manager
 from the lockfile, so the config never hardcodes npm/pnpm/yarn — and writes a committed `.claude/.onboarded` marker so
 teammates aren't re-prompted.
