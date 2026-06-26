@@ -33,7 +33,7 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
    - **Feature-first** projects: replace the layer-first example in Project structure with a `features/<name>/{components,composables,stores,api}` layout.
    - Leave every other line untouched (surgical edits only — see `rules/principles.md`).
 
-5. **Ignore the cache.** Ensure the project's `.gitignore` contains `.claude/.wizard/` — append it if missing. That directory holds the machine-local detection cache (absolute paths, regenerated each session) and must not be committed. Do **not** ignore `.claude/.onboarded`. (Deploying the kit copies only `.claude/` + `CLAUDE.md`, so the kit's own `.gitignore` rule doesn't travel — the wizard re-establishes it here.)
+5. **Confirm the cache is ignored.** The SessionStart hook auto-adds `.claude/.wizard/` to `.gitignore` on every run (`ensureWizardIgnored` in `detect-stack.mjs`), so it should already be there — confirm it, and append it manually only if the hook hasn't run yet. That directory holds the machine-local detection cache (absolute paths, regenerated each session) and must not be committed. Do **not** ignore `.claude/.onboarded`.
 
 6. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack (e.g. `2026-06-24 · pnpm · TypeScript · Tailwind · layer-first`). This stops the SessionStart hook from prompting again, and it **is** committed so teammates skip onboarding.
 
