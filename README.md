@@ -11,7 +11,9 @@ a review pipeline. The architecture is framework-agnostic; swap the framework, p
 project.
 
 > **Reference stack:** the shipped rules and scaffolds target **Vue 3** today (Vite · Pinia · Vitest · Playwright,
-> TypeScript optional). Other frameworks are on the roadmap — the rules/agents/skills structure already supports them.
+> TypeScript optional). `/wizard` **detects your framework** (Vue · React · Angular · Svelte · Solid · Preact · Lit, plus
+> meta-frameworks like Nuxt/Next/SvelteKit) and names it in `CLAUDE.md`; the rules still speak the Vue reference stack,
+> with named APIs translating to your framework.
 
 ## How it works
 
@@ -43,7 +45,7 @@ rules keep every step on your conventions.
    Then add `.claude/settings.local.json` and `.claude/worktrees/` to your repo's `.gitignore` (`cp -r` doesn't carry
    this repo's ignore rules). The first-run hook adds `.claude/.wizard/` (the machine-local cache) automatically. Keep
    `.claude/.onboarded` **tracked**.
-3. **Open your repo in Claude Code.** A first-run hook **asks whether to run `/wizard`** — say yes and it detects your stack and fills in `CLAUDE.md`.
+3. **Open your repo in Claude Code.** A first-run hook **asks whether to run `/wizard`** — say yes and it detects your framework + stack, syncs `CLAUDE.md` to your real project (structure + commands), and offers to `/prune` what you won't use.
 4. **Commit** `.claude/` + `CLAUDE.md` on a branch.
 
 This installs **project scope** (the common case). For personal defaults shared across all your repos, see
@@ -51,14 +53,18 @@ This installs **project scope** (the common case). For personal defaults shared 
 
 ## Onboarding & pruning
 
-**`/wizard`** is offered on the first session — the hook asks whether to run it — and is re-runnable anytime (re-sync after a stack change). It
-guards your git tree (won't touch uncommitted work), keeps `<pm>` as a token — Claude substitutes your package manager
-from the lockfile, so the config never hardcodes npm/pnpm/yarn — and writes a committed `.claude/.onboarded` marker so
-teammates aren't re-prompted.
+**`/wizard`** is offered on the first session — the hook asks whether to run it — and is re-runnable anytime (re-sync
+after a stack change). It **detects your framework** (Vue/React/Angular/Svelte/…), confirms the stack with checkbox
+prompts, guards your git tree (won't touch uncommitted work), and **syncs `CLAUDE.md` to the real project** — resolving
+placeholders, rewriting the project-structure block from your actual `src/` layout, and reconciling the Commands block
+against your real `package.json` scripts. It keeps `<pm>` as a token — Claude substitutes your package manager from the
+lockfile, so the config never hardcodes npm/pnpm/yarn — writes a committed `.claude/.onboarded` marker so teammates
+aren't re-prompted, and finishes by **offering `/prune`**.
 
 **`/prune`** removes agents/skills/rules a project won't use. It's **destructive** (commits on a branch, so git is the
-undo), tiered (safe opt-outs vs. warned essentials like security/a11y), and fixes every cross-reference — verified by
-`.claude/hooks/check-refs.mjs`. Run it once you're settled, not blind on first setup.
+undo), tiered (safe opt-outs vs. warned essentials like security/a11y), driven by checkbox prompts, and fixes every
+cross-reference — verified by `.claude/hooks/check-refs.mjs`. `/wizard` offers it at the end of onboarding, or run it
+anytime once you're settled.
 
 ## Daily use
 

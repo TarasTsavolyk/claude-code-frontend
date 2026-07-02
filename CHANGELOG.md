@@ -9,6 +9,20 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-06-26
+
+Wizard onboarding UX overhaul, driven by real-project testing.
+
+### Added
+- `detect-stack.mjs` detects the **framework** (vue/react/angular/svelte/solid/preact/lit + meta-frameworks nuxt/next/sveltekit/remix/astro) and the real `src/` layout (`srcDirs`), not just `isVue`.
+- `wizard` step 5 — syncs CLAUDE.md to the real project: rewrites the project-structure block from the actual `src/` tree and reconciles the Commands block against real `package.json` scripts (the `/init`-like step).
+- `wizard` step 9 — offers to run `/prune` at the end of onboarding (explicit opt-in; nothing is auto-removed).
+
+### Changed
+- `wizard` confirms the stack via `AskUserQuestion` checkbox/radio prompts (incl. a Framework question) instead of free-text "1,2,3"; `prune` step 2 likewise presents the 15 removable units as four grouped checkbox questions.
+- SessionStart hook nudge is now imperative ("VERY FIRST action … ask to run `/wizard`") so the un-onboarded prompt reliably reaches the user — a hook can't print a banner directly.
+- `detect-stack.mjs` facts schema → v2: `framework`/`frameworkVersion`/`metaFramework`/`srcDirs` added; `isVue`/`vueVersion` derived from `framework`.
+
 ## [0.5.1] - 2026-06-26
 
 Onboarding polish discovered while testing the wizard on a real project.
@@ -107,7 +121,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.0...v0.4.1

@@ -8,11 +8,11 @@
 // Run standalone:  node .claude/hooks/detect-stack.mjs   (detect + write + print)
 // Imported by the hook: session-start.mjs calls detect()/writeFacts() directly.
 
-import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-const SCHEMA_VERSION = 1
+const SCHEMA_VERSION = 2
 
 // Project root: explicit arg > $CLAUDE_PROJECT_DIR (set in hooks) > cwd.
 export function resolveRoot(arg) {
@@ -30,6 +30,17 @@ export function detect(root) {
       return JSON.parse(readFileSync(p(...segs), 'utf8'))
     } catch {
       return null
+    }
+  }
+  // Immediate, non-hidden subdirectories of a path (sorted). [] on any error.
+  const listDirs = (...segs) => {
+    try {
+      return readdirSync(p(...segs), { withFileTypes: true })
+        .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
+        .map((e) => e.name)
+        .sort()
+    } catch {
+      return []
     }
   }
 
@@ -61,6 +72,53 @@ export function detect(root) {
   const hasTsConfig = ['tsconfig.json', 'tsconfig.app.json'].some((f) => fileExists(f))
   const language = hasTsConfig || has('typescript') ? 'ts' : 'js'
 
+  // --- framework (known set + generic fallback) ------------------------------
+  // First match wins. The niche libs are checked before `react` because React
+  // can appear as a compat shim (e.g. preact/compat) in non-React projects.
+  // `framework` is a label or 'unknown' (no known UI dep) — the wizard then asks.
+  const FRAMEWORKS = [
+    ['vue', 'vue'],
+    ['svelte', 'svelte'],
+    ['solid-js', 'solid'],
+    ['preact', 'preact'],
+    ['@angular/core', 'angular'],
+    ['lit', 'lit'],
+    ['react', 'react'],
+  ]
+  let framework = null
+  let frameworkVersion = null
+  for (const [dep, label] of FRAMEWORKS) {
+    if (has(dep)) {
+      framework = label
+      frameworkVersion = deps[dep] || null
+      break
+    }
+  }
+  // Meta-framework hint. Implies its base framework when the base dep is managed
+  // by the meta package and so isn't a direct dependency (e.g. Nuxt → vue).
+  const META = [
+    ['nuxt', 'nuxt', 'vue'],
+    ['next', 'next', 'react'],
+    ['@remix-run/react', 'remix', 'react'],
+    ['@sveltejs/kit', 'sveltekit', 'svelte'],
+    ['@analogjs/platform', 'analog', 'angular'],
+    ['astro', 'astro', null],
+  ]
+  let metaFramework = null
+  let metaFrameworkVersion = null
+  for (const [dep, label, base] of META) {
+    if (has(dep)) {
+      metaFramework = label
+      metaFrameworkVersion = deps[dep] || null
+      // Infer the base framework, but DON'T claim its version: when the base dep
+      // isn't a direct dependency (the normal Nuxt/Next case) the meta package's
+      // version is not the framework's (Nuxt 3.10 ships Vue 3.4.x), so leave it null.
+      if (!framework && base) framework = base
+      break
+    }
+  }
+  if (!framework) framework = 'unknown'
+
   // --- styling (best guess; the wizard confirms) -----------------------------
   let styling = 'css'
   if (has('tailwindcss')) styling = 'tailwind'
@@ -72,10 +130,14 @@ export function detect(root) {
     e2e: has('@playwright/test') || has('playwright') ? 'playwright' : has('cypress') ? 'cypress' : null,
   }
 
-  // --- structure paradigm ----------------------------------------------------
+  // --- structure paradigm + real source layout -------------------------------
+  // `srcDirs` is the actual immediate layout under src/ — the wizard reflects it
+  // into CLAUDE.md's "Project structure" block instead of the template example.
+  const srcDirs = fileExists('src') ? listDirs('src') : []
+  const hasSrcDir = (name) => srcDirs.includes(name)
   let structure = 'unknown'
-  if (fileExists('src', 'features')) structure = 'feature-first'
-  else if (fileExists('src', 'views') || fileExists('src', 'components')) structure = 'layer-first'
+  if (hasSrcDir('features')) structure = 'feature-first'
+  else if (['views', 'components', 'pages', 'routes'].some(hasSrcDir)) structure = 'layer-first'
 
   // --- kit state -------------------------------------------------------------
   // `<PROJECT_NAME>` is the "not onboarded yet" signal — the wizard resolves it
@@ -95,14 +157,19 @@ export function detect(root) {
     root,
     isProject: pkg !== null,
     projectName: typeof pkg?.name === 'string' ? pkg.name : null,
-    isVue: has('vue'),
-    vueVersion: deps.vue || null,
+    framework,
+    frameworkVersion,
+    metaFramework,
+    metaFrameworkVersion,
+    isVue: framework === 'vue', // back-compat convenience; derived from `framework`
+    vueVersion: framework === 'vue' ? frameworkVersion : null,
     packageManager,
     packageManagerAmbiguous,
     language,
     styling,
     testing,
     structure,
+    srcDirs,
     uses: {
       pinia: has('pinia'),
       router: has('vue-router'),
