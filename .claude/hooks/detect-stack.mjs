@@ -12,7 +12,7 @@ import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 3
 
 // Project root: explicit arg > $CLAUDE_PROJECT_DIR (set in hooks) > cwd.
 export function resolveRoot(arg) {
@@ -50,27 +50,32 @@ export function detect(root) {
     warnings.push('package.json exists but could not be parsed; detection will be incomplete.')
   const deps = { ...(pkg?.dependencies || {}), ...(pkg?.devDependencies || {}) }
   const has = (name) => Object.prototype.hasOwnProperty.call(deps, name)
+  // First installed package from a candidate list (null = none) — powers `uses`.
+  const firstDep = (...names) => names.find(has) ?? null
 
   // --- package manager: corepack field is authoritative, else lockfile -------
+  const locks = [
+    ['pnpm-lock.yaml', 'pnpm'],
+    ['yarn.lock', 'yarn'],
+    ['package-lock.json', 'npm'],
+    ['bun.lock', 'bun'], // text lockfile, the Bun ≥1.2 default
+    ['bun.lockb', 'bun'], // legacy binary lockfile
+  ].filter(([f]) => fileExists(f))
+  const lockManagers = [...new Set(locks.map(([, m]) => m))]
   let packageManager = null
   let packageManagerAmbiguous = false
   if (typeof pkg?.packageManager === 'string') {
     packageManager = pkg.packageManager.split('@')[0] || null
-  } else {
-    const locks = [
-      ['pnpm-lock.yaml', 'pnpm'],
-      ['yarn.lock', 'yarn'],
-      ['package-lock.json', 'npm'],
-      ['bun.lock', 'bun'], // text lockfile, the Bun ≥1.2 default
-      ['bun.lockb', 'bun'], // legacy binary lockfile
-    ].filter(([f]) => fileExists(f))
-    const managers = [...new Set(locks.map(([, m]) => m))]
-    if (managers.length === 1) packageManager = managers[0]
-    else if (managers.length > 1) {
-      packageManager = managers[0]
-      packageManagerAmbiguous = true
-      warnings.push(`Multiple lockfiles found (${locks.map((l) => l[0]).join(', ')}); confirm the package manager.`)
-    }
+    if (packageManager && lockManagers.length > 0 && !lockManagers.includes(packageManager))
+      warnings.push(
+        `package.json "packageManager" says ${packageManager}, but the lockfile(s) belong to ${lockManagers.join(', ')}; confirm which one is real.`,
+      )
+  } else if (lockManagers.length === 1) {
+    packageManager = lockManagers[0]
+  } else if (lockManagers.length > 1) {
+    packageManager = lockManagers[0]
+    packageManagerAmbiguous = true
+    warnings.push(`Multiple lockfiles found (${locks.map((l) => l[0]).join(', ')}); confirm the package manager.`)
   }
 
   // --- language --------------------------------------------------------------
@@ -124,6 +129,12 @@ export function detect(root) {
   }
   if (!framework) framework = 'unknown'
 
+  // Monorepo/workspace root: detection reads only the ROOT package.json, so the
+  // app's framework may live in a workspace package instead.
+  const isWorkspaceRoot = Boolean(pkg?.workspaces) || fileExists('pnpm-workspace.yaml')
+  if (isWorkspaceRoot && framework === 'unknown')
+    warnings.push('Workspace/monorepo root: the app likely lives in a workspace package — detection is degraded; confirm values manually.')
+
   // --- styling (best guess; the wizard confirms) -----------------------------
   let styling = 'css'
   if (has('tailwindcss')) styling = 'tailwind'
@@ -175,10 +186,13 @@ export function detect(root) {
     testing,
     structure,
     srcDirs,
+    isWorkspaceRoot,
+    // Companion libs across ecosystems — the value is the detected package name
+    // (null = none found); the wizard reflects these into CLAUDE.md's Stack lines.
     uses: {
-      pinia: has('pinia'),
-      router: has('vue-router'),
-      i18n: has('vue-i18n'),
+      state: firstDep('pinia', 'vuex', '@reduxjs/toolkit', 'redux', 'zustand', 'jotai', 'mobx', '@ngrx/store'),
+      router: firstDep('vue-router', '@tanstack/react-router', 'react-router-dom', 'react-router', '@angular/router', '@solidjs/router'),
+      i18n: firstDep('vue-i18n', 'react-i18next', 'i18next', 'svelte-i18n', '@lingui/core', '@angular/localize'),
     },
     scripts: pkg?.scripts ? Object.keys(pkg.scripts) : [],
     kit: {

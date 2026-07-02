@@ -9,6 +9,18 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-07-02
+
+Wizard accuracy pass.
+
+### Fixed
+- `/wizard` step 3 had the AskUserQuestion budget wrong (claimed "Other" costs an option slot — it doesn't): framework prompts now offer detected + up to three alternatives; the option math matches `/prune`'s.
+- Steps 1/4/5 now consume what the detector already knows — `warnings` surfaced verbatim, Stack lines driven by `uses`/`testing`, Commands by `scripts` — instead of re-inferring; framework versions strip the semver range sigil.
+- Step 6 ensures all three machine-local ignores from the README quick-start (`settings.local.json`, `worktrees/`, `.wizard/`), not just the cache.
+
+### Changed
+- `detect-stack.mjs` (schema v3): `uses` (state / router / i18n) detects across ecosystems and reports the package name instead of Vue-only booleans; warns on corepack↔lockfile mismatch and on workspace/monorepo roots with unknown framework (`isWorkspaceRoot`).
+
 ## [0.10.0] - 2026-07-02
 
 The 2026 pass — the gate becomes a mechanism, skills learn the browser.
@@ -197,7 +209,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.1...v0.8.0
