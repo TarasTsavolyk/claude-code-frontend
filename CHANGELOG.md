@@ -9,6 +9,18 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-02
+
+First-class **bun** support + onboarding edge cases.
+
+### Added
+- bun end-to-end: `detect-stack.mjs` detects the text `bun.lock` (Bun ≥1.2 default) alongside `bun.lockb` — two bun lockfiles no longer read as an ambiguous package manager; CLAUDE.md lockfile table and `settings.json` allows (`bun install`/`bun run`/`bun audit`) cover bun.
+
+### Fixed
+- README copy step also removes `.claude/.wizard`/`.claude/worktrees`, so machine-local caches can't be committed into a host repo before the first session.
+- `detect-stack.mjs`: a garbled `package.json` still counts as a project (with a warning); `ensureWizardIgnored` recognizes leading-slash `.gitignore` entries instead of appending a duplicate.
+- `wizard` labels the detected option plain `(detected)` — no hardcoded Ukrainian.
+
 ## [0.6.1] - 2026-07-02
 
 Accuracy pass + token diet, from a full kit audit.
@@ -133,7 +145,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.0...v0.5.1

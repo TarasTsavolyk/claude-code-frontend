@@ -44,7 +44,10 @@ export function detect(root) {
     }
   }
 
+  const hasPkgFile = fileExists('package.json')
   const pkg = readJSON('package.json')
+  if (hasPkgFile && pkg === null)
+    warnings.push('package.json exists but could not be parsed; detection will be incomplete.')
   const deps = { ...(pkg?.dependencies || {}), ...(pkg?.devDependencies || {}) }
   const has = (name) => Object.prototype.hasOwnProperty.call(deps, name)
 
@@ -58,11 +61,13 @@ export function detect(root) {
       ['pnpm-lock.yaml', 'pnpm'],
       ['yarn.lock', 'yarn'],
       ['package-lock.json', 'npm'],
-      ['bun.lockb', 'bun'],
+      ['bun.lock', 'bun'], // text lockfile, the Bun ≥1.2 default
+      ['bun.lockb', 'bun'], // legacy binary lockfile
     ].filter(([f]) => fileExists(f))
-    if (locks.length === 1) packageManager = locks[0][1]
-    else if (locks.length > 1) {
-      packageManager = locks[0][1]
+    const managers = [...new Set(locks.map(([, m]) => m))]
+    if (managers.length === 1) packageManager = managers[0]
+    else if (managers.length > 1) {
+      packageManager = managers[0]
       packageManagerAmbiguous = true
       warnings.push(`Multiple lockfiles found (${locks.map((l) => l[0]).join(', ')}); confirm the package manager.`)
     }
@@ -155,7 +160,7 @@ export function detect(root) {
     schemaVersion: SCHEMA_VERSION,
     generatedAt: new Date().toISOString(),
     root,
-    isProject: pkg !== null,
+    isProject: hasPkgFile,
     projectName: typeof pkg?.name === 'string' ? pkg.name : null,
     framework,
     frameworkVersion,
@@ -212,7 +217,9 @@ export function ensureWizardIgnored(root) {
     } catch {
       /* no .gitignore yet — we'll create it */
     }
-    const already = content.split(/\r?\n/).some((line) => line.trim().replace(/\/+$/, '') === '.claude/.wizard')
+    const already = content
+      .split(/\r?\n/)
+      .some((line) => line.trim().replace(/^\/+/, '').replace(/\/+$/, '') === '.claude/.wizard')
     if (already) return false
     const sep = content && !content.endsWith('\n') ? '\n' : ''
     writeFileSync(gitignorePath, `${content}${sep}# Wizard machine-local cache (regenerated each session)\n.claude/.wizard/\n`)
