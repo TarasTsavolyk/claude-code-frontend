@@ -16,7 +16,13 @@ Removes whole **capabilities** (agent + skill + rule bundles) the project doesn'
 
 1. **Guard the working tree.** Run `git status --short`. If it is not clean, stop and ask the user to commit/stash first, or to explicitly approve proceeding anyway. Recommend a dedicated branch (e.g. `chore/prune-kit`).
 
-2. **Ask what to remove.** Present the capabilities below grouped by tier and let the user multi-select. For any **Tier B** pick, show its ⚠️ warning and require explicit confirmation — those are woven through many files and back a stated Core principle.
+2. **Ask what to remove — use `AskUserQuestion` checkboxes, not a "type 1,2,3" list.** Present the removable capabilities as `multiSelect: true` questions so the user ticks boxes. The tool caps each question at 4 options and each call at 4 questions, and there are 15 units — so issue **one call with these four checkbox questions** (4 + 4 + 4 + 3):
+   - **Tier A — pipeline & agents:** e2e tests · refactor flow · devil's advocate · docs agent
+   - **Tier A — rules (I):** i18n · forms · data fetching · error handling
+   - **Tier A — rules (II) & maintenance:** config · observability · dependency upgrades · CI/CD + release
+   - **Tier B — high blast radius ⚠️:** security · performance · accessibility
+
+   Put each unit's one-line effect in its option description; for every **Tier B** option, lead the description with its ⚠️ warning. After the user submits, for any **Tier B** pick re-confirm explicitly before deleting (they're woven through many files and back a stated Core principle). Never offer the Tier C spine.
 
 3. **Apply each chosen unit's recipe** (below): delete its files, then fix the references it lists. If several units are removed together, a file deleted by one unit satisfies another unit's reference automatically (recipes say "if still present").
 
