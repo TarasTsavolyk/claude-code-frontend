@@ -41,6 +41,7 @@ rules keep every step on your conventions.
    cp -r .claude /path/to/your-app/.claude   # ⚠ overwrites an existing .claude/ — merge by hand if you have one
    cp CLAUDE.md  /path/to/your-app/CLAUDE.md
    rm -f /path/to/your-app/.claude/settings.local.json   # machine-local, don't share
+   rm -rf /path/to/your-app/.claude/.wizard /path/to/your-app/.claude/worktrees   # machine-local caches, present if you ran Claude Code in the kit clone
    ```
    Then add `.claude/settings.local.json` and `.claude/worktrees/` to your repo's `.gitignore` (`cp -r` doesn't carry
    this repo's ignore rules). The first-run hook adds `.claude/.wizard/` (the machine-local cache) automatically. Keep
@@ -58,7 +59,7 @@ after a stack change). It **detects your framework** (Vue/React/Angular/Svelte/�
 prompts, guards your git tree (won't touch uncommitted work), and **syncs `CLAUDE.md` to the real project** — resolving
 placeholders, rewriting the project-structure block from your actual `src/` layout, and reconciling the Commands block
 against your real `package.json` scripts. It keeps `<pm>` as a token — Claude substitutes your package manager from the
-lockfile, so the config never hardcodes npm/pnpm/yarn — writes a committed `.claude/.onboarded` marker so teammates
+lockfile, so the config never hardcodes npm/pnpm/yarn/bun — writes a committed `.claude/.onboarded` marker so teammates
 aren't re-prompted, and finishes by **offering `/prune`**.
 
 **`/prune`** removes agents/skills/rules a project won't use. It's **destructive** (commits on a branch, so git is the
@@ -124,7 +125,7 @@ Edit `CLAUDE.md` by hand:
 
 ## Permissions
 
-`.claude/settings.json` pre-approves safe commands (npm/pnpm/yarn install·run, plus npx for vitest/playwright/eslint), gates `git commit`/`push` behind
+`.claude/settings.json` pre-approves safe commands (npm/pnpm/yarn/bun install·run, plus npx for vitest/playwright/eslint), gates `git commit`/`push` behind
 `ask`, and denies destructive commands + `.env`/`.pem` reads. Matching is prefix-based, so treat `deny` as
 defense-in-depth behind the `ask` gates, not a hard guarantee. `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` runs the quality
 gate agents in parallel — remove it if your Claude Code version lacks agent teams.

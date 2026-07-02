@@ -30,9 +30,10 @@ Detect from the lockfile and use that one **consistently** — never mix:
 - `package-lock.json` → **npm**
 - `pnpm-lock.yaml` → **pnpm**
 - `yarn.lock` → **yarn**
+- `bun.lock` / `bun.lockb` → **bun**
 
 No lockfile? Ask which to use. `<pm>` is the detected manager: `<pm> install`, `<pm> run <script>` (the explicit `run`
-form works for npm/pnpm/yarn), `<pm> exec <bin>` (or `npx <bin>`).
+form works for npm/pnpm/yarn/bun), `<pm> exec <bin>` (or `npx <bin>`).
 
 ## Commands
 

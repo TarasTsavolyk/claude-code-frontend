@@ -19,7 +19,7 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
 
 2. **Guard the working tree.** Run `git status --short`. If it is **not** clean, tell the user the wizard will edit CLAUDE.md and ask whether to proceed anyway or stop to commit/stash first. Never edit a dirty tree without an explicit go-ahead (git is the only undo).
 
-3. **Confirm the stack — use `AskUserQuestion`, not free text.** Present each value as a radio question (`multiSelect: false`) with the **detected value first**, labelled `(виявлено)` / `(detected)`; rely on the automatic "Other" for the long tail. The tool caps each call at **4 questions** and each question at **4 options** (one of which is the auto-added "Other", leaving room for **3 you author**), so split into two calls:
+3. **Confirm the stack — use `AskUserQuestion`, not free text.** Present each value as a radio question (`multiSelect: false`) with the **detected value first**, labelled `(detected)`; rely on the automatic "Other" for the long tail. The tool caps each call at **4 questions** and each question at **4 options** (one of which is the auto-added "Other", leaving room for **3 you author**), so split into two calls:
    - **Call 1 — basics:**
      - **Framework** — detected `framework` first, plus **at most two** likely alternatives (3 options total); the auto-"Other" covers the rest of the known set.
      - **Package manager** — `npm｜pnpm｜yarn｜bun`. If `packageManagerAmbiguous` is true or it is `null`, the user **must** choose (surface any `warnings`).
