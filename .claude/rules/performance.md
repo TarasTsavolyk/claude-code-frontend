@@ -19,9 +19,10 @@ paths:
 - Always key `v-for` with a stable unique id (never the index for dynamic lists).
 - Virtualize long lists (hundreds+ rows) instead of rendering everything.
 - Use `computed` for derived state; avoid `watch` that recomputes what a `computed` could.
+- Keep expensive work out of render: no heavy computation in template expressions or on every re-render — precompute in a `computed` or memoize.
 - Reach for `v-once`/`v-memo` only on proven-expensive static subtrees.
 - Debounce/throttle high-frequency handlers (input, scroll, resize).
-- Large or deeply-nested data that doesn't need per-property reactivity → `shallowRef`/`shallowReactive`; wrap inert data (config, big lookups) with `markRaw` to skip proxying.
+- Large or deeply-nested data that doesn't need per-property reactivity → `shallowRef`/`shallowReactive`; wrap inert data (config, big lookups) with `markRaw` to skip proxying. Avoid needless deep clones of large structures.
 
 ## Assets
 - Serve appropriately sized, modern-format images; lazy-load off-screen images.

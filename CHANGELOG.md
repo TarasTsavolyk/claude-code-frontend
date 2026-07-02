@@ -9,6 +9,19 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-02
+
+Twin convergence — every checklist has one home.
+
+### Changed
+- **BREAKING (user scope):** the six skill↔agent twin pairs no longer restate their checklists — criteria live in the owning rule (`accessibility.md`, `performance.md`, `security.md`, `architecture.md` → Decomposition & reuse, `testing.md`, plus `code-style.md`/`styling.md`/`data-fetching.md` for review) and each twin reads it first, carrying process + output format only (twin bodies −23%). Copying skills/agents to `~/.claude/` without the project rules no longer works — README "Two scopes" now scopes user scope to personal global rules.
+- `debug-frontend`/`debugger` stay self-contained (no backing rule) — the documented exception.
+- CONTRIBUTING: the "mirror across rule/skill/agent, change all three together" convention replaced by **one home per rule**.
+- Security twins keep the OWASP/CWE crosswalk (their job per v0.7.1) with the concrete CWE ids restored in the output contract.
+
+### Added
+- Rules absorbed the twins' unique criteria (verified by an adversarial 8-agent pass): heading/landmark sanity, `prefers-reduced-motion`, focus-after-actions (`accessibility.md`); expensive-work-in-render, no needless deep clones (`performance.md`); test-file placement, composable cleanup coverage, programmatic auth, failure-path + `--repeat-each=3`, user-visible e2e assertions (`testing.md`); sensible prop defaults (`architecture.md`); no-needless-complexity (`code-style.md`).
+
 ## [0.7.1] - 2026-07-02
 
 Rule dedup — "one rule, one home".
@@ -157,7 +170,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.0...v0.6.1

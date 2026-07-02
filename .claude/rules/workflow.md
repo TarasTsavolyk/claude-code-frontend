@@ -4,7 +4,7 @@
 
 Orchestration for feature work. Agents live in `.claude/agents/`. Prefer delegating bounded work to subagents to keep the main context clean.
 
-**Skills vs agents** — a `/skill` runs its checklist inline in the current session (quick, ad-hoc, can fix as it goes); the matching agent (`code-review` → `ui-reviewer`, `a11y-audit` → `accessibility-auditor`, `perf-audit` → `performance-auditor`, `security-audit` → `security-scanner`, `debug-frontend` → `debugger`, `refactor` → `refactoring-expert`, `add-tests` → `test-engineer`) is the isolated, least-privilege specialist the pipeline delegates to. Use the skill for solo/ad-hoc work, the agent for a gated pipeline run.
+**Skills vs agents** — a `/skill` runs the procedure inline in the current session (quick, ad-hoc, can fix as it goes); the matching agent (`code-review` → `ui-reviewer`, `a11y-audit` → `accessibility-auditor`, `perf-audit` → `performance-auditor`, `security-audit` → `security-scanner`, `debug-frontend` → `debugger`, `refactor` → `refactoring-expert`, `add-tests` → `test-engineer`) is the isolated, least-privilege specialist the pipeline delegates to. Use the skill for solo/ad-hoc work, the agent for a gated pipeline run. Both sides of a pair audit against the same owning rule in `.claude/rules/` — the checklist has one home.
 
 ## Standard feature
 ```

@@ -17,6 +17,8 @@ paths:
 - Do NOT test: framework internals, trivial passthrough props, exact class strings, or snapshot-everything.
 
 ## Unit / component (Vitest)
+- Test files sit beside the unit under test: `<Name>.test.ts` (`.test.js` in JS).
+- For composables, cover reactive inputs and cleanup (`onScopeDispose`), not just return values.
 - Accessible queries come from `@testing-library/vue` or Vitest browser-mode locators (`vitest-browser-vue`); in plain Vue Test Utils projects, still prefer role/label selection. Component tests run in jsdom or Vitest browser mode per the project's config — don't mix.
 - Query by accessible role/label/text (`getByRole`, `getByLabelText`), not by CSS selectors or test-id unless nothing else works.
 - Arrange–Act–Assert. One behavior per test; descriptive names ("emits `submit` with form data when valid").
@@ -25,8 +27,9 @@ paths:
 
 ## E2E (Playwright)
 - Cover the few flows that would be catastrophic if broken (auth, primary CRUD path, checkout-equivalent).
-- Prefer role/text locators and Playwright auto-waiting; avoid arbitrary `waitForTimeout`.
-- Keep e2e independent and idempotent; set up state via API/fixtures, not by clicking through prerequisites.
+- Prefer role/text locators and Playwright auto-waiting; avoid arbitrary `waitForTimeout`. Assert user-visible outcomes (URL, visible text, element state), not implementation details.
+- Keep e2e independent and idempotent; set up state via API/fixtures and authenticate programmatically, not by clicking through prerequisites.
+- Include at least one failure/validation path per flow; confirm non-flaky (`--repeat-each=3`).
 
 ## Bar
 - New logic ships with tests. A bug fix ships with a regression test that fails before the fix.

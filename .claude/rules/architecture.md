@@ -42,7 +42,7 @@ Split when you see a **signal**, then reach for the matching **pattern** — don
 ## Component API design
 Design the public surface — props, events, slots — like any API: small, predictable, hard to misuse. (Syntax lives in `code-style.md`; this is the shape.)
 - **Props in, events out, slots for markup.** Data flows down as props; the component reports up via `emit`; markup injection is a slot, not a prop (see *Slots over props* above). Never mutate props.
-- **Minimal surface.** Fewer, orthogonal props beat many overlapping ones. Avoid the **boolean trap** — several `is*`/`show*` flags that fork the template usually mean a `variant`/`mode` enum, separate components, or slots (a split signal — see above).
+- **Minimal surface.** Fewer, orthogonal props beat many overlapping ones; optional props get sensible defaults. Avoid the **boolean trap** — several `is*`/`show*` flags that fork the template usually mean a `variant`/`mode` enum, separate components, or slots (a split signal — see above).
 - **Two-way via `defineModel`** for genuine v-model state; otherwise one-way prop + explicit event.
 - **Name for the consumer.** Past-tense/imperative events (`@saved`, `@close`), predicate booleans, no leaking of internal state names. Keep the API stable; changing it means updating callers (flag them).
 - **Type the contract** — props/emits/slots typed in TS, runtime validators in JS — so misuse fails loudly at the call site.

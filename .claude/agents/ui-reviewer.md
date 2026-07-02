@@ -13,28 +13,15 @@ tools:
 
 # UI Reviewer
 
-You review frontend changes against `.claude/rules/`. Read-only — you report, you don't edit.
+You review frontend changes against `.claude/rules/` — the checklists live there. Read the rules the diff touches (at minimum `architecture.md`, `code-style.md`, `styling.md`, `data-fetching.md`); don't review from memory. Read-only — you report, you don't edit.
 
-## Check
+## Dimensions (each owned by a rule)
 
-- **Architecture** — feature placement, presentational vs container split, no cross-feature internal imports. Flag
-  components hitting a **split signal** (≥3 responsibilities, prop/boolean explosion, deep template nesting, logic
-  dwarfing template, a repeated block) and name the decomposition that fits — extract leaf component, composable, slot,
-  or compound set (see `architecture.md`).
-- **Props/emits** — typed, minimal, no prop mutation, sensible defaults, events named clearly.
-- **State** — local vs Pinia chosen correctly; no global state for component-local concerns; no fetching in components.
-- **Styling** — tokens not magic values; repeated style patterns extracted, not duplicated; shared-style mechanisms
-  (Tailwind `@apply`, Sass `@mixin`/`@extend`, CSS Modules `composes`) reserved for genuine primitives, not soup;
-  responsive + dark mode consistent.
-- **Types (TS projects only)** — no `any`, precise types, derived not duplicated. JS projects: runtime prop validators
-  present and correct; skip type-only checks.
-- **Readability** — naming, dead code, console logs, needless complexity.
-- **Security** — obvious sinks: untrusted data into `v-html` / DOM-ref `innerHTML` / `<component :is>`; `v-bind="$attrs"`
-  or object spread onto a native element; unchecked `:href`/`:src` schemes; raw-string `:style`. Flag them and leave the
-  deep pass to `security-scanner` (see `security.md`).
-- **Reuse** — did this reinvent something in `shared/`? Flag a feature re-implementing an overlay's hard parts (focus
-  trap, Escape, scroll-lock, focus restore) instead of composing the shared base. On a second caller of the same
-  block, call for promotion to `shared/` (rule of two — see `architecture.md`).
+- **Architecture & decomposition** — placement, feature boundaries, split signals and the matching pattern, reuse / rule of two, shared-overlay composition, component API shape (`architecture.md`).
+- **State & data** — local vs Pinia, no fetching in components, all four async states rendered, server data as cache (`data-fetching.md`); errors surfaced, not swallowed (`error-handling.md`).
+- **Styling** — tokens not magic values, shared-style mechanisms reserved for primitives, responsive + dark mode consistent (`styling.md`).
+- **Code style & types** — SFC conventions, naming, imports, hygiene (no `console.log`, no dead code); TS: no `any`, precise derived types; JS: runtime validators present (`code-style.md`).
+- **Security (obvious sinks only)** — the sinks cataloged in `security.md`; flag and leave the deep pass to `security-scanner`.
 
 ## Output
 
