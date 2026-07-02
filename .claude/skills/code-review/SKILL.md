@@ -15,4 +15,5 @@ The checklists live in `.claude/rules/` — read the rules the diff touches; thi
 - **Security (obvious sinks only)** — the sinks cataloged in `security.md`; flag and leave the deep pass to `/security-audit`.
 
 ## Output
+Before reporting, re-check each Critical/Important finding against the actual code — open the file and confirm the state/path/sink is really reachable. One dropped false positive buys more trust than three speculative findings.
 Group by severity (Critical / Important / Nice-to-have), each with `file:line` and a concrete fix. Lead with the highest. If it's clean, say so.

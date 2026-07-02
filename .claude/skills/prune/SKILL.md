@@ -24,48 +24,40 @@ Removes whole **capabilities** (agent + skill + rule bundles) the project doesn'
 
    Put each unit's one-line effect in its option description; for every **Tier B** option, lead the description with its ⚠️ warning. After the user submits, for any **Tier B** pick re-confirm explicitly before deleting (they're woven through many files and back a stated Core principle). Never offer the Tier C spine.
 
-3. **Apply each chosen unit's recipe** (below): delete its files, then fix the references it lists. If several units are removed together, a file deleted by one unit satisfies another unit's reference automatically (recipes say "if still present").
+3. **Delete each chosen unit's files** (unit map below). Special case — **e2e tests** is a trim, not a delete: remove the "e2e (Playwright)" section and the `test:e2e` run line from `.claude/skills/add-tests/`; optionally drop `test:e2e` from CLAUDE.md Commands, Playwright from the Stack line, and `npx playwright:*` from `settings.json`. Keep `test-engineer`/`testing.md`.
 
 4. **Reconcile the universal hubs** — touched by almost every removal:
    - **`.claude/rules/workflow.md`** — remove the agent from any flow / Quality-Gate line; if a whole flow section empties out, delete that section.
-   - **`CLAUDE.md`** — only the Core-principle bullet / structure / stack line a unit owns (see recipes).
+   - **`CLAUDE.md`** — only the Core-principle bullet / structure / stack line that names the removed unit.
    - **`README.md` / `docs/`** — *kit repo only.* A deployed project has only `.claude/` + `CLAUDE.md` (the kit's README/docs/CHANGELOG aren't copied in), so skip these there. When pruning the kit repo itself: remove the name(s) from the Contents tree, **recompute the headline counts** ("N agents, N rules (N path-scoped), N skills" — path-scoped = rules whose frontmatter has `paths:`/`globs:`), and drop any pipeline/design-note prose naming a removed agent. Recipe rows that delete `docs/…` or `.github/…` are likewise no-ops when those files aren't present.
 
-5. **Verify — no danglers.** Run:
+5. **Reconcile by graph, not by memory.** For every removed unit, pass its slug(s) as they appear in file names (`data-fetching`, `security-scanner`, `perf-audit`):
    ```bash
    node .claude/hooks/check-refs.mjs <removed-name> [<removed-name>...]
    ```
-   Review every hit (it prints `file:line  [name]  text`). Fix real dangling references. A hit that is a legitimate English word (e.g. "release") or a generic concept mention may be left — but only after confirming it isn't actually a reference to the removed unit. Re-run until clean or every remaining hit is justified.
+   Review every hit (it prints `file:line  [name]  text`). Fix real dangling references. A hit that is a legitimate English word (e.g. "release") or a generic concept mention may be left — but only after confirming it isn't actually a reference to the removed unit. Re-run until clean or every remaining hit is justified. Typical danglers: `(see <rule>.md)` clauses in sibling rules and agent bodies, the skills-vs-agents pairs line in `workflow.md`, `planner.md` mentions, and the unit's CLAUDE.md Core-principle bullet.
 
 6. **Re-detect & summarize.** If `CLAUDE.md` changed, re-run `node .claude/hooks/detect-stack.mjs`. Tell the user exactly what was deleted and which files were edited; show `git diff --stat`.
 
 7. **Commit.** On a branch, one focused commit (never `main` — see `rules/git-operations.md`). Surface the changed-file list and the full commit message for approval before committing.
 
-## Removal recipes
+## Unit map (what each unit deletes)
 
-### Tier A — safe opt-outs
+Reference cleanup is discovered by step 5's graph pass, not memorized here — this table only says which files go.
 
-| Capability | Delete | Fix references |
-|---|---|---|
-| **e2e tests** | *(trim, don't delete)* | `.claude/skills/add-tests/`: remove the "## 3. e2e (Playwright)" section + the `test:e2e` run line — keep the skill (it still does unit/component). Optional tidy: drop `test:e2e` from CLAUDE.md Commands, Playwright from the Stack line, and `npx playwright:*` from `settings.json` allow. Keep `test-engineer`/`testing.md`. |
-| **refactor flow** | `.claude/agents/refactoring-expert.md`, `.claude/skills/refactor/` | `workflow.md`: delete the whole `## Refactor` section + drop `refactor` from the skills-vs-agents line. README tree + agent & skill counts. (Keep `architecture.md` → Decomposition & reuse — it's general guidance, not refactor-only.) |
-| **devil's advocate** | `.claude/agents/devil.md` | `planner.md`: drop the "recommend a `devil` pass" bullet. `workflow.md`: remove `devil` from the Planning step. README tree + feature-flow + design-note prose + agent count. |
-| **docs agent** | `.claude/agents/docs-writer.md` | `workflow.md`: remove the DocsWriter step from Standard feature. README tree + pipeline prose + agent count. |
-| **i18n** | `.claude/rules/i18n.md` | `security.md`: drop the vue-i18n XSS bullet (if security kept). `CLAUDE.md`: remove the `translations/` line from the structure block. `planner.md`: drop the "RTL/i18n" mention. README tree + rule & path-scoped counts. |
-| **forms** | `.claude/rules/forms.md` | README tree + rule & path-scoped counts. (Nothing else references it.) |
-| **data fetching** | `.claude/rules/data-fetching.md` | `architecture.md`: drop the "see `data-fetching.md`" clause. `CLAUDE.md`: drop the data-fetching Core-principle clause. README tree + rule & path-scoped counts. |
-| **error handling** | `.claude/rules/error-handling.md` | `data-fetching.md` + `observability.md`: drop their "see `error-handling.md`" refs (if kept). `CLAUDE.md`: drop the error-handling Core-principle bullet. README tree + rule & path-scoped counts. |
-| **config** | `.claude/rules/config.md` | `data-fetching.md`: drop the "see `config.md`" ref (if kept). `CLAUDE.md`: drop the config Core-principle bullet. README tree + rule & path-scoped counts. |
-| **observability** | `.claude/rules/observability.md` | `error-handling.md`: drop the "see `observability.md`" ref (if kept). `CLAUDE.md`: drop the observability Core-principle bullet. README tree + rule & path-scoped counts. |
-| **dependency upgrades** | `.claude/skills/upgrade-deps/` | README tree + skill count. (Nothing else references it.) |
-| **CI/CD + release** | `.claude/agents/ci-cd-engineer.md`, `.claude/skills/release/`, `docs/release-automation.md`, `.github/workflows/release.yml` | `workflow.md`: delete the `## CI/CD` section. `security.md`: reword the "automated in CI (see `ci-cd-engineer`)" clause to drop the agent ref (if security kept). README: tree, counts, the "Release automation" design note, the release badge. Remove now-empty `docs/` / `.github/workflows/`. |
+| Unit | Files |
+|---|---|
+| e2e tests | *(trim, don't delete — see step 3)* |
+| refactor flow | `agents/refactoring-expert.md` · `skills/refactor/` |
+| devil's advocate | `agents/devil.md` |
+| docs agent | `agents/docs-writer.md` |
+| i18n · forms · data fetching · error handling · config · observability | the matching `rules/<name>.md` |
+| dependency upgrades | `skills/upgrade-deps/` |
+| CI/CD + release | `agents/ci-cd-engineer.md` · `skills/release/` · `docs/release-automation.md` · `.github/workflows/release.yml` |
+| security ⚠️ | `rules/security.md` · `agents/security-scanner.md` · `skills/security-audit/` |
+| performance ⚠️ | `rules/performance.md` · `agents/performance-auditor.md` · `skills/perf-audit/` |
+| accessibility ⚠️ | `rules/accessibility.md` · `agents/accessibility-auditor.md` · `skills/a11y-audit/` |
 
-### Tier B — high blast radius (warn + explicit confirm)
-
-| Capability | Delete | Fix references |
-|---|---|---|
-| **security** ⚠️ | `.claude/rules/security.md`, `.claude/agents/security-scanner.md`, `.claude/skills/security-audit/` | Reword/remove the `(see security.md)` clauses in: `ui-reviewer.md`, `planner.md`, `architecture.md`, `performance.md`, `styling.md`, `config.md`, `observability.md`, and `devil.md`/`i18n.md`/`data-fetching.md` (if still present). `workflow.md`: remove `security-scanner` from Quality Gate + CI/CD + drop `security-audit` from the skills-vs-agents line. `CLAUDE.md`: drop the security Core-principle bullet. README: tree, counts (rule + skill), pipeline + design-note prose. **⚠️ Security is a stated Core principle and the server-trust-boundary stance lives in `security.md` — confirm the user truly wants client-side security guidance gone.** |
-| **performance** ⚠️ | `.claude/rules/performance.md`, `.claude/agents/performance-auditor.md`, `.claude/skills/perf-audit/` | `workflow.md`: skills-vs-agents line + Quality Gate. `CLAUDE.md`: drop the performance Core-principle bullet. README: tree, counts, prose. |
-| **accessibility** ⚠️ | `.claude/rules/accessibility.md`, `.claude/agents/accessibility-auditor.md`, `.claude/skills/a11y-audit/` | `forms.md`: drop the "Accessibility (see `accessibility.md`)" section (if forms kept). `workflow.md`: skills-vs-agents line + Quality Gate. `CLAUDE.md`: drop the a11y Core-principle bullet. README: tree, counts, prose. **⚠️ a11y is a stated requirement, not a nice-to-have — confirm.** |
+> **Tier B ⚠️ re-confirmation:** security backs a stated Core principle (the server-trust-boundary stance lives in `security.md`); a11y is a stated requirement, not a nice-to-have. Spell that out when re-confirming.
 
 > **Tier C — never removable here:** the pipeline spine (`planner`, `frontend-developer`, `ui-reviewer`, `test-engineer`, `debugger`), their inline twins (`code-review`, `add-tests`, `debug-frontend`, `verify`), and the always-on rules (`principles`, `code-style`, `architecture`, `styling`, `git-operations`, `workflow`). Removing these would gut the kit.

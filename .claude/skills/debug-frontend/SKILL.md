@@ -7,7 +7,7 @@ description: Systematically diagnose a frontend bug to root cause before fixing.
 
 For a gated pipeline run, delegate to the `debugger` agent instead (isolated).
 
-1. **Reproduce deterministically.** Nail the exact steps, environment, and expected vs actual. Can't reproduce → state what info is missing and stop guessing.
+1. **Reproduce deterministically.** Nail the exact steps, environment, and expected vs actual. Browser tooling available (Playwright / Chrome DevTools MCP)? Reproduce live — drive the UI and watch console/network/state as it breaks — instead of inferring from code. Prod-reported bug and an error-tracker MCP (Sentry-style) connected? Pull the actual event (stack, breadcrumbs, release) before theorizing. Can't reproduce → state what info is missing and stop guessing.
 2. **Read before editing.** Locate the relevant component(s), composable(s), store, and API path. Trace the data flow end to end.
 3. **Inspect the usual frontend suspects:**
    - Reactivity lost — destructured `reactive`, mutated prop, missing `ref`/`toRefs`.
