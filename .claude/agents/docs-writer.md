@@ -3,7 +3,7 @@ name: docs-writer
 description:
   'Writes and updates frontend docs: README, component usage/props docs, changelog, and ADR-style notes — only when
   public behavior or APIs change.'
-model: sonnet
+model: haiku
 color: blue
 tools:
   - Read

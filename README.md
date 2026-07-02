@@ -133,6 +133,11 @@ gate agents in parallel — remove it if your Claude Code version lacks agent te
 
 - **Lean context** — path-scoped rules load only for the files they match.
 - **Least-privilege agents** — each declares an explicit `tools:` list; reviewers and auditors are read-only.
+- **Model tiers as a cost dial** — `opus` for the judgment-heavy chain (`planner`, `devil`, `frontend-developer`,
+  `debugger`, `security-scanner`), `sonnet` for the bounded auditors, `haiku` for `docs-writer`. Fable-class models earn
+  their premium as the **lead session** (pipeline orchestration, epics) or as a one-off `debugger` escalation — not as
+  a default agent tier. Exception: keep `security-scanner` off Fable — its cyber safety classifiers false-positive on
+  security-review work.
 - **Skill vs agent** — same-named pairs (`a11y-audit` / `accessibility-auditor`) are deliberate: the **skill** runs
   inline for quick/solo use; the **agent** is the isolated specialist the pipeline delegates to.
 - **One home per rule** — a convention lives in exactly one rule file; skills and agents carry the *process* and point
