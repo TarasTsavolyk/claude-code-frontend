@@ -12,7 +12,13 @@ Planning  →  Developer  →  Quality Gate (parallel)  →  DocsWriter
 ```
 1. **Planning** — `planner` turns the request into a short plan (scope, components, state, edge cases, test plan). For anything with real UX/architecture/security trade-offs, the lead runs `devil` against the plan (read-only) and folds the critique back into planning before code is written. Trivial changes skip straight to Developer.
 2. **Developer** — `frontend-developer` implements against the plan and the rules. Writes/updates unit tests as it goes.
-3. **Quality Gate (run in parallel)** — `ui-reviewer`, `accessibility-auditor`, `test-engineer`, `performance-auditor`, and `security-scanner`. If any returns a Critical/Important finding, it routes back to `frontend-developer`; then only the auditors that flagged rerun. After two fix-and-rerun cycles, stop and surface any remaining findings to the user for a decision.
+3. **Quality Gate (risk-scaled; selected auditors run in parallel)** — scale the board to what the diff touches instead of always running all five:
+   - Always: `ui-reviewer`; add `test-engineer` when the change ships new logic.
+   - Markup / styles / interaction touched → add `accessibility-auditor`.
+   - Untrusted data, auth/session, storage, raw-HTML-class sinks, or dependency changes → add `security-scanner`.
+   - Lists, bundle-affecting changes, new dependencies, or asset handling → add `performance-auditor`.
+   - Large or release-bound changes → run the full board.
+   If any auditor returns a Critical/Important finding, it routes back to `frontend-developer`; then only the auditors that flagged rerun. After two fix-and-rerun cycles, stop and surface any remaining findings to the user for a decision.
 4. **DocsWriter** — `docs-writer` updates README/component docs/changelog if public behavior changed.
 
 > **Execution model.** The lead (main session) spawns each agent with the context it needs and relays results between steps — subagents report back to the lead, not to each other. `SendMessage` between agents applies only when the pipeline runs as an experimental agent **team** (enabled by `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, which `settings.json` already sets).

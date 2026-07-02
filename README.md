@@ -6,7 +6,7 @@
 > Copy-and-adapt config — **not** an npm package. Drop it into a frontend repo, run `/wizard`, and Claude Code works as
 > a teammate that already knows your stack and conventions.
 
-A Claude Code configuration for **frontend projects** — **12 agents, 16 rules (13 path-scoped), and 14 skills** wired into
+A Claude Code configuration for **frontend projects** — **12 agents, 16 rules (13 path-scoped), and 15 skills** wired into
 a review pipeline. The architecture is framework-agnostic; swap the framework, package manager, and styling specifics per
 project.
 
@@ -22,7 +22,7 @@ project.
 | **Rules** | `.claude/rules/` | Conventions Claude follows. Path-scoped — each loads only for matching files, so context stays lean. |
 | **Agents** | `.claude/agents/` | Specialist subagents (planner, builder, reviewers, auditors), each with least-privilege tools. |
 | **Skills** | `.claude/skills/` | Invokable `/procedures` — scaffold, audit, debug, release, onboard. |
-| **Pipeline** | `rules/workflow.md` | How they combine: **plan → build → quality gate (review · a11y · tests · perf · security) → docs**. |
+| **Pipeline** | `rules/workflow.md` | How they combine: **plan → build → risk-scaled quality gate (review · a11y · tests · perf · security) → docs**. |
 
 In practice: you ask for a feature, the pipeline plans it, builds it, runs the quality gate, and updates docs — and the
 rules keep every step on your conventions.
@@ -82,7 +82,7 @@ anytime once you're settled.
 CLAUDE.md                       # always-loaded project memory (the template)
 .claude/
   settings.json                 # permissions + agent-teams flag + onboarding hook
-  hooks/                        # node helpers: detect-stack · session-start · check-refs
+  hooks/                        # node helpers: detect-stack · session-start · check-refs · pre-commit-gate
   rules/                        # 13 path-scoped + 3 global
     architecture  code-style  styling  testing  forms
     accessibility  performance  i18n  security        # path-scoped
@@ -92,9 +92,9 @@ CLAUDE.md                       # always-loaded project memory (the template)
     planner  devil  frontend-developer  ui-reviewer  accessibility-auditor
     test-engineer  performance-auditor  refactoring-expert  debugger
     security-scanner  ci-cd-engineer  docs-writer
-  skills/                       # 14 invokable workflows
+  skills/                       # 15 invokable workflows
     wizard  prune                                     # onboarding
-    scaffold-component  scaffold-feature  add-tests
+    scaffold-component  scaffold-feature  from-figma  add-tests
     code-review  a11y-audit  perf-audit  security-audit  verify
     debug-frontend  refactor  upgrade-deps  release
 ```
@@ -128,6 +128,11 @@ Edit `CLAUDE.md` by hand:
 `ask`, and denies destructive commands + `.env`/`.pem` reads. Matching is prefix-based, so treat `deny` as
 defense-in-depth behind the `ask` gates, not a hard guarantee. `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` runs the quality
 gate agents in parallel — remove it if your Claude Code version lacks agent teams.
+
+A `PreToolUse` hook ([`pre-commit-gate.mjs`](.claude/hooks/pre-commit-gate.mjs)) additionally **blocks `git commit`
+until the quality gate passes** — lint → typecheck → test via your lockfile-detected package manager. It fails open:
+docs-only and `.claude/`-only commits, repos without a `package.json`/lockfile, or missing scripts skip the gate. Slow
+suite? Trim the `steps` list in the hook or raise its `timeout` in `settings.json`.
 
 ## Design choices
 

@@ -15,10 +15,14 @@ Turn "should work" into "verified". The quality gate is the floor (`CLAUDE.md`);
 - Restate the task as a concrete, checkable outcome and confirm the change meets it — new behavior is exercised by a test; a bug fix has a regression test that **failed before** and passes now (see `testing.md`).
 - Check the diff for scope creep: only what the task required changed (see `principles.md` → surgical changes). No stray `console.log`, debug code, or commented-out blocks.
 
-## 3. Spot-check the relevant rules
+## 3. See it, don't just infer it
+- UI changed and browser tooling is available (Playwright / Chrome DevTools MCP, or the running dev server)? Open the changed view and look: it renders, the async states actually appear, no console errors. Screenshot UI changes for the report.
+- No browser tooling? Note "verified by tests only" in the report instead of silently skipping — it's a different claim than "seen working".
+
+## 4. Spot-check the relevant rules
 - New behavior: loading/error/empty/success states rendered, errors not swallowed (`data-fetching.md`, `error-handling.md`).
 - UI: keyboard-operable + labelled (`accessibility.md`); tokens not magic values (`styling.md`); no obvious XSS sink (`security.md`).
 - For a deeper pass, hand off to `/code-review`, `/a11y-audit`, `/perf-audit`, or `/security-audit`.
 
-## 4. Report
+## 5. Report
 - State plainly what passed and what (if anything) is still failing or skipped — show the failing output, don't paper over it. Only call it done when the gate is green and the goal is met.

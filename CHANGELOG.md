@@ -9,6 +9,21 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-07-02
+
+The 2026 pass — the gate becomes a mechanism, skills learn the browser.
+
+### Added
+- `hooks/pre-commit-gate.mjs` + `PreToolUse` wiring: `git commit` is blocked until the CLAUDE.md gate passes (lint → typecheck → test via the lockfile-detected `<pm>`); fails open for docs-/`.claude/`-only commits and repos without matching scripts.
+- `/from-figma` — design-to-code via the Figma MCP: pull the node, map raw values onto tokens/`shared/`, build per scaffold conventions, verify against the design.
+
+### Changed
+- `workflow.md` Quality Gate is risk-scaled: `ui-reviewer` always (+ `test-engineer` for new logic); a11y / security / perf auditors join by what the diff touches; the full board is reserved for large or release-bound changes.
+- Skills go browser-first when tooling is available: `verify` opens the changed view before calling it done; `debug-frontend` reproduces live (Playwright / Chrome DevTools MCP) and pulls error-tracker events for prod bugs; `a11y-audit` runs axe in the real browser.
+- `code-review` re-checks Critical/Important findings against the code before reporting (false-positive kill pass).
+- `prune` recipes slimmed to a unit→files map + graph-driven reference cleanup via `check-refs` (the per-unit "fix references" columns are gone).
+- README: pipeline described as risk-scaled; Permissions documents the commit gate and how to tune it.
+
 ## [0.9.0] - 2026-07-02
 
 Fable-era model pass — tier by role, escalate by exception.
@@ -182,7 +197,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.0...v0.7.1
