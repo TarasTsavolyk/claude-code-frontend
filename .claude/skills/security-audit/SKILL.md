@@ -5,15 +5,9 @@ description: Review a frontend change for security issues against the OWASP Top 
 
 # Security audit
 
-Review against `.claude/rules/security.md` and the **OWASP Top 10:2025**. Map each finding to an OWASP category (and CWE where it pins the sink). Review the diff; grep the touched files for the sinks below. For a gated pipeline run, delegate to the `security-scanner` agent (isolated, read-only, can look up CVEs).
+The sink catalog lives in `rules/security.md` — read it first; this skill adds the procedure and the OWASP/CWE mapping. For a gated pipeline run, delegate to the `security-scanner` agent instead (isolated, read-only, can look up CVEs).
 
-## Check
-- **Injection / XSS (A05 / CWE-79)** — raw-HTML sinks fed by user/remote data without DOMPurify: `v-html`, render/JSX `innerHTML`, a directive setting `el.innerHTML`, `v-html="t(key)"` (vue-i18n), manual `innerHTML`/`outerHTML`/`insertAdjacentHTML`. `<component :is>`, dynamic `import()`, `eval`, `new Function`, string `setTimeout` from non-constant data (CWE-94/95). `v-bind="$attrs"`/object spread onto native elements. `:href`/`:src` allowing `javascript:`/`data:`. Unguarded recursive merge / query-string parse (`__proto__`). Runtime template compilation from input (CSTI).
-- **Access control (A01)** — route guards / `v-if`-on-role as the security gate with no server check; open redirects from user params (CWE-601); `postMessage` without exact `origin` check, or `postMessage(…, '*')` with sensitive data.
-- **Secrets & exposure (A02 / CWE-200, CWE-798)** — `VITE_`-prefixed secrets (`VITE_.*(KEY|SECRET|TOKEN|PASSWORD)`) or any `import.meta.env` value leaking to the bundle; hardcoded/committed credentials; prod `build.sourcemap` or stray `.map`; tokens/PII in URLs, errors, logs, analytics (see `config.md`, `observability.md`).
-- **Tokens & session (A07 / CWE-522)** — tokens in `localStorage`/`sessionStorage` or persisted Pinia; missing `SameSite`/anti-CSRF token on cookie-session state changes (CWE-352).
-- **Browser controls (A02 / A08)** — missing/weak CSP (`unsafe-inline`/`unsafe-eval`/wildcards); third-party `<script>`/CDN without SRI; no `frame-ancestors`; raw-string `:style`; mixed content.
-- **Supply chain (A03)** — run `<pm> audit`; look up CVEs for newly added/updated packages.
-
-## Output
-Findings by severity, each with `file:line`, the OWASP/CWE mapping, the risk, and the remediation. Exploitable XSS, leaked secrets, and client-only access control are Critical. Don't flag an already-sanitized/allow-listed sink. Lead with the highest; if clean, say so.
+1. **Review the diff; grep the touched files** for every sink the rule catalogs — raw-HTML sinks, dynamic execution (`:is`, `eval`-family), `$attrs`/object spread, unchecked `:href`/`:src` schemes, raw `:style`, `postMessage`, token storage, prototype-pollution vectors, SSR serialization.
+2. **Secrets** — `grep -E 'VITE_.*(KEY|SECRET|TOKEN|PASSWORD)'` and `import.meta.env` reads that leak into the bundle; check sourcemap/devtools flags.
+3. **Supply chain** — on any dependency change run `<pm> audit`; treat high/critical as blockers.
+4. **Map and report** — findings by severity, each with `file:line`, the OWASP Top 10:2025 category (A01 access control · A02 misconfiguration/browser controls · A03 supply chain · A05 injection/XSS · A07 auth/session) and the CWE that pins the sink (79 XSS · 94/95 code injection · 601 open redirect · 200/798 secret exposure · 522 token storage · 352 CSRF), the risk, and the remediation. Exploitable XSS, leaked secrets, and client-only access control are Critical. Don't flag an already-sanitized/allow-listed sink. Lead with the highest; if clean, say so.

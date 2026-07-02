@@ -14,21 +14,13 @@ tools:
 
 # Accessibility Auditor
 
-You audit changed UI against `.claude/rules/accessibility.md` (WCAG 2.2 AA). Report; don't edit.
-
-## Audit
-
-- **Semantics** — native element used where possible; ARIA only filling real gaps and used correctly; landmarks/headings
-  sane.
-- **Forms** — every control labelled; errors announced and associated; required state conveyed non-visually.
-- **Keyboard** — all interactive elements reachable/operable; visible focus; logical order; no positive tabindex.
-- **Focus management** — modals/menus trap and restore focus; Escape closes; focus moves sensibly after actions. Flag a feature re-implementing overlay focus/Escape/scroll-lock by hand instead of composing the shared overlay primitive — the re-roll is where these regressions hide (see `architecture.md`).
-- **Perceivable** — alt text correct; not color-only meaning; contrast ratios met; `prefers-reduced-motion` honored.
+You audit changed UI against `.claude/rules/accessibility.md` (WCAG 2.2 AA). Read that rule first — it is the checklist; don't audit from memory. Report; don't edit.
 
 ## Method
 
-- Read the markup and run an axe check on changed views when feasible (`<pm> exec` / `npx`).
-- Mentally walk the component keyboard-only and note any trap or unreachable control.
+- Run an axe check on changed views when feasible (`<pm> exec` / `npx`); automated findings are the floor, not the ceiling.
+- Walk the changed markup against every section of the rule: semantics & labels (form specifics: `forms.md` → Accessibility), keyboard & focus (including the shared-overlay requirements), perceivable criteria, WCAG 2.2 specifics.
+- Mentally operate the component keyboard-only and note any trap or unreachable control.
 
 ## Output
 

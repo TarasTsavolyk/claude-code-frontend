@@ -101,18 +101,17 @@ CLAUDE.md                       # always-loaded project memory (the template)
 
 ## Two scopes (optional)
 
-Split the config: stack specifics + path-scoped rules in **project scope** `<repo>/.claude/` + `CLAUDE.md` (committed,
-shared); personal defaults in **user scope** `~/.claude/` (auto-applies everywhere, not committed):
+The kit itself lives in **project scope** — `<repo>/.claude/` + `CLAUDE.md`, committed and shared. **User scope**
+`~/.claude/` (auto-applies everywhere, not committed) is for personal defaults only:
 
 ```bash
-mkdir -p ~/.claude/rules ~/.claude/agents ~/.claude/skills
-cp .claude/rules/principles.md .claude/rules/git-operations.md .claude/rules/workflow.md ~/.claude/rules/  # global only
-cp .claude/agents/*.md ~/.claude/agents/
-cp -r .claude/skills/*  ~/.claude/skills/
+mkdir -p ~/.claude/rules
+cp .claude/rules/principles.md .claude/rules/git-operations.md ~/.claude/rules/   # personal working habits
 ```
 
-> **Gotcha:** path-scoped rules (`paths:` frontmatter) are ignored in user scope `~/.claude/rules/` — copy only the
-> **global** rules there (above) and keep path-scoped rules in the project. If one still won't load, try `paths:` → `globs:`.
+> **Gotcha:** path-scoped rules (`paths:` frontmatter) are ignored in user scope `~/.claude/rules/` — keep them in the
+> project (if one still won't load, try `paths:` → `globs:`). And don't copy skills/agents to `~/.claude/`: their
+> checklists have one home in the project's `.claude/rules/`, so outside the project they'd point at nothing.
 
 ## Manual setup (only if you skip the wizard)
 
@@ -136,6 +135,8 @@ gate agents in parallel — remove it if your Claude Code version lacks agent te
 - **Least-privilege agents** — each declares an explicit `tools:` list; reviewers and auditors are read-only.
 - **Skill vs agent** — same-named pairs (`a11y-audit` / `accessibility-auditor`) are deliberate: the **skill** runs
   inline for quick/solo use; the **agent** is the isolated specialist the pipeline delegates to.
+- **One home per rule** — a convention lives in exactly one rule file; skills and agents carry the *process* and point
+  at the owning rule instead of restating it.
 - **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and (most) a dedicated auditor.
 - **Lean descriptions** — agent/skill `description`s stay short and functional; they load into every session, so no keyword lists.
 - **Release automation** — CHANGELOG-driven via `.github/workflows/release.yml` (see [`docs/release-automation.md`](docs/release-automation.md)).

@@ -49,3 +49,4 @@ ESLint + Prettier are the source of truth for formatting — never hand-format a
 ## Hygiene
 - No `console.log` in committed code (use a logger or remove). No commented-out code blocks.
 - No TODOs without a tracking reference.
+- Prefer the simplest construct that works — no needless complexity or cleverness (see `principles.md` → Simplicity first).

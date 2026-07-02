@@ -5,11 +5,8 @@ description: Run an accessibility audit on a view or component against WCAG 2.2 
 
 # Accessibility audit
 
-For a gated pipeline run, delegate to the `accessibility-auditor` agent instead (isolated, read-only).
+The checklist is `rules/accessibility.md` (WCAG 2.2 AA) — read it first; this skill is the procedure. For a gated pipeline run, delegate to the `accessibility-auditor` agent instead (isolated, read-only).
 
 1. **Automated pass** — run an axe check on the changed view(s) (`<pm> exec` / `npx`). Record violations; they're the floor, not the ceiling.
-2. **Semantics** — verify native elements are used where possible; ARIA only fills real gaps and is correct; headings/landmarks are sane.
-3. **Forms** — every control has a label; errors are associated and announced; required/invalid state isn't color-only.
-4. **Keyboard walk** — operate the component keyboard-only: everything reachable and operable, visible focus, logical order, Escape closes overlays, focus traps in modals and restores on close.
-5. **Perceivable** — alt text correct (empty for decorative); meaning never by color alone; contrast ≥4.5:1 (text) / ≥3:1 (large text, UI); `prefers-reduced-motion` honored.
-6. **Report** — list issues by severity with the exact element and the fix; separate automated from manual findings. A11y blockers are Critical and block merge.
+2. **Manual pass** — walk the changed markup against every section of the rule: semantics & labels (form specifics: `forms.md` → Accessibility), keyboard & focus (including the shared-overlay requirements), perceivable criteria, WCAG 2.2 specifics. Operate the component keyboard-only.
+3. **Report** — list issues by severity with the exact element and the fix; separate automated from manual findings. A11y blockers are Critical and block merge.
