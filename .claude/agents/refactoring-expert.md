@@ -2,8 +2,7 @@
 name: refactoring-expert
 description:
   'Improves existing frontend code without changing behavior: extracting composables/components, removing duplication,
-  tightening types, simplifying state. Trigger words — EN: refactor, clean up, simplify, extract, deduplicate, tech
-  debt. Trigger words — UA: рефакторинг, почистити, спростити, винести, дублювання, технічний борг.'
+  tightening types, simplifying state.'
 model: sonnet
 color: cyan
 tools:

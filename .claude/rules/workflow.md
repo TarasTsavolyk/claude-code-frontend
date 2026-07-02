@@ -1,8 +1,10 @@
 # Workflow — Agent Pipeline
 
+(Global rule — no path scope. Applies whenever work is delegated.)
+
 Orchestration for feature work. Agents live in `.claude/agents/`. Prefer delegating bounded work to subagents to keep the main context clean.
 
-**Skills vs agents** — a `/skill` runs its checklist inline in the current session (quick, ad-hoc, can fix as it goes); the matching agent (`code-review` → `ui-reviewer`, `a11y-audit` → `accessibility-auditor`, `perf-audit` → `performance-auditor`, `security-audit` → `security-scanner`, `debug-frontend` → `debugger`, `refactor` → `refactoring-expert`) is the isolated, least-privilege specialist the pipeline delegates to. Use the skill for solo/ad-hoc work, the agent for a gated pipeline run.
+**Skills vs agents** — a `/skill` runs its checklist inline in the current session (quick, ad-hoc, can fix as it goes); the matching agent (`code-review` → `ui-reviewer`, `a11y-audit` → `accessibility-auditor`, `perf-audit` → `performance-auditor`, `security-audit` → `security-scanner`, `debug-frontend` → `debugger`, `refactor` → `refactoring-expert`, `add-tests` → `test-engineer`) is the isolated, least-privilege specialist the pipeline delegates to. Use the skill for solo/ad-hoc work, the agent for a gated pipeline run.
 
 ## Standard feature
 ```
@@ -13,7 +15,7 @@ Planning  →  Developer  →  Quality Gate (parallel)  →  DocsWriter
 3. **Quality Gate (run in parallel)** — `ui-reviewer`, `accessibility-auditor`, `test-engineer`, `performance-auditor`, and `security-scanner`. If any returns a Critical/Important finding, it routes back to `frontend-developer`; then only the auditors that flagged rerun. After two fix-and-rerun cycles, stop and surface any remaining findings to the user for a decision.
 4. **DocsWriter** — `docs-writer` updates README/component docs/changelog if public behavior changed.
 
-> **Execution model.** The lead (main session) spawns each agent with the context it needs and relays results between steps — subagents report back to the lead, not to each other. `SendMessage` between agents applies only when the pipeline runs as an experimental agent **team** (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in `settings.json`).
+> **Execution model.** The lead (main session) spawns each agent with the context it needs and relays results between steps — subagents report back to the lead, not to each other. `SendMessage` between agents applies only when the pipeline runs as an experimental agent **team** (enabled by `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, which `settings.json` already sets).
 
 ## Bug fix
 ```

@@ -2,8 +2,7 @@
 name: ci-cd-engineer
 description:
   'Sets up and maintains frontend CI/CD: GitHub Actions for install/lint/typecheck/test/build, caching, preview deploys,
-  and artifact handling. Trigger words — EN: CI, CD, pipeline, github actions, workflow yml, deploy, build pipeline.
-  Trigger words — UA: CI, CD, пайплайн, github actions, деплой, збірка.'
+  and artifact handling.'
 model: sonnet
 color: pink
 tools:

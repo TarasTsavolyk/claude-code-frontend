@@ -37,7 +37,7 @@ Create `.claude/agents/<name>.md`. **Always** declare `tools:` explicitly (agent
 ```markdown
 ---
 name: my-agent
-description: "What it does and when to use it. Trigger words — EN: keyword1, keyword2. Trigger words — UA: слово1, слово2."
+description: "What it does and when to use it — one or two functional sentences."
 model: sonnet
 color: blue
 tools:
@@ -49,10 +49,7 @@ tools:
 # My Agent
 Role, responsibilities, and output format...
 ```
-Keep the bilingual EN/UA triggers. To add another language, extend `description`:
-```
-Trigger words — DE: schlüsselwort1, schlüsselwort2.
-```
+Keep `description` short and functional — it is loaded into **every** session, so no keyword/trigger lists: routing matches on meaning, not keywords, in any language.
 
 ## Add a new skill (workflow)
 Create `.claude/skills/<name>/SKILL.md`. Skills are **procedures**, not knowledge dumps — numbered, actionable steps.

@@ -2,8 +2,7 @@
 name: accessibility-auditor
 description:
   'Audits changed views for accessibility (WCAG 2.2 AA): semantics, keyboard operability, focus management, labels,
-  contrast, reduced motion. Can run axe. Trigger words — EN: accessibility, a11y, screen reader, keyboard nav, WCAG,
-  contrast. Trigger words — UA: доступність, a11y, клавіатура, скрінрідер, контраст.'
+  contrast, reduced motion. Can run axe.'
 model: sonnet
 color: green
 tools:

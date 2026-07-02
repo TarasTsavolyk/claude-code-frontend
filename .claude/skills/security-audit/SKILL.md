@@ -1,6 +1,6 @@
 ---
 name: security-audit
-description: Review a frontend change for security issues against the OWASP Top 10:2025 — XSS/injection sinks, secret/token leakage, client-side access control, CSP/SRI, dependency vulns. The inline twin of the security-scanner agent.
+description: Review a frontend change for security issues against the OWASP Top 10:2025 — XSS/injection sinks, secret/token leakage, client-side access control, CSP/SRI, dependency vulns.
 ---
 
 # Security audit

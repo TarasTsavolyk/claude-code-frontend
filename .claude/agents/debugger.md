@@ -2,8 +2,7 @@
 name: debugger
 description:
   'Investigates frontend bugs and finds root cause before any fix: reproduces, inspects console/network/state, forms and
-  tests a hypothesis. Trigger words — EN: bug, debug, broken, not working, error, investigate, root cause, reproduce.
-  Trigger words — UA: баг, дебаг, не працює, помилка, зламано, дослідити, відтворити.'
+  tests a hypothesis.'
 model: opus
 color: red
 tools:

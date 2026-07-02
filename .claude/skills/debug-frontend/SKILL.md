@@ -5,6 +5,8 @@ description: Systematically diagnose a frontend bug to root cause before fixing.
 
 # Debug a frontend issue
 
+For a gated pipeline run, delegate to the `debugger` agent instead (isolated).
+
 1. **Reproduce deterministically.** Nail the exact steps, environment, and expected vs actual. Can't reproduce → state what info is missing and stop guessing.
 2. **Read before editing.** Locate the relevant component(s), composable(s), store, and API path. Trace the data flow end to end.
 3. **Inspect the usual frontend suspects:**

@@ -9,6 +9,18 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-07-02
+
+Accuracy pass + token diet, from a full kit audit.
+
+### Changed
+- All 12 agent `description`s dropped their EN/UA trigger-word lists and the `wizard` description was tightened — ~20% less always-loaded context; routing is meaning-based and unaffected.
+- `workflow.md` now lists all seven skill↔agent twins (`add-tests` → `test-engineer` was undocumented); `a11y-audit`/`perf-audit`/`debug-frontend` name their pipeline agent; "inline twin" phrasing left the skill descriptions.
+- `CONTRIBUTING.md` agent conventions: short functional descriptions, no trigger lists.
+
+### Fixed
+- `security-scanner` description names OWASP Top 10:2025; CLAUDE.md says "plus three global" rules and lists the fourth async state (`success`); `workflow.md` agent-teams note matches the shipped `settings.json`; README no longer claims `exec` permissions; `planner` documents when WebSearch/WebFetch apply; `settings.json` allows yarn classic `yarn audit`.
+
 ## [0.6.0] - 2026-06-26
 
 Wizard onboarding UX overhaul, driven by real-project testing.
@@ -121,7 +133,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.4.1...v0.5.0

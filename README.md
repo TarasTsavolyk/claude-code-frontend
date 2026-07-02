@@ -124,7 +124,7 @@ Edit `CLAUDE.md` by hand:
 
 ## Permissions
 
-`.claude/settings.json` pre-approves safe commands (npm/pnpm/yarn install·run·exec), gates `git commit`/`push` behind
+`.claude/settings.json` pre-approves safe commands (npm/pnpm/yarn install·run, plus npx for vitest/playwright/eslint), gates `git commit`/`push` behind
 `ask`, and denies destructive commands + `.env`/`.pem` reads. Matching is prefix-based, so treat `deny` as
 defense-in-depth behind the `ask` gates, not a hard guarantee. `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` runs the quality
 gate agents in parallel — remove it if your Claude Code version lacks agent teams.
@@ -136,7 +136,7 @@ gate agents in parallel — remove it if your Claude Code version lacks agent te
 - **Skill vs agent** — same-named pairs (`a11y-audit` / `accessibility-auditor`) are deliberate: the **skill** runs
   inline for quick/solo use; the **agent** is the isolated specialist the pipeline delegates to.
 - **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and (most) a dedicated auditor.
-- **Bilingual triggers** — every agent has EN + UA trigger words.
+- **Lean descriptions** — agent/skill `description`s stay short and functional; they load into every session, so no keyword lists.
 - **Release automation** — CHANGELOG-driven via `.github/workflows/release.yml` (see [`docs/release-automation.md`](docs/release-automation.md)).
 
 ## Optional community add-ons

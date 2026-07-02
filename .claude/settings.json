@@ -31,6 +31,7 @@
       "Bash(npm audit:*)",
       "Bash(pnpm audit:*)",
       "Bash(yarn npm audit:*)",
+      "Bash(yarn audit:*)",
       "Bash(git status)",
       "Bash(git diff:*)",
       "Bash(git add:*)",

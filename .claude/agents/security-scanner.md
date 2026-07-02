@@ -1,10 +1,8 @@
 ---
 name: security-scanner
 description:
-  'Read-only frontend security review against the OWASP Top 10: XSS/injection sinks, unsafe HTML, secret/token leakage,
-  client-side access control, CSP/SRI, dependency vulnerabilities, auth/storage handling. Can look up CVEs. Trigger
-  words — EN: security, vulnerability, XSS, secrets, CVE, audit deps, sanitize, OWASP, CSP. Trigger words — UA: безпека,
-  вразливість, XSS, секрети, токени, перевір залежності.'
+  'Read-only frontend security review against the OWASP Top 10:2025 — XSS/injection sinks, unsafe HTML, secret/token
+  leakage, client-side access control, CSP/SRI, dependency vulnerabilities, auth/storage handling. Can look up CVEs.'
 model: opus
 color: red
 tools:
