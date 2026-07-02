@@ -36,5 +36,4 @@ How the app talks to the network. Architecture says *where* fetching lives (`arc
 - Server data is a **cache**, not source-of-truth app state. Don't copy fetched data into a Pinia store and treat it as canonical — let the query layer own it; keep Pinia for genuinely shared *client* state (see `architecture.md`).
 
 ## Verify
-- Each new async read renders loading, error, and empty states, not just the happy path.
-- Responses are validated/parsed before use; requests are cancelled on teardown.
+- All four async states render (not just the happy path); responses are parsed at the boundary; teardown cancels in-flight requests.

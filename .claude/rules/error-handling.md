@@ -34,5 +34,4 @@ Failures are part of the contract. Handle them deliberately; make them visible t
 - Preserve user input on failure (don't clear the form). Offer retry for transient errors. Field-level vs form-level error placement follows `forms.md`.
 
 ## Verify
-- New async paths handle rejection; no empty catches introduced.
-- Failure states are reachable and rendered (test the error branch, not just success).
+- New async paths handle rejection (no empty catches), and the error branch is rendered and tested — not just success.

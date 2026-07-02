@@ -16,7 +16,7 @@ Turn "should work" into "verified". The quality gate is the floor (`CLAUDE.md`);
 - Check the diff for scope creep: only what the task required changed (see `principles.md` → surgical changes). No stray `console.log`, debug code, or commented-out blocks.
 
 ## 3. Spot-check the relevant rules
-- New behavior: loading/error/empty states rendered, errors not swallowed (`data-fetching.md`, `error-handling.md`).
+- New behavior: loading/error/empty/success states rendered, errors not swallowed (`data-fetching.md`, `error-handling.md`).
 - UI: keyboard-operable + labelled (`accessibility.md`); tokens not magic values (`styling.md`); no obvious XSS sink (`security.md`).
 - For a deeper pass, hand off to `/code-review`, `/a11y-audit`, `/perf-audit`, or `/security-audit`.
 
