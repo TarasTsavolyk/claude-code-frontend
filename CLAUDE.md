@@ -1,6 +1,6 @@
 # <PROJECT_NAME>
 
-This file is always-loaded memory: keep it short and factual. Domain conventions live in `.claude/rules/` (path-scoped).
+This file is always-loaded memory: keep it short and factual. Domain conventions live in `.claude/rules/` (path-scoped, plus three global ones).
 Workflows live in `.claude/skills/`. The agent pipeline is defined in `.claude/rules/workflow.md`.
 
 > **Reference stack in rule/agent bodies.** Conventions are written against the **Vue 3 reference stack** (the kit
@@ -83,7 +83,7 @@ src/
 - Components stay small and presentational. Logic lives in composables (`useX`).
 - Pinia stores hold **shared** state only; local state stays in the component.
 - No data fetching inside components — go through a composable or service layer; validate responses and render
-  loading/error/empty states (see `rules/data-fetching.md`).
+  loading/error/empty/success states (see `rules/data-fetching.md`).
 - Handle errors explicitly — never swallow; surface unexpected ones to an error boundary (see
   `rules/error-handling.md`).
 - Config comes from validated env, centralized and typed; only `VITE_` vars reach the client (see `rules/config.md`).

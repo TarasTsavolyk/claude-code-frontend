@@ -1,6 +1,6 @@
 ---
 name: wizard
-description: First-run onboarding — adapt this kit to the host project: detect the framework + stack, confirm it with checkbox prompts, sync CLAUDE.md to the real project (placeholders, structure, commands), then offer to prune what the project won't use. Use right after copying the kit into a repo, or re-run to re-sync after the stack changes. Removes nothing on its own — pruning is an explicit opt-in at the end.
+description: First-run onboarding — detect the host project's framework + stack, confirm via checkbox prompts, sync CLAUDE.md to the real project (structure, commands), then offer /prune (opt-in — removes nothing itself). Use after copying the kit into a repo, or re-run after a stack change.
 ---
 
 # Onboarding wizard

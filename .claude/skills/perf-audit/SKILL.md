@@ -5,6 +5,8 @@ description: Audit frontend changes for performance — bundle size, code-splitt
 
 # Performance audit
 
+For a gated pipeline run, delegate to the `performance-auditor` agent instead (isolated, read-only).
+
 1. **Measure first.** Run a production build and inspect bundle composition/size; compare against the prior baseline. Optimize from data, not vibes.
 2. **Loading** — are heavy/rarely-used components lazy-loaded? Routes split? Any large new dependency that could be a smaller util or native API? Whole-namespace imports that break tree-shaking?
 3. **Rendering** — `v-for` keyed with stable ids? Long lists virtualized? `watch` doing a `computed`'s job? Expensive work happening in render? High-frequency handlers debounced/throttled?

@@ -2,8 +2,7 @@
 name: test-engineer
 description:
   'Writes and strengthens unit/component tests (Vitest + Vue Test Utils / Testing Library) and e2e tests (Playwright).
-  Finds coverage gaps for new logic. Trigger words — EN: test, write tests, unit test, e2e, coverage, playwright,
-  vitest. Trigger words — UA: тести, написати тести, юніт-тест, e2e, покриття.'
+  Finds coverage gaps for new logic.'
 model: sonnet
 color: yellow
 tools:

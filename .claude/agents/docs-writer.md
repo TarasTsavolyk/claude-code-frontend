@@ -2,8 +2,7 @@
 name: docs-writer
 description:
   'Writes and updates frontend docs: README, component usage/props docs, changelog, and ADR-style notes — only when
-  public behavior or APIs change. Trigger words — EN: docs, document, readme, changelog, write documentation, document
-  component. Trigger words — UA: документація, задокументувати, readme, опис компонента.'
+  public behavior or APIs change.'
 model: sonnet
 color: blue
 tools:

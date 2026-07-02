@@ -5,6 +5,8 @@ description: Run an accessibility audit on a view or component against WCAG 2.2 
 
 # Accessibility audit
 
+For a gated pipeline run, delegate to the `accessibility-auditor` agent instead (isolated, read-only).
+
 1. **Automated pass** — run an axe check on the changed view(s) (`<pm> exec` / `npx`). Record violations; they're the floor, not the ceiling.
 2. **Semantics** — verify native elements are used where possible; ARIA only fills real gaps and is correct; headings/landmarks are sane.
 3. **Forms** — every control has a label; errors are associated and announced; required/invalid state isn't color-only.

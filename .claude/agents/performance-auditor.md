@@ -2,9 +2,7 @@
 name: performance-auditor
 description:
   'Read-only performance review of frontend changes: bundle impact, code-splitting, render efficiency, list
-  virtualization, asset/image handling. Can run build analysis. Trigger words — EN: performance, perf, bundle size,
-  slow, optimize, lighthouse, re-render. Trigger words — UA: продуктивність, перф, розмір бандлу, повільно,
-  оптимізувати, лагає.'
+  virtualization, asset/image handling. Can run build analysis.'
 model: sonnet
 color: orange
 tools:

@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review a Vue change for architecture fit, prop/emit/slot design, state placement, styling/token use, types, and readability before merge. The inline twin of the ui-reviewer agent.
+description: Review a Vue change for architecture fit, prop/emit/slot design, state placement, styling/token use, types, and readability before merge.
 ---
 
 # Code review
