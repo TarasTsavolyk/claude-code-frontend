@@ -27,5 +27,4 @@ If it breaks or slows down in production, you should know without a user telling
 - Respect consent and Do-Not-Track; gate non-essential tracking behind it. Sample high-volume logs/events instead of sending everything.
 
 ## Verify
-- No PII/secrets in logs, breadcrumbs, or analytics payloads.
-- Unexpected errors reach the tracker; source maps are uploaded privately, not shipped.
+- No PII/secrets in logs, breadcrumbs, or analytics payloads; unexpected errors reach the tracker.

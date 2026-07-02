@@ -9,6 +9,18 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-07-02
+
+Rule dedup — "one rule, one home".
+
+### Changed
+- Each convention now lives in one canonical rule, others point at it: `architecture.md` states props/mutation and fetch-placement once (route guards and the overlay behaviors point at `security.md`/`accessibility.md`); `i18n.md`'s `v-html` bullet points at `security.md`.
+- `security.md` dropped its per-bullet OWASP/CWE codes — the `security-scanner`/`/security-audit` pair owns that mapping, so the rule no longer rots when OWASP renumbers.
+- `## Verify` blocks that restated their own file (`data-fetching`, `config`, `error-handling`, `observability`, `security`) compress to one non-restating line each.
+
+### Fixed
+- `data-fetching.md` Verify and the `verify` skill name all four async states (`success` was missing).
+
 ## [0.7.0] - 2026-07-02
 
 First-class **bun** support + onboarding edge cases.
@@ -145,7 +157,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.5.1...v0.6.0

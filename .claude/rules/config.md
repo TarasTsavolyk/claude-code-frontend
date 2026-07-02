@@ -27,5 +27,4 @@ One typed, validated source of config. No hardcoded hosts, keys, or magic enviro
 - Centralize flags in the typed config; default new flags **off**. Remove a flag once its rollout is complete — stale flags are dead branches.
 
 ## Verify
-- No `process.env` or raw inline secrets in client code; no scattered `import.meta.env.VITE_*` reads outside the config module.
-- Required vars are validated at startup and documented in `.env.example`.
+- Env reads live only in the config module — validated at startup, documented in `.env.example`; no `process.env` or inline secrets in client code.
