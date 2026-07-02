@@ -9,6 +9,18 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-07-02
+
+Fable-era model pass — tier by role, escalate by exception.
+
+### Changed
+- `docs-writer` runs on `haiku` (mechanical diff→docs work; was `sonnet`).
+- `workflow.md` Bug fix: a bug that survives a full `debugger` pass escalates via a stronger model override (`fable`) instead of looping on the same tier.
+
+### Added
+- README "Design choices": the model-tier rationale — `opus` judgment chain, `sonnet` auditors, `haiku` docs; Fable as the lead-session/escalation tier.
+- `security-scanner` frontmatter pins the not-Fable constraint at the point of edit (its cyber classifiers false-positive on security review).
+
 ## [0.8.0] - 2026-07-02
 
 Twin convergence — every checklist has one home.
@@ -170,7 +182,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.6.1...v0.7.0

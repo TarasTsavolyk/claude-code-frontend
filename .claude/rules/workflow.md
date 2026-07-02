@@ -22,6 +22,8 @@ Planning  →  Developer  →  Quality Gate (parallel)  →  DocsWriter
 Debugger  →  Developer  →  Verify (test-engineer + ui-reviewer)
 ```
 `debugger` reproduces and finds root cause; `frontend-developer` fixes; verification confirms with a regression test.
+A bug that survives a full `debugger` pass gets escalated, not looped: re-spawn `debugger` with a stronger model
+override (`fable` where available) instead of retrying on the same tier.
 
 ## Refactor
 ```
