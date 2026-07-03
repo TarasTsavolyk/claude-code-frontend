@@ -81,8 +81,8 @@ anytime once you're settled.
 ```
 CLAUDE.md                       # always-loaded project memory (the template)
 .claude/
-  settings.json                 # permissions + agent-teams flag + onboarding hook
-  hooks/                        # node helpers: detect-stack · session-start · check-refs · pre-commit-gate
+  settings.json                 # permissions + agent-teams flag + hooks wiring (gate · onboarding)
+  hooks/                        # node helpers: detect-stack · session-start · check-refs · pre-commit-gate · post-edit-lint (opt-in)
   rules/                        # 13 path-scoped + 3 global
     architecture  code-style  styling  testing  forms
     accessibility  performance  i18n  security        # path-scoped
@@ -113,6 +113,18 @@ cp .claude/rules/principles.md .claude/rules/git-operations.md ~/.claude/rules/ 
 > project (if one still won't load, try `paths:` → `globs:`). And don't copy skills/agents to `~/.claude/`: their
 > checklists have one home in the project's `.claude/rules/`, so outside the project they'd point at nothing.
 
+## Multi-tool teams (AGENTS.md)
+
+`CLAUDE.md` is the source of truth. If teammates run tools that read the cross-tool `AGENTS.md` standard (Cursor,
+Codex, Zed, …), point it at the same file instead of maintaining two memories:
+
+```bash
+ln -s CLAUDE.md AGENTS.md   # commit the symlink
+```
+
+Only the memory file travels this way — `.claude/rules|agents|skills|hooks` are Claude Code-specific, so other tools
+get the conventions summary but not the pipeline.
+
 ## Manual setup (only if you skip the wizard)
 
 Edit `CLAUDE.md` by hand:
@@ -134,6 +146,25 @@ until the quality gate passes** — lint → typecheck → test via your lockfil
 docs-only and `.claude/`-only commits, repos without a `package.json`/lockfile, or missing scripts skip the gate. Slow
 suite? Trim the `steps` list in the hook or raise its `timeout` in `settings.json`.
 
+**Opt-in:** [`post-edit-lint.mjs`](.claude/hooks/post-edit-lint.mjs) silently runs `eslint --fix` on every file Claude
+edits (skipped when the project has no local eslint). It's not wired by default — eslint startup on every edit isn't
+free — enable it by adding to `"hooks"` in `settings.json`:
+
+```json
+"PostToolUse": [
+  {
+    "matcher": "Edit|Write",
+    "hooks": [
+      {
+        "type": "command",
+        "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-lint.mjs\"",
+        "timeout": 30
+      }
+    ]
+  }
+]
+```
+
 ## Design choices
 
 - **Lean context** — path-scoped rules load only for the files they match.
@@ -150,6 +181,9 @@ suite? Trim the `steps` list in the hook or raise its `timeout` in `settings.jso
 - **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and (most) a dedicated auditor.
 - **Lean descriptions** — agent/skill `description`s stay short and functional; they load into every session, so no keyword lists.
 - **Release automation** — CHANGELOG-driven via `.github/workflows/release.yml` (see [`docs/release-automation.md`](docs/release-automation.md)).
+- **Copy-and-adapt over plugin install** — the kit is meant to be *owned*: `/wizard` rewrites CLAUDE.md and `/prune`
+  deletes files, which a read-only plugin install can't do. A plugin build may come later for discovery; the project's
+  committed copy stays the source of truth.
 
 ## Optional community add-ons
 

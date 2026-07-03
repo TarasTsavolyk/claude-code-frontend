@@ -9,6 +9,17 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-07-03
+
+Adoption pass — auto-fix on edit (opt-in), AGENTS.md interop, distribution stance.
+
+### Added
+- `hooks/post-edit-lint.mjs` (opt-in, not wired by default): silently runs `eslint --fix` on every file Claude edits; README documents the `PostToolUse` snippet to enable it.
+- README "Multi-tool teams (AGENTS.md)": symlink `AGENTS.md → CLAUDE.md` so AGENTS.md-reading tools share the same memory; `.claude/*` stays Claude Code-specific.
+
+### Changed
+- README "Design choices" states the distribution stance: copy-and-adapt over plugin install (`/wizard` rewrites and `/prune` deletes — a read-only plugin can't); Contents tree glosses updated (settings hooks wiring, new hook).
+
 ## [0.10.1] - 2026-07-02
 
 Wizard accuracy pass.
@@ -209,7 +220,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.1...v0.11.0
 [0.10.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.8.0...v0.9.0
