@@ -18,7 +18,7 @@ Planning  →  Developer  →  Quality Gate (parallel)  →  DocsWriter
    - Untrusted data, auth/session, storage, raw-HTML-class sinks, or dependency changes → add `security-scanner`.
    - Lists, bundle-affecting changes, new dependencies, or asset handling → add `performance-auditor`.
    - Large or release-bound changes → run the full board.
-   If any auditor returns a Critical/Important finding, it routes back to `frontend-developer`; then only the auditors that flagged rerun. After two fix-and-rerun cycles, stop and surface any remaining findings to the user for a decision.
+   **Verify before bouncing** — auditor findings are claims, not facts. For each Critical/Important finding, the lead spawns one fresh instance of the flagging auditor's agent with a single job: *refute this finding against the actual code*. Confirmed findings route back to `frontend-developer`; refuted ones are dropped with a one-line note; Nice-to-haves skip verification. Then only the auditors that flagged rerun on the fix. After two fix-and-rerun cycles, stop and surface any remaining findings to the user for a decision.
 4. **DocsWriter** — `docs-writer` updates README/component docs/changelog if public behavior changed.
 
 > **Execution model.** The lead (main session) spawns each agent with the context it needs and relays results between steps — subagents report back to the lead, not to each other. `SendMessage` between agents applies only when the pipeline runs as an experimental agent **team** (enabled by `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, which `settings.json` already sets).

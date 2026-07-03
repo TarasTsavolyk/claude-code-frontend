@@ -173,7 +173,8 @@ free — enable it by adding to `"hooks"` in `settings.json`:
   `debugger`, `security-scanner`), `sonnet` for the bounded auditors, `haiku` for `docs-writer`. Fable-class models earn
   their premium as the **lead session** (pipeline orchestration, epics) or as a one-off `debugger` escalation — not as
   a default agent tier. Exception: keep `security-scanner` off Fable — its cyber safety classifiers false-positive on
-  security-review work.
+  security-review work. Prefer following the session instead? Set `model: inherit` on the judgment chain and pick the
+  tier per session.
 - **Skill vs agent** — same-named pairs (`a11y-audit` / `accessibility-auditor`) are deliberate: the **skill** runs
   inline for quick/solo use; the **agent** is the isolated specialist the pipeline delegates to.
 - **One home per rule** — a convention lives in exactly one rule file; skills and agents carry the *process* and point

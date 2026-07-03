@@ -55,7 +55,8 @@ form works for npm/pnpm/yarn/bun), `<pm> exec <bin>` (or `npx <bin>`).
 ## Quality gate (must pass before any commit)
 
 `<pm> run lint && <pm> run test` (plus `<pm> run typecheck` in TypeScript projects) — no exceptions. New behavior
-requires tests.
+requires tests. A `PreToolUse` hook enforces this mechanically at `git commit` time
+(`.claude/hooks/pre-commit-gate.mjs`).
 
 ## Project structure
 

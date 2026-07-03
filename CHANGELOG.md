@@ -9,6 +9,15 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-07-03
+
+Findings are claims, not facts.
+
+### Changed
+- Quality Gate verifies before bouncing: each Critical/Important finding gets one fresh refutation pass by the flagging auditor's agent; only confirmed findings route back to `frontend-developer` — the pipeline-level twin of `code-review`'s inline false-positive kill pass.
+- CLAUDE.md Quality gate names its mechanical enforcement (`pre-commit-gate.mjs` at `git commit` time).
+- README model-tiers bullet documents `model: inherit` as the per-session cost dial for the judgment chain.
+
 ## [0.11.0] - 2026-07-03
 
 Adoption pass — auto-fix on edit (opt-in), AGENTS.md interop, distribution stance.
@@ -220,7 +229,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.1...v0.11.0
 [0.10.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.9.0...v0.10.0
