@@ -5,7 +5,7 @@ description: First-run onboarding — detect the host project's framework + stac
 
 # Onboarding wizard
 
-Adapts the kit to **this** project: detect the framework and stack, confirm it with the user, sync [CLAUDE.md](../../../CLAUDE.md) to the real project, then optionally hand off to `/prune`. The wizard itself deletes no agents/skills/rules — pruning happens only if the user opts in at the end (step 9).
+Adapts the kit to **this** project: detect the framework and stack, confirm it with the user, sync [CLAUDE.md](../../../CLAUDE.md) to the real project, then optionally hand off to `/prune`. The wizard itself deletes no agents/skills/rules — pruning happens only if the user opts in at the end (step 10).
 
 Work through the steps in order. Stop and ask whenever a value is ambiguous; never guess a stack choice silently. **Prefer `AskUserQuestion` (checkbox/radio prompts) over asking the user to type "1, 2, 3".**
 
@@ -48,8 +48,17 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
 
 6. **Confirm the machine-local paths are ignored.** The SessionStart hook auto-adds `.claude/.wizard/` to `.gitignore` on every run (`ensureWizardIgnored` in `detect-stack.mjs`) — confirm it, and append it manually only if the hook hasn't run yet (it holds the machine-local detection cache, which must not be committed). Also ensure the other two machine-local entries from the README quick-start: `.claude/settings.local.json` and `.claude/worktrees/` — append any that are missing. Do **not** ignore `.claude/.onboarded` (it's the committed marker teammates rely on).
 
-7. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack, framework first (e.g. `2026-06-26 · react · pnpm · TypeScript · Tailwind · layer-first`). This stops the SessionStart hook from prompting again, and it **is** committed so teammates skip onboarding.
+7. **Offer the native pre-commit gate (opt-in).** The shipped `PreToolUse` hook gates only commits made *through
+   Claude Code* — a commit from a plain terminal bypasses it. Ask via `AskUserQuestion` (yes/no) whether to install the
+   same gate as a native git hook. If **yes**: when the repo already uses a hook manager (husky/lefthook — check
+   `package.json` and existing hook dirs), add `node .claude/hooks/pre-commit-gate.mjs --native` to its pre-commit
+   config instead of fighting it; otherwise write `.git/hooks/pre-commit` (`#!/bin/sh` + `exec node "$(git rev-parse
+   --show-toplevel)/.claude/hooks/pre-commit-gate.mjs" --native`) and `chmod +x` it. Note that `.git/hooks/` is
+   machine-local — teammates re-run `/wizard` or copy the snippet from the README. If **no**, mention the README
+   documents the one-liner.
 
-8. **Summarize.** Tell the user exactly what changed in CLAUDE.md — placeholders resolved, structure synced, commands reconciled. Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see `rules/git-operations.md`).
+8. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack, framework first (e.g. `2026-06-26 · react · pnpm · TypeScript · Tailwind · layer-first`). This stops the SessionStart hook from prompting again, and it **is** committed so teammates skip onboarding.
 
-9. **Offer to prune (opt-in).** The kit still ships **every** agent, skill, and rule — nothing was removed. Ask the user via `AskUserQuestion` (yes/no) whether to remove the capabilities this project won't use now. If **yes**, run the `/prune` skill — it presents the removable units as checkboxes, is graph-aware, and fixes every cross-reference. Note that `/prune` wants a clean tree, so recommend committing the onboarding first. If **no**, remind them `/prune` is available anytime later. Never remove anything without this explicit go-ahead.
+9. **Summarize.** Tell the user exactly what changed in CLAUDE.md — placeholders resolved, structure synced, commands reconciled. Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see `rules/git-operations.md`).
+
+10. **Offer to prune (opt-in).** The kit still ships **every** agent, skill, and rule — nothing was removed. Ask the user via `AskUserQuestion` (yes/no) whether to remove the capabilities this project won't use now. If **yes**, run the `/prune` skill — it presents the removable units as checkboxes, is graph-aware, and fixes every cross-reference. Note that `/prune` wants a clean tree, so recommend committing the onboarding first. If **no**, remind them `/prune` is available anytime later. Never remove anything without this explicit go-ahead.

@@ -56,7 +56,8 @@ form works for npm/pnpm/yarn/bun), `<pm> exec <bin>` (or `npx <bin>`).
 
 `<pm> run lint && <pm> run test` (plus `<pm> run typecheck` in TypeScript projects) — no exceptions. New behavior
 requires tests. A `PreToolUse` hook enforces this mechanically at `git commit` time
-(`.claude/hooks/pre-commit-gate.mjs`).
+(`.claude/hooks/pre-commit-gate.mjs`) — Claude-side only; the same script installs as a native git hook
+(`--native`, `/wizard` offers it) to gate terminal commits too.
 
 ## Project structure
 

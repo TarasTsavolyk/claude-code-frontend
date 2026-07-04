@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 /**
- * PreToolUse hook — the quality gate as a mechanism, not a convention.
+ * The quality gate as a mechanism, not a convention. Two entry points:
  *
- * Fires on every Bash tool call; acts only when the command is a `git commit`.
- * Runs the CLAUDE.md gate (lint → typecheck → test, via the lockfile-detected
- * package manager) and blocks the commit (exit 2) on the first failure, feeding
- * the output back to Claude.
+ * - PreToolUse hook (default): fires on every Bash tool call; acts only when
+ *   the command is a `git commit`. Catches commits made *through Claude Code*.
+ * - `--native`: run from `.git/hooks/pre-commit` (the wizard offers to install
+ *   it), so commits from a plain terminal hit the same gate.
+ *
+ * Either way it runs the CLAUDE.md gate (lint → typecheck → test, via the
+ * lockfile-detected package manager) and blocks the commit (exit 2 / non-zero)
+ * on the first failure, feeding the output back.
  *
  * Fail-open by design, like detect-stack: unparseable input, no package.json,
  * no lockfile, no matching scripts, or a docs-/kit-config-only commit → exit 0.
@@ -15,18 +19,21 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const chunks = [];
-for await (const chunk of process.stdin) chunks.push(chunk);
+const native = process.argv.includes('--native');
 
 let payload;
-try {
-  payload = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-} catch {
-  process.exit(0);
+let command = '';
+if (!native) {
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  try {
+    payload = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  } catch {
+    process.exit(0);
+  }
+  command = payload?.tool_input?.command ?? '';
+  if (!isGitCommit(command)) process.exit(0);
 }
-
-const command = payload?.tool_input?.command ?? '';
-if (!isGitCommit(command)) process.exit(0);
 
 const root = process.env.CLAUDE_PROJECT_DIR || payload?.cwd || process.cwd();
 const pkgPath = join(root, 'package.json');

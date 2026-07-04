@@ -9,6 +9,16 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-07-05
+
+The gate and the framing tell the truth.
+
+### Added
+- `pre-commit-gate.mjs --native`: the same gate runs from `.git/hooks/pre-commit`, so terminal commits are gated too — the `PreToolUse` hook only ever caught commits made through Claude Code. `/wizard` step 7 offers to install it (husky/lefthook-aware); README documents the one-liner and the limit.
+
+### Changed
+- README repositioned as **Vue-first**: Vue is the native fit; other detected frameworks run in explicit "translation mode" until per-framework rule sets exist — no more implying full framework-agnostic value today.
+
 ## [0.14.0] - 2026-07-05
 
 Agents get eyes.

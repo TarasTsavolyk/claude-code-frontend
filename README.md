@@ -6,14 +6,15 @@
 > Copy-and-adapt config — **not** an npm package. Drop it into a frontend repo, run `/wizard`, and Claude Code works as
 > a teammate that already knows your stack and conventions.
 
-A Claude Code configuration for **frontend projects** — **12 agents, 16 rules (13 path-scoped), and 15 skills** wired into
-a review pipeline. The architecture is framework-agnostic; swap the framework, package manager, and styling specifics per
-project.
+A **Vue-first** Claude Code configuration for frontend projects — **12 agents, 16 rules (13 path-scoped), and 15
+skills** wired into a review pipeline. The architecture (rules/agents/skills/hooks and how they combine) is
+framework-agnostic; the shipped conventions speak Vue.
 
-> **Reference stack:** the shipped rules and scaffolds target **Vue 3** today (Vite · Pinia · Vitest · Playwright,
-> TypeScript optional). `/wizard` **detects your framework** (Vue · React · Angular · Svelte · Solid · Preact · Lit, plus
-> meta-frameworks like Nuxt/Next/SvelteKit) and names it in `CLAUDE.md`; the rules still speak the Vue reference stack,
-> with named APIs translating to your framework.
+> **Reference stack:** the shipped rules and scaffolds target **Vue 3** (Vite · Pinia · Vitest · Playwright,
+> TypeScript optional) — that's the native fit. `/wizard` **detects other frameworks** (React · Angular · Svelte ·
+> Solid · Preact · Lit, plus meta-frameworks like Nuxt/Next/SvelteKit) and names yours in `CLAUDE.md`, but until
+> per-framework rule sets exist that is **translation mode**: the rules still name Vue APIs and Claude maps them to
+> your framework's equivalents. Workable, with overhead — Vue teams get the full value today.
 
 ## How it works
 
@@ -60,8 +61,9 @@ after a stack change). It **detects your framework** (Vue/React/Angular/Svelte/�
 prompts, guards your git tree (won't touch uncommitted work), and **syncs `CLAUDE.md` to the real project** — resolving
 placeholders, rewriting the project-structure block from your actual `src/` layout, and reconciling the Commands block
 against your real `package.json` scripts. It keeps `<pm>` as a token — Claude substitutes your package manager from the
-lockfile, so the config never hardcodes npm/pnpm/yarn/bun — writes a committed `.claude/.onboarded` marker so teammates
-aren't re-prompted, and finishes by **offering `/prune`**.
+lockfile, so the config never hardcodes npm/pnpm/yarn/bun — offers to install the quality gate as a **native git
+hook** (see [Permissions](#permissions)), writes a committed `.claude/.onboarded` marker so teammates aren't
+re-prompted, and finishes by **offering `/prune`**.
 
 **`/prune`** removes agents/skills/rules a project won't use. It's **destructive** (commits on a branch, so git is the
 undo), tiered (safe opt-outs vs. warned essentials like security/a11y), driven by checkbox prompts, and fixes every
@@ -147,6 +149,17 @@ A `PreToolUse` hook ([`pre-commit-gate.mjs`](.claude/hooks/pre-commit-gate.mjs))
 until the quality gate passes** — lint → typecheck → test via your lockfile-detected package manager. It fails open:
 docs-only and `.claude/`-only commits, repos without a `package.json`/lockfile, or missing scripts skip the gate. Slow
 suite? Trim the `steps` list in the hook or raise its `timeout` in `settings.json`.
+
+**Honest limit:** the `PreToolUse` hook gates only commits made *through Claude Code* — a commit from your own
+terminal bypasses it. `/wizard` offers to install the same script as a **native git hook** (or add it to your
+husky/lefthook config); to do it by hand:
+
+```bash
+printf '#!/bin/sh\nexec node "$(git rev-parse --show-toplevel)/.claude/hooks/pre-commit-gate.mjs" --native\n' > .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+`.git/hooks/` is machine-local — each teammate installs it once (or lets `/wizard` do it).
 
 **Opt-in:** [`post-edit-lint.mjs`](.claude/hooks/post-edit-lint.mjs) silently runs `eslint --fix` on every file Claude
 edits (skipped when the project has no local eslint). It's not wired by default — eslint startup on every edit isn't
