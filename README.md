@@ -99,6 +99,7 @@ anytime once you're settled.
 CLAUDE.md                       # always-loaded project memory (the template)
 .mcp.json                       # Playwright MCP — a real browser for the lead and the browser-capable agents
 .claude-plugin/  plugin/        # marketplace + installer plugin (kit-repo only — adopters don't copy these)
+tests/hooks/                    # hook unit tests, zero-dep `node --test` (kit-repo only; CI runs them on every PR)
 .claude/
   settings.json                 # permissions + agent-teams flag + hooks wiring (gate · onboarding)
   hooks/                        # node helpers: detect-stack · session-start · check-refs · pre-commit-gate · post-edit-lint (opt-in)
@@ -233,7 +234,8 @@ Third-party, stack-agnostic — install only if you want them:
 
 ## Contributing
 
-PRs welcome — new rules, agents, and skills especially. See [CONTRIBUTING.md](CONTRIBUTING.md) for conventions (generic,
+PRs welcome — new rules, agents, and skills especially. Touching a hook? Run `node --test tests/hooks/*.test.mjs`
+(Node 18+, no install needed — CI runs it on every PR). See [CONTRIBUTING.md](CONTRIBUTING.md) for conventions (generic,
 TypeScript-optional, package-manager-agnostic, least-privilege tools) and the
 [issue](.github/ISSUE_TEMPLATE) / [PR](.github/PULL_REQUEST_TEMPLATE.md) templates.
 

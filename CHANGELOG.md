@@ -9,6 +9,14 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-07-05
+
+The riskiest code in the kit — the hooks — is now tested.
+
+### Added
+- `tests/hooks/` — 28 unit tests over all five hooks via zero-dep `node --test` (no package.json needed): detect-stack heuristics (framework/meta/PM/corepack/workspaces/kit-state), pre-commit-gate (fail-open paths, commit parsing, block/pass, docs-only skip, `--native`), check-refs (corpus exclusions, hyphen boundary), post-edit-lint (fail-open, real `--fix` invocation), session-start (nudge/silence).
+- `.github/workflows/test.yml` runs the suite on every push/PR; README Contributing points hook changes at it.
+
 ## [0.16.0] - 2026-07-05
 
 The kit gets an update path.
