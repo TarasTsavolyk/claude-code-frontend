@@ -40,6 +40,7 @@ gate in parallel — and the rules keep every step on your conventions.
    ```bash
    cp -r .claude /path/to/your-app/.claude   # ⚠ overwrites an existing .claude/ — merge by hand if you have one
    cp CLAUDE.md  /path/to/your-app/CLAUDE.md
+   cp .mcp.json  /path/to/your-app/.mcp.json  # Playwright MCP (browser for agents) — merge by hand if you have one
    rm -f /path/to/your-app/.claude/settings.local.json   # machine-local, don't share
    rm -rf /path/to/your-app/.claude/.wizard /path/to/your-app/.claude/worktrees   # machine-local caches, present if you ran Claude Code in the kit clone
    ```
@@ -80,6 +81,7 @@ anytime once you're settled.
 
 ```
 CLAUDE.md                       # always-loaded project memory (the template)
+.mcp.json                       # Playwright MCP — a real browser for the lead and the browser-capable agents
 .claude/
   settings.json                 # permissions + agent-teams flag + hooks wiring (gate · onboarding)
   hooks/                        # node helpers: detect-stack · session-start · check-refs · pre-commit-gate · post-edit-lint (opt-in)
@@ -180,6 +182,10 @@ free — enable it by adding to `"hooks"` in `settings.json`:
 - **One home per rule** — a convention lives in exactly one rule file; skills and agents carry the *process* and point
   at the owning rule instead of restating it.
 - **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and (most) a dedicated auditor.
+- **See it, don't infer it** — `.mcp.json` ships the [Playwright MCP](https://github.com/microsoft/playwright-mcp)
+  (`npx`-run, pre-approved in `settings.json`), so with a dev server running, `/verify`, `/debug-frontend`,
+  `/a11y-audit` — and the `debugger` / `ui-reviewer` / `accessibility-auditor` agents — judge the **rendered** UI
+  (console, network, axe in a real browser), not just the code. Remove the file if you'd rather not grant a browser.
 - **Lean descriptions** — agent/skill `description`s stay short and functional; they load into every session, so no keyword lists.
 - **Release automation** — CHANGELOG-driven via `.github/workflows/release.yml` (see [`docs/release-automation.md`](docs/release-automation.md)).
 - **Copy-and-adapt over plugin install** — the kit is meant to be *owned*: `/wizard` rewrites CLAUDE.md and `/prune`

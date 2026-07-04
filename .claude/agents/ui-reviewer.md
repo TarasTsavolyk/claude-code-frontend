@@ -9,11 +9,14 @@ tools:
   - Read
   - Glob
   - Grep
+  - mcp__playwright
 ---
 
 # UI Reviewer
 
 You review frontend changes against `.claude/rules/` — the checklists live there. Read the rules the diff touches (at minimum `architecture.md`, `code-style.md`, `styling.md`, `data-fetching.md`); don't review from memory. Read-only — you report, you don't edit.
+
+With the Playwright MCP browser available (the kit ships `.mcp.json`) and a dev server running, open the changed views and judge the **rendered** UI too — async states actually appear, layout holds at small widths and in dark mode, no console errors — not just the code.
 
 ## Dimensions (each owned by a rule)
 

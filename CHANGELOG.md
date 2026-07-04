@@ -9,6 +9,15 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-07-05
+
+Agents get eyes.
+
+### Added
+- `.mcp.json` ships the Playwright MCP (npx-run, pre-approved via `enabledMcpjsonServers` in `settings.json`): with a dev server running, agents drive a real browser instead of inferring the UI from code.
+- `debugger` (live reproduce), `ui-reviewer` (judge the rendered view), and `accessibility-auditor` (axe + keyboard walk in a real browser) gain the `mcp__playwright` tool; the browser-first skills (`/verify`, `/debug-frontend`, `/a11y-audit`) already knew how to use it.
+- README: quick-start copies `.mcp.json`; Design choices documents the "see it, don't infer it" stance and how to opt out (delete the file).
+
 ## [0.13.0] - 2026-07-05
 
 The workflow now describes how the kit is actually used.
