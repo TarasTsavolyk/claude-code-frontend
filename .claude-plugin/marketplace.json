@@ -1,0 +1,15 @@
+{
+  "name": "claude-code-frontend",
+  "owner": { "name": "Taras Tsavolyk" },
+  "description": "Frontend kit for Claude Code — installer/updater plugin. The kit itself (rules · agents · skills · hooks) is installed into your repo as an owned, committed copy.",
+  "plugins": [
+    {
+      "name": "frontend-kit",
+      "source": "./plugin",
+      "description": "Install and update the claude-code-frontend kit in the current repo",
+      "version": "0.16.0",
+      "license": "MIT",
+      "homepage": "https://github.com/TarasTsavolyk/claude-code-frontend"
+    }
+  ]
+}

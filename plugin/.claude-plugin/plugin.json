@@ -1,0 +1,11 @@
+{
+  "name": "frontend-kit",
+  "displayName": "Frontend Kit (installer)",
+  "description": "Installer/updater for the claude-code-frontend kit. Plugins can't ship rules, CLAUDE.md, or settings — so this plugin doesn't try: it copies the kit into your repo as an owned, committed copy and keeps it up to date.",
+  "version": "0.16.0",
+  "author": { "name": "Taras Tsavolyk" },
+  "homepage": "https://github.com/TarasTsavolyk/claude-code-frontend",
+  "repository": "https://github.com/TarasTsavolyk/claude-code-frontend",
+  "license": "MIT",
+  "keywords": ["frontend", "vue", "claude-code", "configuration", "kit"]
+}

@@ -9,6 +9,14 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-07-05
+
+The kit gets an update path.
+
+### Added
+- The repo is now a plugin **marketplace** (`.claude-plugin/marketplace.json`) shipping one plugin: `frontend-kit` (`plugin/`) — an installer/updater, not a runtime. `/frontend-kit:install` copies the kit into a repo (then hands off to `/wizard`); `/frontend-kit:update` syncs new releases into the committed copy — diff-aware, prune-aware (never silently re-adds removed units), and never touches the project's `CLAUDE.md`.
+- Why not a full plugin port: plugins can't ship rules, CLAUDE.md, permissions, or env settings — so the owned committed copy stays the source of truth and the plugin is only the delivery vehicle. README quick start now leads with the plugin route; the Design choices distribution bullet updated.
+
 ## [0.15.0] - 2026-07-05
 
 The gate and the framing tell the truth.

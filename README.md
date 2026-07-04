@@ -3,8 +3,8 @@
 [![Release](https://img.shields.io/github/v/release/TarasTsavolyk/claude-code-frontend?sort=semver)](https://github.com/TarasTsavolyk/claude-code-frontend/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> Copy-and-adapt config — **not** an npm package. Drop it into a frontend repo, run `/wizard`, and Claude Code works as
-> a teammate that already knows your stack and conventions.
+> Copy-and-adapt config — **not** an npm package. Install it via the plugin (or copy it by hand), run `/wizard`, and
+> Claude Code works as a teammate that already knows your stack and conventions.
 
 A **Vue-first** Claude Code configuration for frontend projects — **12 agents, 16 rules (13 path-scoped), and 15
 skills** wired into a review pipeline. The architecture (rules/agents/skills/hooks and how they combine) is
@@ -31,6 +31,20 @@ gate in parallel — and the rules keep every step on your conventions.
 ## Quick start
 
 **Requirements:** Claude Code CLI (installed + authenticated) · Node 18+ (the hooks are plain ESM) · a frontend repo.
+
+**Via the plugin installer (recommended — it gives you an update path):**
+
+```
+/plugin marketplace add TarasTsavolyk/claude-code-frontend
+/plugin install frontend-kit@claude-code-frontend
+```
+
+Then open your repo and run `/frontend-kit:install` — same result as the manual steps below — and later
+`/frontend-kit:update` to sync new kit releases into your committed copy (diff-aware, prune-aware, never touches your
+`CLAUDE.md`). The plugin ships **only** the installer: plugins can't carry rules, `CLAUDE.md`, or settings, so the kit
+itself always lives as an owned copy in your repo.
+
+**Manually:**
 
 1. **Get the kit:**
    ```bash
@@ -84,6 +98,7 @@ anytime once you're settled.
 ```
 CLAUDE.md                       # always-loaded project memory (the template)
 .mcp.json                       # Playwright MCP — a real browser for the lead and the browser-capable agents
+.claude-plugin/  plugin/        # marketplace + installer plugin (kit-repo only — adopters don't copy these)
 .claude/
   settings.json                 # permissions + agent-teams flag + hooks wiring (gate · onboarding)
   hooks/                        # node helpers: detect-stack · session-start · check-refs · pre-commit-gate · post-edit-lint (opt-in)
@@ -201,9 +216,10 @@ free — enable it by adding to `"hooks"` in `settings.json`:
   (console, network, axe in a real browser), not just the code. Remove the file if you'd rather not grant a browser.
 - **Lean descriptions** — agent/skill `description`s stay short and functional; they load into every session, so no keyword lists.
 - **Release automation** — CHANGELOG-driven via `.github/workflows/release.yml` (see [`docs/release-automation.md`](docs/release-automation.md)).
-- **Copy-and-adapt over plugin install** — the kit is meant to be *owned*: `/wizard` rewrites CLAUDE.md and `/prune`
-  deletes files, which a read-only plugin install can't do. A plugin build may come later for discovery; the project's
-  committed copy stays the source of truth.
+- **Copy-and-adapt, delivered by a plugin** — the kit is meant to be *owned*: `/wizard` rewrites CLAUDE.md and
+  `/prune` deletes files, and plugins can't ship rules/CLAUDE.md/settings at all. So the `frontend-kit` plugin is just
+  the delivery vehicle (`/frontend-kit:install` copies the kit in, `/frontend-kit:update` syncs releases); the
+  project's committed copy stays the source of truth.
 
 ## Optional community add-ons
 
