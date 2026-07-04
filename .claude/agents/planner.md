@@ -2,7 +2,7 @@
 name: planner
 description:
   'Turns a feature request into a concrete frontend plan: scope, components, state, edge cases, and a test plan. Use
-  BEFORE writing code for any non-trivial feature.'
+  when planning itself needs heavy codebase reading — the lead plans inline by default (workflow.md).'
 model: opus
 color: purple
 tools:

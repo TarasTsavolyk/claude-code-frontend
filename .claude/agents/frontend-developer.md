@@ -2,7 +2,8 @@
 name: frontend-developer
 description:
   'Implements Vue 3 features (TypeScript when the project uses it): components, composables, Pinia stores, styling
-  (the project''s approach — Tailwind by default), and unit tests. The primary builder.'
+  (the project''s approach — Tailwind by default), and unit tests. The delegated builder for bounded, well-specified
+  work (batch changes, parallel worktree tracks) — the lead builds inline by default (workflow.md).'
 model: opus
 color: blue
 tools:

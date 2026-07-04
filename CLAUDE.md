@@ -1,7 +1,7 @@
 # <PROJECT_NAME>
 
 This file is always-loaded memory: keep it short and factual. Domain conventions live in `.claude/rules/` (path-scoped, plus three global ones).
-Workflows live in `.claude/skills/`. The agent pipeline is defined in `.claude/rules/workflow.md`.
+Workflows live in `.claude/skills/`. How the lead, skills, and agents combine is defined in `.claude/rules/workflow.md`.
 
 > **Reference stack in rule/agent bodies.** Conventions are written against the **Vue 3 reference stack** (the kit
 > default); the principles are framework-agnostic. Translate named Vue APIs (`defineProps`/`defineModel`, composables,

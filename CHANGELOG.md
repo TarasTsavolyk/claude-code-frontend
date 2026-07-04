@@ -9,6 +9,15 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-07-05
+
+The workflow now describes how the kit is actually used.
+
+### Changed
+- `workflow.md` recentered on the real flow: the lead plans and builds **inline** (skills are the default); agents are for context isolation, parallelism, and least privilege — `planner` only for read-heavy planning, `frontend-developer` only for bounded delegated/batch work, docs inline unless the surface is large. The quality-gate board (risk-scaled, parallel, verify-before-bouncing) is unchanged — it's where agents earn their keep.
+- Bug-fix and refactor flows name the inline skill (`/debug-frontend`, `/refactor`) as the default and the agent as the isolated variant.
+- `planner`/`frontend-developer` descriptions, README (How it works, Daily use, Design choices), and CLAUDE.md updated to match.
+
 ## [0.12.0] - 2026-07-03
 
 Findings are claims, not facts.

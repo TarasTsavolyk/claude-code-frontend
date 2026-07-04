@@ -20,12 +20,12 @@ project.
 | Block | Lives in | What it is |
 | --- | --- | --- |
 | **Rules** | `.claude/rules/` | Conventions Claude follows. Path-scoped — each loads only for matching files, so context stays lean. |
-| **Agents** | `.claude/agents/` | Specialist subagents (planner, builder, reviewers, auditors), each with least-privilege tools. |
+| **Agents** | `.claude/agents/` | Specialist subagents (reviewers, auditors, delegated builder) with least-privilege tools — for isolation and parallelism. |
 | **Skills** | `.claude/skills/` | Invokable `/procedures` — scaffold, audit, debug, release, onboard. |
-| **Pipeline** | `rules/workflow.md` | How they combine: **plan → build → risk-scaled quality gate (review · a11y · tests · perf · security) → docs**. |
+| **Pipeline** | `rules/workflow.md` | How they combine: **lead plans & builds inline → risk-scaled quality gate (parallel agents: review · a11y · tests · perf · security) → docs**. |
 
-In practice: you ask for a feature, the pipeline plans it, builds it, runs the quality gate, and updates docs — and the
-rules keep every step on your conventions.
+In practice: you ask for a feature, the lead plans and builds it inline, the agent board runs the risk-scaled quality
+gate in parallel — and the rules keep every step on your conventions.
 
 ## Quick start
 
@@ -69,8 +69,8 @@ anytime once you're settled.
 
 ## Daily use
 
-- **Feature** — ask for a plan → `planner` (+ `devil`, a devil's-advocate review of the plan, for tricky UX) → `frontend-developer` → quality gate → `docs-writer`.
-- **Bug** — ask to debug → `debugger` finds root cause → fix → verify with a regression test.
+- **Feature** — the lead plans and builds inline (+ `devil`, a devil's-advocate review of the plan, for tricky trade-offs; `planner` for read-heavy planning) → quality-gate board in parallel → docs.
+- **Bug** — `/debug-frontend` finds root cause (or the `debugger` agent, isolated) → fix → verify with a regression test.
 - **Scaffold** — `/scaffold-component`, `/scaffold-feature`, `/add-tests`.
 - **Review & verify** — `/code-review`, `/a11y-audit`, `/perf-audit`, `/security-audit`, `/verify`, `/refactor`.
 - **Maintain** — `/upgrade-deps`, `/release`.
@@ -176,7 +176,7 @@ free — enable it by adding to `"hooks"` in `settings.json`:
   security-review work. Prefer following the session instead? Set `model: inherit` on the judgment chain and pick the
   tier per session.
 - **Skill vs agent** — same-named pairs (`a11y-audit` / `accessibility-auditor`) are deliberate: the **skill** runs
-  inline for quick/solo use; the **agent** is the isolated specialist the pipeline delegates to.
+  inline and is the default; the **agent** is the isolated specialist for the parallel quality gate and delegated work.
 - **One home per rule** — a convention lives in exactly one rule file; skills and agents carry the *process* and point
   at the owning rule instead of restating it.
 - **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and (most) a dedicated auditor.
