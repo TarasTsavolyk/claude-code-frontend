@@ -29,11 +29,12 @@ Split when you see a **signal**, then reach for the matching **pattern** — don
 - A block (markup + its state) repeated across views, or copy-pasted with tweaks.
 
 **Patterns** (use when):
-- **Extract a leaf component** — a self-contained chunk of template + its local state. Use when a region has its own job and could be named (`UserAvatar`, `PriceTag`).
+- **Extract a leaf component** — a self-contained chunk of template + its local state. Use when a region has its own job and could be named (`UserAvatar`, `PriceTag`). Using scoped `<style>`? Move the chunk's styles with the markup — parent scoped rules match only the new child's root element, so styles for moved inner markup silently stop applying (lint/tests stay green); re-aim any `:deep()` that targeted it.
 - **Extract a composable** — logic, not markup, is the weight. Move stateful/reusable behavior to `useX` (see Logic placement).
 - **Slots over props** — when callers need to inject *markup*, not just data. Prefer a `<slot>` (named/scoped) to a `content`/`render`-style prop; a boolean that toggles a chunk of template is usually a slot. (see `code-style.md`)
 - **Compound components** — a set that shares implicit state (`Tabs`/`Tab`, `Accordion`/`Item`). Share it through `provide`/`inject`, not prop drilling.
 - **Headless vs styled** — when the same behavior needs different looks, split the logic (a composable or renderless unit) from the presentation.
+- **Split a fat store** — the same signals apply to Pinia: multiple state domains in one store → one store per domain (stores may use other stores); state only one component reads → local `ref` (see anti-patterns); pure logic in actions → plain functions; fetched server data → the query layer, not the store (see `data-fetching.md`). The store **id** (`defineStore('cart', …)`) is public API — persistence plugins and devtools key off it — keep it stable or migrate the persisted key.
 
 **Promote to `shared/`** — rule of two: the first reuse can copy; the **second** caller means extract. Before promoting, the unit must be presentational (no feature-specific imports), have a stable prop/emit/slot API, and earn its own name. One-off code stays local (see `principles.md`).
 

@@ -35,7 +35,7 @@ override (`fable` where available) instead of retrying on the same tier.
 ```
 /refactor inline (or refactoring-expert)  →  Verify (test-engineer + ui-reviewer)
 ```
-Restructure code without changing behavior — tests stay green before and after (add characterization tests first if the area is uncovered). `/refactor` inline is the default; delegate to `refactoring-expert` for large, bounded restructurings. For component splits, work from the decomposition patterns and split signals in `architecture.md`; verify confirms behavior is unchanged and that extracted/promoted units keep a stable API.
+Restructure code without changing behavior — tests stay green before and after (add characterization tests first if the area is uncovered). `/refactor` inline is the default; delegate to `refactoring-expert` for large, bounded restructurings. For component splits, work from the decomposition patterns and split signals in `architecture.md`; verify confirms behavior is unchanged and that extracted/promoted units keep a stable API. Markup-moving refactors (component split, overlay collapse onto the shared primitive) add `accessibility-auditor` to verify — focus order, label/`id` wiring, and `aria` relationships can break while tests stay green.
 
 ## CI/CD
 ```

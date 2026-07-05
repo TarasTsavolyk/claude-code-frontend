@@ -9,6 +9,18 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-07-05
+
+The refactor path gets real safety mechanics — found by a 6-lens adversarially-verified audit.
+
+### Added
+- `/refactor`: reference sweep before editing (PascalCase *and* kebab-case tags, alias *and* relative imports, lazy `import()` strings, barrel re-exports, string-keyed i18n/analytics/route/storage keys — grep is the only net in JS projects); strangler-fig migration for many-caller replacements; red-step abort rule (revert, never edit an assertion to green a refactor); visual-parity check when template/styles move; a codemod procedure for mechanical many-file changes. Sweep + abort rule mirrored in `refactoring-expert`.
+- `architecture.md`: **Split a fat store** pattern (domain split, demote to local, actions → plain functions, server data → query layer; `defineStore` id is public API) and the scoped-`<style>` breakage gotcha on leaf extraction.
+- `workflow.md`: markup-moving refactors add `accessibility-auditor` to the Refactor verify board — focus/label/aria wiring breaks with tests green.
+
+### Fixed
+- `/refactor` delegation criterion now matches `workflow.md` ("large, bounded restructuring") and drops the false "least-privilege" tag on a write-capable agent.
+
 ## [0.17.0] - 2026-07-05
 
 The riskiest code in the kit — the hooks — is now tested.
