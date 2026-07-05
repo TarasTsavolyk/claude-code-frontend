@@ -24,7 +24,7 @@ Removes whole **capabilities** (agent + skill + rule bundles) the project doesn'
 
    Put each unit's one-line effect in its option description; for every **Tier B** option, lead the description with its ⚠️ warning. After the user submits, for any **Tier B** pick re-confirm explicitly before deleting (they're woven through many files and back a stated Core principle). Never offer the Tier C spine.
 
-3. **Delete each chosen unit's files** (unit map below). Special case — **e2e tests** is a trim, not a delete: remove the "e2e (Playwright)" section and the `test:e2e` run line from `.claude/skills/add-tests/`; optionally drop `test:e2e` from CLAUDE.md Commands, Playwright from the Stack line, and `npx playwright:*` from `settings.json`. Keep `test-engineer`/`testing.md`.
+3. **Delete each chosen unit's files** (unit map below). Special case — **e2e tests** is a trim, not a delete: remove the "e2e (Playwright)" section and the `test:e2e` run line from `.claude/skills/add-tests/`, plus the `test:e2e` bullet from `.claude/skills/verify/` step 1; optionally drop `test:e2e` from CLAUDE.md Commands, Playwright from the Stack line, and `npx playwright:*` from `settings.json`. Keep `test-engineer`/`testing.md`.
 
 4. **Reconcile the universal hubs** — touched by almost every removal:
    - **`.claude/rules/workflow.md`** — remove the agent from any flow / Quality-Gate line; if a whole flow section empties out, delete that section.

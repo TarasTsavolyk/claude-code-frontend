@@ -12,7 +12,7 @@ Plan (lead, inline)  →  Build (lead, inline)  →  Quality Gate (parallel agen
 ```
 1. **Plan — lead, inline.** The lead reads the relevant code and turns the request into a short plan (scope, components, state, edge cases, test plan). Escalate to the `planner` agent only when planning itself needs heavy codebase reading that would flood the main context. For anything with real UX/architecture/security trade-offs, run `devil` against the plan (read-only) and fold the critique back in before code is written. Trivial changes skip straight to build.
 2. **Build — lead, inline.** The lead implements against the plan and the rules (`/scaffold-component`, `/scaffold-feature`), writing/updating unit tests as it goes. Delegate to `frontend-developer` only for **bounded, well-specified work that can run unattended** — batch changes, a parallel track in a worktree — not as the default builder.
-3. **Quality Gate (risk-scaled; selected auditors run in parallel)** — this is where agents earn their keep: fresh context, read-only tools, parallel execution. Scale the board to what the diff touches instead of always running all five:
+3. **Quality Gate (risk-scaled; selected auditors run in parallel)** — this is where agents earn their keep: fresh context, least-privilege tools (auditors are read-only; `test-engineer` alone writes — it fills test gaps itself and reports only what it didn't fill), parallel execution. Scale the board to what the diff touches instead of always running all five:
    - Always: `ui-reviewer`; add `test-engineer` when the change ships new logic.
    - Markup / styles / interaction touched → add `accessibility-auditor`.
    - Untrusted data, auth/session, storage, raw-HTML-class sinks, or dependency changes → add `security-scanner`.

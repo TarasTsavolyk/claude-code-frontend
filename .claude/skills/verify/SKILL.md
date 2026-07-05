@@ -9,11 +9,12 @@ Turn "should work" into "verified". The quality gate is the floor (`CLAUDE.md`);
 
 ## 1. Run the gate
 - `<pm> run lint && <pm> run test` — and `<pm> run typecheck` in TS projects. All must pass; a failing gate blocks the commit.
+- e2e specs touched, or the change hits a flow only e2e covers → also `<pm> run test:e2e` (excluded from the default gate for speed, not because it's optional).
 - If a script name differs in this repo, use the actual one (`package.json`).
 
 ## 2. Confirm the goal, not just green
 - Restate the task as a concrete, checkable outcome and confirm the change meets it — new behavior is exercised by a test; a bug fix has a regression test that **failed before** and passes now (see `testing.md`).
-- Check the diff for scope creep: only what the task required changed (see `principles.md` → surgical changes). No stray `console.log`, debug code, or commented-out blocks.
+- Check the diff for scope creep: only what the task required changed (see `principles.md` → surgical changes). No stray `console.log`, debug code, or commented-out blocks; no leftover `.only`/`.skip` in tests — a local `.only` silently shrinks the suite (Vitest allows it outside CI), so the gate goes green on one test.
 
 ## 3. See it, don't just infer it
 - UI changed and browser tooling is available (Playwright / Chrome DevTools MCP, or the running dev server)? Open the changed view and look: it renders, the async states actually appear, no console errors. Screenshot UI changes for the report.

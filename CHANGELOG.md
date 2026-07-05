@@ -9,6 +9,21 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-07-05
+
+The testing surface gets wiring mechanics and honest bars — same audit as v0.18.0.
+
+### Added
+- `testing.md`: read-the-harness-first; MSW lifecycle (`onUnhandledRequest: 'error'`, `resetHandlers()` per test); test-data builders over copy-pasted fixtures; Pinia wiring (`setActivePinia` / `createTestingPinia`); router wiring (`RouterLinkStub` / `createMemoryHistory` + `isReady`); settle-before-asserting (`await` interactions, `nextTick`, `flushPromises`); web-first e2e assertions; per-flow `@axe-core/playwright` scan; a characterization-tests definition under Bar (with the golden-master carve-out). Frontmatter now also scopes `__tests__/` dirs and tsx/jsx test files.
+- `/add-tests`: step 1 "Find the gap" (diff-driven or `--coverage`) and a closing "Run & report" step matching `test-engineer`'s report.
+- `/verify`: conditional `test:e2e` run when e2e is touched; leftover `.only`/`.skip` joins the scope-creep check (a local `.only` greens the gate on one test).
+
+### Changed
+- `testing.md` Bar: "happy path + one edge/error/empty branch" now lives in the owning rule; the coverage ratchet names its mechanism (Vitest `coverage.thresholds` + `autoUpdate`) instead of being aspiration; flake check is `--repeat-each=3 --retries=0` (retries mask flakes; synced in `/add-tests`); visual regression covers Vitest browser mode's `toMatchScreenshot()`, not just Storybook; the snapshot ban gains its one legitimate carve-out.
+- `/debug-frontend` steps 5–6: the failing test that confirms the hypothesis IS the regression test — no fix-first with a retrofitted test.
+- `workflow.md` step 3 tells the truth about the gate board: auditors are read-only, `test-engineer` alone writes.
+- `/prune` e2e trim also strips the new `test:e2e` bullet from `/verify`.
+
 ## [0.18.0] - 2026-07-05
 
 The refactor path gets real safety mechanics — found by a 6-lens adversarially-verified audit.

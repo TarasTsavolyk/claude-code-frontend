@@ -11,7 +11,7 @@ description: Create a new Vue 3 component the project's way — props/emits cont
    - Keep it presentational: state in, events out. No data fetching here.
 3. **Template** — semantic native elements; labels for any control; keyboard-operable; visible focus. Style with the project's design tokens — no magic values (Tailwind utilities by default; Sass variables or `var(--token)` custom properties otherwise).
 4. **Logic** — if there's non-trivial logic, extract a `useX` composable instead of inlining it.
-5. **Test** — add `<Name>.test.ts` (`.test.js` in JS projects): render with props, assert visible output and emitted events, cover an edge/error state. Query by role/label/text.
+5. **Test** — add `<Name>.test.ts` (`.test.js` in JS projects): render with props, assert visible output and emitted events, cover an edge/error state. Query by role/label/text (see `testing.md`).
 6. **Verify** — `<pm> run lint && <pm> run test` (add `<pm> run typecheck` in TS projects). Run a quick axe check if interactive.
 7. **Export** if it's a shared component (barrel/index per project convention).
 

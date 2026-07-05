@@ -17,6 +17,6 @@ For a gated pipeline run, delegate to the `debugger` agent instead (isolated).
    - Leaked listener/timer not cleaned up.
    - Build/env difference (works in dev, not prod).
 4. **Form one hypothesis** for the root cause and say *why*. Separate symptom from cause.
-5. **Confirm it** with a minimal change or a failing test that isolates the cause — don't fix on a hunch.
-6. **Fix minimally**, add a regression test that fails before / passes after, and note any related latent issues.
+5. **Confirm it** with a failing test that isolates the cause — this becomes the regression test. Fall back to a minimal probe change only when a test can't reach the cause; don't fix on a hunch.
+6. **Fix minimally** — the step-5 test now passes (probed instead? write the regression test and watch it fail before fixing) — and note any related latent issues.
 7. **Verify** the whole suite stays green.
