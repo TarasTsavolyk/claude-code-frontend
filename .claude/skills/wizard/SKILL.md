@@ -1,20 +1,19 @@
 ---
 name: wizard
-description: First-run onboarding — detect the host project's framework + stack, confirm via checkbox prompts, sync CLAUDE.md to the real project (structure, commands), then offer /prune (opt-in — removes nothing itself). Use after copying the kit into a repo, or re-run after a stack change.
+description: First-run onboarding — detect the host Vue project's stack, confirm via checkbox prompts, sync CLAUDE.md to the real project (structure, commands), then offer /prune (opt-in — removes nothing itself). Use after copying the kit into a repo, or re-run after a stack change.
 ---
 
 # Onboarding wizard
 
-Adapts the kit to **this** project: detect the framework and stack, confirm it with the user, sync [CLAUDE.md](../../../CLAUDE.md) to the real project, then optionally hand off to `/prune`. The wizard itself deletes no agents/skills/rules — pruning happens only if the user opts in at the end (step 10).
+Adapts the kit to **this** project: detect the stack, confirm it with the user, sync [CLAUDE.md](../../../CLAUDE.md) to the real project, then optionally hand off to `/prune`. The wizard itself deletes no agents/skills/rules — pruning happens only if the user opts in at the end (step 10).
 
 Work through the steps in order. Stop and ask whenever a value is ambiguous; never guess a stack choice silently. **Prefer `AskUserQuestion` (checkbox/radio prompts) over asking the user to type "1, 2, 3".**
 
 1. **Refresh the facts.** Run `node .claude/hooks/detect-stack.mjs` (cheap, fail-open), then read `.claude/.wizard/facts.json`.
    - If `isProject` is `false`, there is no host project here — this is the kit repo itself or an empty dir. **Stop**, say so, edit nothing.
-   - Read `framework` (one of `vue｜react｜angular｜svelte｜solid｜preact｜lit`, or `unknown`) and `metaFramework` (e.g. `nuxt｜next｜sveltekit｜remix｜astro`, or `null`). The kit's rules speak the **Vue reference stack**, so:
-     - `vue` → native fit; proceed.
-     - a known non-Vue framework → tell the user the rules are written against the Vue reference stack and that named APIs translate to their framework; confirm they want to proceed.
-     - `unknown` → the detector found no known UI framework. **Ask** the user which framework this is (or whether it's framework-agnostic) before continuing — don't assume Vue.
+   - Read `isVue` and `metaFramework` (`nuxt` or `null`). The kit is **Vue-3-only**:
+     - `isVue: true` → proceed.
+     - `isVue: false` → tell the user the kit's rules, skills, and agents are written for Vue 3 and won't fit another framework; **stop** unless they explicitly confirm they want to onboard anyway (e.g. Vue lives in a workspace package the detector can't see).
    - If `kit.onboarded` is already `true`, this is a re-sync — say so and continue (re-running is supported).
    - Surface every entry in `warnings` to the user — they flag ambiguous or conflicting detection.
 
@@ -22,7 +21,6 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
 
 3. **Confirm the stack — use `AskUserQuestion`, not free text.** Present each value as a radio question (`multiSelect: false`) with the **detected value first**, labelled `(detected)`; rely on the automatic "Other" for the long tail. The tool caps each call at **4 questions** and each question at **4 authored options** — the "Other" free-text choice is added automatically **on top** and costs no slot. Split into two calls:
    - **Call 1 — basics:**
-     - **Framework** — detected `framework` first, plus up to **three** likely alternatives (4 authored options); the auto-"Other" covers the rest of the known set.
      - **Package manager** — `npm｜pnpm｜yarn｜bun`. If `packageManagerAmbiguous` is true or it is `null`, the user **must** choose (surface any `warnings`).
      - **Language** — TypeScript or JavaScript (default `language`).
      - **Styling** — Tailwind / Sass-SCSS / CSS Modules / scoped `<style>` (default `styling`).
@@ -33,8 +31,7 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
 
 4. **Apply the confirmed values to CLAUDE.md.** Surgical edits only — the file may already be hand-edited (see `rules/principles.md`):
    - Title `# <PROJECT_NAME>` → the project name.
-   - **Stack** section — name the confirmed framework on the first line, with its version **only if `frameworkVersion` is non-null**, stripping the semver range sigil (`^3.4.0` → 3.4); don't fabricate one — on a meta-framework project the base version isn't readable, so write e.g. "Vue (via Nuxt `metaFrameworkVersion`)" instead of guessing a Vue version. Keep tooling lines (state / router / i18n / test libs) only where the facts confirm them — `uses` and `testing` in `facts.json` name what's actually installed; don't re-infer from memory. On a stack the kit can't detect libs for, name the framework and leave its equivalents to the user — never assert tools the facts don't show.
-   - **Reference-stack note** (the callout under the title): on a Vue project you can drop it (nothing to translate); on a known non-Vue framework keep it and name that framework as what the Vue APIs translate to; on `unknown` keep it generic.
+   - **Stack** section — the first line stays Vue, with its version **only if `vueVersion` is non-null**, stripping the semver range sigil (`^3.4.0` → 3.4); don't fabricate one — on a Nuxt project the Vue version isn't readable, so write e.g. "Vue (via Nuxt `metaFrameworkVersion`)" instead of guessing. Keep tooling lines (state / router / i18n / test libs) only where the facts confirm them — `uses` and `testing` in `facts.json` name what's actually installed; don't re-infer from memory. Never assert tools the facts don't show.
    - **Language** section: collapse `**TypeScript** | **JavaScript** ← set one for this repo.` to the chosen one, and keep only the relevant guidance sentence.
    - **Package manager** — *keep the `<pm>` token* in the Commands block and Quality gate. The kit is PM-agnostic by design (README: the config never hardcodes npm/pnpm/yarn/bun): the agent substitutes `<pm>` from the lockfile. In the Package-manager section, just state the detected manager (e.g. "Detected: **pnpm** (from `pnpm-lock.yaml`)") and drop the generic lockfile table. Do **not** rewrite `<pm>` to the concrete manager anywhere — in CLAUDE.md or the rules.
    - **Styling** line in Stack → state the chosen approach (drop the "swap for…" aside once decided).
@@ -57,7 +54,7 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
    machine-local — teammates re-run `/wizard` or copy the snippet from the README. If **no**, mention the README
    documents the one-liner.
 
-8. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack, framework first (e.g. `2026-06-26 · react · pnpm · TypeScript · Tailwind · layer-first`). This stops the SessionStart hook from prompting again, and it **is** committed so teammates skip onboarding.
+8. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack (e.g. `2026-06-26 · vue · pnpm · TypeScript · Tailwind · layer-first`). This stops the SessionStart hook from prompting again, and it **is** committed so teammates skip onboarding.
 
 9. **Summarize.** Tell the user exactly what changed in CLAUDE.md — placeholders resolved, structure synced, commands reconciled. Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see `rules/git-operations.md`).
 

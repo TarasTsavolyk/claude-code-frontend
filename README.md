@@ -6,15 +6,11 @@
 > Copy-and-adapt config — **not** an npm package. Install it via the plugin (or copy it by hand), run `/wizard`, and
 > Claude Code works as a teammate that already knows your stack and conventions.
 
-A **Vue-first** Claude Code configuration for frontend projects — **12 agents, 16 rules (13 path-scoped), and 15
-skills** wired into a review pipeline. The architecture (rules/agents/skills/hooks and how they combine) is
-framework-agnostic; the shipped conventions speak Vue.
+A **Vue-3-only** Claude Code configuration for frontend projects — path-scoped rules, least-privilege agents, and
+invokable skills wired into a review pipeline.
 
-> **Reference stack:** the shipped rules and scaffolds target **Vue 3** (Vite · Pinia · Vitest · Playwright,
-> TypeScript optional) — that's the native fit. `/wizard` **detects other frameworks** (React · Angular · Svelte ·
-> Solid · Preact · Lit, plus meta-frameworks like Nuxt/Next/SvelteKit) and names yours in `CLAUDE.md`, but until
-> per-framework rule sets exist that is **translation mode**: the rules still name Vue APIs and Claude maps them to
-> your framework's equivalents. Workable, with overhead — Vue teams get the full value today.
+> **Stack:** Vue 3 (`<script setup>`) · Vite · Pinia · Vitest · Playwright, TypeScript optional. The kit targets Vue 3
+> and nothing else — rules, scaffolds, and agents name Vue APIs directly. Not using Vue? This kit isn't for your repo.
 
 ## How it works
 
@@ -62,7 +58,7 @@ itself always lives as an owned copy in your repo.
    Then add `.claude/settings.local.json` and `.claude/worktrees/` to your repo's `.gitignore` (`cp -r` doesn't carry
    this repo's ignore rules). The first-run hook adds `.claude/.wizard/` (the machine-local cache) automatically. Keep
    `.claude/.onboarded` **tracked**.
-3. **Open your repo in Claude Code.** A first-run hook **asks whether to run `/wizard`** — say yes and it detects your framework + stack, syncs `CLAUDE.md` to your real project (structure + commands), and offers to `/prune` what you won't use.
+3. **Open your repo in Claude Code.** A first-run hook **asks whether to run `/wizard`** — say yes and it detects your stack, syncs `CLAUDE.md` to your real project (structure + commands), and offers to `/prune` what you won't use.
 4. **Commit** `.claude/` + `CLAUDE.md` on a branch.
 
 This installs **project scope** (the common case). For personal defaults shared across all your repos, see
@@ -71,8 +67,8 @@ This installs **project scope** (the common case). For personal defaults shared 
 ## Onboarding & pruning
 
 **`/wizard`** is offered on the first session — the hook asks whether to run it — and is re-runnable anytime (re-sync
-after a stack change). It **detects your framework** (Vue/React/Angular/Svelte/…), confirms the stack with checkbox
-prompts, guards your git tree (won't touch uncommitted work), and **syncs `CLAUDE.md` to the real project** — resolving
+after a stack change). It **detects your stack** (package manager, TS/JS, styling, testing, layout — and verifies the
+repo is actually Vue), confirms it with checkbox prompts, guards your git tree (won't touch uncommitted work), and **syncs `CLAUDE.md` to the real project** — resolving
 placeholders, rewriting the project-structure block from your actual `src/` layout, and reconciling the Commands block
 against your real `package.json` scripts. It keeps `<pm>` as a token — Claude substitutes your package manager from the
 lockfile, so the config never hardcodes npm/pnpm/yarn/bun — offers to install the quality gate as a **native git

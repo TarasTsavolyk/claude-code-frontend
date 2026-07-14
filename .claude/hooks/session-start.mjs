@@ -27,7 +27,7 @@ try {
       'placeholder, so the config does not yet match this project). Your VERY FIRST action ' +
       'this session — before responding to or starting any other task — MUST be to ask the ' +
       'user one clear yes/no question: "This repo uses the claude-code-frontend kit but ' +
-      "isn't onboarded yet. Run /wizard now to detect the framework + stack and adapt " +
+      "isn't onboarded yet. Run /wizard now to detect the stack and adapt " +
       'CLAUDE.md to this project?" If yes, run the /wizard skill. If no, do not bring it up ' +
       'again this session. Do not skip this prompt even if the user opened with another request.'
 

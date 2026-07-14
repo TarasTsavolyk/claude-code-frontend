@@ -10,7 +10,7 @@ after(cleanup)
 test('empty dir: not a project, everything degrades to unknown/null, no throw', () => {
   const facts = detect(fixture())
   assert.equal(facts.isProject, false)
-  assert.equal(facts.framework, 'unknown')
+  assert.equal(facts.isVue, false)
   assert.equal(facts.packageManager, null)
   assert.equal(facts.structure, 'unknown')
   assert.deepEqual(facts.srcDirs, [])
@@ -37,8 +37,8 @@ test('vue + pnpm + TS + tailwind + layer-first project detected end to end', () 
   })
   const facts = detect(root)
   assert.equal(facts.projectName, 'my-app')
-  assert.equal(facts.framework, 'vue')
-  assert.equal(facts.frameworkVersion, '^3.4.0')
+  assert.equal(facts.isVue, true)
+  assert.equal(facts.vueVersion, '^3.4.0')
   assert.equal(facts.packageManager, 'pnpm')
   assert.equal(facts.packageManagerAmbiguous, false)
   assert.equal(facts.language, 'ts')
@@ -50,17 +50,18 @@ test('vue + pnpm + TS + tailwind + layer-first project detected end to end', () 
   assert.deepEqual(facts.scripts, ['dev', 'lint'])
 })
 
-test('meta-framework implies base framework but never claims its version', () => {
+test('nuxt implies Vue but never claims a Vue version', () => {
   const facts = detect(fixture({ 'package.json': { dependencies: { nuxt: '^3.10.0' } } }))
   assert.equal(facts.metaFramework, 'nuxt')
   assert.equal(facts.metaFrameworkVersion, '^3.10.0')
-  assert.equal(facts.framework, 'vue')
-  assert.equal(facts.frameworkVersion, null)
+  assert.equal(facts.isVue, true)
+  assert.equal(facts.vueVersion, null)
 })
 
-test('preact wins over react (compat shim ordering)', () => {
-  const facts = detect(fixture({ 'package.json': { dependencies: { react: '^18.0.0', preact: '^10.0.0' } } }))
-  assert.equal(facts.framework, 'preact')
+test('non-Vue project: isVue false + Vue-only warning surfaced', () => {
+  const facts = detect(fixture({ 'package.json': { dependencies: { react: '^18.0.0' } } }))
+  assert.equal(facts.isVue, false)
+  assert.ok(facts.warnings.some((w) => w.includes('Vue-3-only')))
 })
 
 test('multiple lockfiles: ambiguous + warning; two bun locks are NOT ambiguous', () => {
@@ -81,7 +82,7 @@ test('corepack packageManager field is authoritative; lockfile mismatch warns', 
   assert.ok(facts.warnings.some((w) => w.includes('lockfile')))
 })
 
-test('workspace root without a framework warns about degraded detection', () => {
+test('workspace root without Vue warns about degraded detection', () => {
   const facts = detect(fixture({ 'package.json': { workspaces: ['packages/*'] } }))
   assert.equal(facts.isWorkspaceRoot, true)
   assert.ok(facts.warnings.some((w) => w.includes('Workspace/monorepo root')))

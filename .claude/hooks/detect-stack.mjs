@@ -12,7 +12,7 @@ import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-const SCHEMA_VERSION = 3
+const SCHEMA_VERSION = 4
 
 // Project root: explicit arg > $CLAUDE_PROJECT_DIR (set in hooks) > cwd.
 export function resolveRoot(arg) {
@@ -82,57 +82,21 @@ export function detect(root) {
   const hasTsConfig = ['tsconfig.json', 'tsconfig.app.json'].some((f) => fileExists(f))
   const language = hasTsConfig || has('typescript') ? 'ts' : 'js'
 
-  // --- framework (known set + generic fallback) ------------------------------
-  // First match wins. The niche libs are checked before `react` because React
-  // can appear as a compat shim (e.g. preact/compat) in non-React projects.
-  // `framework` is a label or 'unknown' (no known UI dep) — the wizard then asks.
-  const FRAMEWORKS = [
-    ['vue', 'vue'],
-    ['svelte', 'svelte'],
-    ['solid-js', 'solid'],
-    ['preact', 'preact'],
-    ['@angular/core', 'angular'],
-    ['lit', 'lit'],
-    ['react', 'react'],
-  ]
-  let framework = null
-  let frameworkVersion = null
-  for (const [dep, label] of FRAMEWORKS) {
-    if (has(dep)) {
-      framework = label
-      frameworkVersion = deps[dep] || null
-      break
-    }
-  }
-  // Meta-framework hint. Implies its base framework when the base dep is managed
-  // by the meta package and so isn't a direct dependency (e.g. Nuxt → vue).
-  const META = [
-    ['nuxt', 'nuxt', 'vue'],
-    ['next', 'next', 'react'],
-    ['@remix-run/react', 'remix', 'react'],
-    ['@sveltejs/kit', 'sveltekit', 'svelte'],
-    ['@analogjs/platform', 'analog', 'angular'],
-    ['astro', 'astro', null],
-  ]
-  let metaFramework = null
-  let metaFrameworkVersion = null
-  for (const [dep, label, base] of META) {
-    if (has(dep)) {
-      metaFramework = label
-      metaFrameworkVersion = deps[dep] || null
-      // Infer the base framework, but DON'T claim its version: when the base dep
-      // isn't a direct dependency (the normal Nuxt/Next case) the meta package's
-      // version is not the framework's (Nuxt 3.10 ships Vue 3.4.x), so leave it null.
-      if (!framework && base) framework = base
-      break
-    }
-  }
-  if (!framework) framework = 'unknown'
+  // --- framework (Vue-only kit) ----------------------------------------------
+  // The kit targets Vue 3; detection answers one question: is this a Vue app —
+  // directly, or via Nuxt (which manages `vue` as a transitive dep, so the Vue
+  // version isn't readable from the root package.json — leave it null there).
+  const metaFramework = has('nuxt') ? 'nuxt' : null
+  const metaFrameworkVersion = metaFramework ? deps.nuxt || null : null
+  const isVue = has('vue') || metaFramework === 'nuxt'
+  const vueVersion = has('vue') ? deps.vue || null : null
+  if (hasPkgFile && pkg !== null && !isVue)
+    warnings.push('No Vue dependency found — the kit is Vue-3-only; confirm this is a Vue project before onboarding.')
 
   // Monorepo/workspace root: detection reads only the ROOT package.json, so the
-  // app's framework may live in a workspace package instead.
+  // app's Vue dep may live in a workspace package instead.
   const isWorkspaceRoot = Boolean(pkg?.workspaces) || fileExists('pnpm-workspace.yaml')
-  if (isWorkspaceRoot && framework === 'unknown')
+  if (isWorkspaceRoot && !isVue)
     warnings.push('Workspace/monorepo root: the app likely lives in a workspace package — detection is degraded; confirm values manually.')
 
   // --- styling (best guess; the wizard confirms) -----------------------------
@@ -173,12 +137,10 @@ export function detect(root) {
     root,
     isProject: hasPkgFile,
     projectName: typeof pkg?.name === 'string' ? pkg.name : null,
-    framework,
-    frameworkVersion,
+    isVue,
+    vueVersion,
     metaFramework,
     metaFrameworkVersion,
-    isVue: framework === 'vue', // back-compat convenience; derived from `framework`
-    vueVersion: framework === 'vue' ? frameworkVersion : null,
     packageManager,
     packageManagerAmbiguous,
     language,
@@ -187,12 +149,12 @@ export function detect(root) {
     structure,
     srcDirs,
     isWorkspaceRoot,
-    // Companion libs across ecosystems — the value is the detected package name
+    // Vue-ecosystem companion libs — the value is the detected package name
     // (null = none found); the wizard reflects these into CLAUDE.md's Stack lines.
     uses: {
-      state: firstDep('pinia', 'vuex', '@reduxjs/toolkit', 'redux', 'zustand', 'jotai', 'mobx', '@ngrx/store'),
-      router: firstDep('vue-router', '@tanstack/react-router', 'react-router-dom', 'react-router', '@angular/router', '@solidjs/router'),
-      i18n: firstDep('vue-i18n', 'react-i18next', 'i18next', 'svelte-i18n', '@lingui/core', '@angular/localize'),
+      state: firstDep('pinia', 'vuex'),
+      router: firstDep('vue-router'),
+      i18n: firstDep('vue-i18n', 'i18next'),
     },
     scripts: pkg?.scripts ? Object.keys(pkg.scripts) : [],
     kit: {

@@ -2,11 +2,8 @@
 
 This file is always-loaded memory: keep it short and factual. Domain conventions live in `.claude/rules/` (path-scoped, plus three global ones).
 Workflows live in `.claude/skills/`. How the lead, skills, and agents combine is defined in `.claude/rules/workflow.md`.
-
-> **Reference stack in rule/agent bodies.** Conventions are written against the **Vue 3 reference stack** (the kit
-> default); the principles are framework-agnostic. Translate named Vue APIs (`defineProps`/`defineModel`, composables,
-> `onScopeDispose`, `app.config.errorHandler`, Pinia, …) to your framework's equivalent. `/wizard` sets the per-project
-> stack.
+The kit is **Vue-3-only**: rules, skills, and agents are written directly against Vue 3 APIs. `/wizard` syncs this file
+to the host project.
 
 ## Stack
 

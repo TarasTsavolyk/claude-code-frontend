@@ -9,6 +9,17 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-07-14
+
+Vue-3-only: the multi-framework surface is gone (team review decision).
+
+### Changed
+- `detect-stack.mjs` detects Vue/Nuxt only — `isVue`/`vueVersion` replace `framework`/`frameworkVersion`, non-Vue repos get an explicit warning (facts schema v4).
+- `/wizard` onboards Vue projects only — stops on non-Vue repos; the framework question is gone.
+
+### Removed
+- Framework-agnostic / "translation mode" framing from CLAUDE.md and README — the kit targets Vue 3, period.
+
 ## [0.19.0] - 2026-07-05
 
 The testing surface gets wiring mechanics and honest bars — same audit as v0.18.0.
