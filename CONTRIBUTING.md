@@ -69,7 +69,7 @@ description: What this workflow does and when to use it.
 - Drop the config into a real Vue project and confirm with `/memory` (rules load per file type), `/agents` (your agent appears), and by invoking the skill.
 - Update `CHANGELOG.md` and, if you changed structure or counts, the `README.md`.
 - One focused change per PR. Conventional Commit titles (`feat:`, `fix:`, `docs:`…).
-- **One home per rule:** checklists/criteria live in exactly one rule file; the matching skill and agent carry *process* only and point at the rule — don't restate rule content in them. (Exception: the debug pair has no backing rule, so keep `debug-frontend` and `debugger` in sync by hand.)
+- **One home per rule:** checklists/criteria live in exactly one rule file; the matching skill and agent carry *process* only and point at the rule — don't restate rule content in them. 
 
 ## Reporting issues
 Use the issue templates. Include your Claude Code version, OS, and what you expected vs what happened.

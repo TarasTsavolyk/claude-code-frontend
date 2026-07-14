@@ -36,7 +36,7 @@ Split when you see a **signal**, then reach for the matching **pattern** — don
 - **Headless vs styled** — when the same behavior needs different looks, split the logic (a composable or renderless unit) from the presentation.
 - **Split a fat store** — the same signals apply to Pinia: multiple state domains in one store → one store per domain (stores may use other stores); state only one component reads → local `ref` (see anti-patterns); pure logic in actions → plain functions; fetched server data → the query layer, not the store (see `data-fetching.md`). The store **id** (`defineStore('cart', …)`) is public API — persistence plugins and devtools key off it — keep it stable or migrate the persisted key.
 
-**Promote to `shared/`** — rule of two: the first reuse can copy; the **second** caller means extract. Before promoting, the unit must be presentational (no feature-specific imports), have a stable prop/emit/slot API, and earn its own name. One-off code stays local (see `principles.md`).
+**Promote to `shared/`** — rule of two: the first reuse can copy; the **second** caller means extract. Before promoting, the unit must be presentational (no feature-specific imports), have a stable prop/emit/slot API, and earn its own name. One-off code stays local (see CLAUDE.md → Working principles).
 
 **Overlay UI is a shared primitive** — modal/dialog/drawer/popover/menu share the same hard parts (focus, Escape, scroll-lock, `aria` wiring — the required behaviors live in `accessibility.md`). Build (or adopt) **one** base overlay that owns them, and compose specific overlays from it via slots. A feature re-implementing them by hand is a defect, not a variation.
 

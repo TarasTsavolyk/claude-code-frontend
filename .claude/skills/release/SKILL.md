@@ -5,7 +5,7 @@ description: Cut a release — match the project's mechanism (CHANGELOG-driven o
 
 # Cut a release
 
-Detect the mechanism first, then follow that track. Always run the quality gate before shipping and use the `git-operations.md` approval flow for the commit/PR.
+Detect the mechanism first, then follow that track. Always run the quality gate before shipping and use the CLAUDE.md → Git approval flow for the commit/PR.
 
 ## Detect
 

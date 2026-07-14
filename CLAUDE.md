@@ -1,6 +1,6 @@
 # <PROJECT_NAME>
 
-This file is always-loaded memory: keep it short and factual. Domain conventions live in `.claude/rules/` (path-scoped, plus three global ones).
+This file is always-loaded memory: keep it short and factual. Domain conventions live in `.claude/rules/` (path-scoped, plus the global `workflow.md`).
 Workflows live in `.claude/skills/`. How the lead, skills, and agents combine is defined in `.claude/rules/workflow.md`.
 The kit is **Vue-3-only**: rules, skills, and agents are written directly against Vue 3 APIs. `/wizard` syncs this file
 to the host project.
@@ -88,9 +88,35 @@ src/
   `rules/error-handling.md`).
 - Config comes from validated env, centralized and typed; only `VITE_` vars reach the client (see `rules/config.md`).
 - Make failures observable — logging, error reporting, field metrics, with no PII/secret leakage (see
-  `rules/observability.md`).
+  `rules/error-handling.md`).
 - Design tokens, not magic values (see `rules/styling.md`).
 - Accessibility is a requirement, not a nice-to-have (see `rules/accessibility.md`).
 - Respect performance budgets (see `rules/performance.md`).
 - Security is a requirement: the server is the only trust boundary, client controls are defense-in-depth (see
   `rules/security.md`).
+
+## Working principles
+
+- Think before coding: state assumptions; if uncertain, ask instead of guessing. Multiple reasonable interpretations?
+  Present them — don't silently pick one. If a simpler approach meets the goal, say so; push back when warranted.
+- Simplicity first: write the minimum code that solves the stated problem — no speculative features, abstractions,
+  configurability, or error handling for cases that can't occur; no abstraction for single-use code.
+- Surgical changes: touch only what the task requires; match the existing style; don't refactor what isn't broken.
+  Remove only what YOUR change orphaned — flag pre-existing dead code, don't delete it.
+- Goal-driven: turn the task into a verifiable goal and loop until verified — run the quality gate, never stop at
+  "should work". A bug's regression test fails before the fix; refactors stay green throughout (see
+  `rules/testing.md`).
+
+## Git
+
+- Never commit directly to `main`/`master` — branch first (`feature/…`, `fix/…`, `chore/…`). Never force-push or
+  rewrite shared history without explicit human confirmation. Never commit secrets/`.env`/keys — if one is staged,
+  stop and flag it.
+- Conventional Commits: `type(scope): summary` (`feat fix refactor perf test docs chore build ci style`), imperative,
+  ≤72-char subject; the body explains *why*. Small, focused commits over one giant commit.
+- Run the quality gate before every commit. Keep PRs small and single-purpose; the description covers **What**,
+  **Why**, **How to test**, screenshots for UI changes, and any a11y/perf impact.
+- **Approval before committing or opening a PR:** show the changed files (`git status --short` / `git diff --stat`)
+  and the **full** commit message or PR description verbatim, then wait — let the user edit or append first.
+  `settings.json` puts `git commit`/`git push` behind `ask`; this defines *what to surface* at that stop. Never push
+  on the user's behalf without confirmation.

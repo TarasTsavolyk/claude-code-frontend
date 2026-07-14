@@ -18,7 +18,7 @@ invokable skills wired into a review pipeline.
 | --- | --- | --- |
 | **Rules** | `.claude/rules/` | Conventions Claude follows. Path-scoped — each loads only for matching files, so context stays lean. |
 | **Agents** | `.claude/agents/` | Specialist subagents (reviewers, auditors, delegated builder) with least-privilege tools — for isolation and parallelism. |
-| **Skills** | `.claude/skills/` | Invokable `/procedures` — scaffold, audit, debug, release, onboard. |
+| **Skills** | `.claude/skills/` | Invokable `/procedures` — scaffold, verify, release, onboard. |
 | **Pipeline** | `rules/workflow.md` | How they combine: **lead plans & builds inline → risk-scaled quality gate (parallel agents: review · a11y · tests · perf · security) → docs**. |
 
 In practice: you ask for a feature, the lead plans and builds it inline, the agent board runs the risk-scaled quality
@@ -81,11 +81,11 @@ anytime once you're settled.
 
 ## Daily use
 
-- **Feature** — the lead plans and builds inline (+ `devil`, a devil's-advocate review of the plan, for tricky trade-offs; `planner` for read-heavy planning) → quality-gate board in parallel → docs.
-- **Bug** — `/debug-frontend` finds root cause (or the `debugger` agent, isolated) → fix → verify with a regression test.
-- **Scaffold** — `/scaffold-component`, `/scaffold-feature`, `/add-tests`.
-- **Review & verify** — `/code-review`, `/a11y-audit`, `/perf-audit`, `/security-audit`, `/verify`, `/refactor`.
-- **Maintain** — `/upgrade-deps`, `/release`.
+- **Feature** — the lead plans and builds inline → quality-gate board in parallel (risk-scaled) → docs.
+- **Bug** — the lead diagnoses to root cause (failing test first) → fix → verify with a regression test.
+- **Scaffold** — `/scaffold-component`, `/scaffold-feature`, `/from-figma`.
+- **Verify** — `/verify` runs the quality gate + a rules sanity pass; the auditor agents go deeper on demand.
+- **Ship** — `/release`.
 - **Check what loaded** — `/memory` (open a component and a test file to watch path-scoped rules activate) · `/agents`.
 
 ## Contents
@@ -97,31 +97,25 @@ tests/hooks/                    # hook unit tests, zero-dep `node --test` (kit-r
 .claude/
   settings.json                 # permissions + agent-teams flag + one hook wiring (the commit gate)
   hooks/                        # node helpers: pre-commit-gate (wired) · detect-stack (wizard) · check-refs (prune) · post-edit-lint (opt-in)
-  rules/                        # 13 path-scoped + 3 global
+  rules/                        # 12 path-scoped + 1 global
     architecture  code-style  styling  testing  forms
-    accessibility  performance  i18n  security        # path-scoped
-    data-fetching  error-handling  config  observability   # path-scoped
-    principles  git-operations  workflow              # global
-  agents/                       # 12 least-privilege subagents
-    planner  devil  frontend-developer  ui-reviewer  accessibility-auditor
-    test-engineer  performance-auditor  refactoring-expert  debugger
-    security-scanner  ci-cd-engineer  docs-writer
-  skills/                       # 15 invokable workflows
+    accessibility  performance  i18n  security
+    data-fetching  error-handling  config
+    workflow                                          # global
+  agents/                       # 5 least-privilege subagents (4 read-only auditors + test-engineer)
+    ui-reviewer  accessibility-auditor  performance-auditor
+    security-scanner  test-engineer
+  skills/                       # 7 invokable workflows
     wizard  prune                                     # onboarding
-    scaffold-component  scaffold-feature  from-figma  add-tests
-    code-review  a11y-audit  perf-audit  security-audit  verify
-    debug-frontend  refactor  upgrade-deps  release
+    scaffold-component  scaffold-feature  from-figma
+    verify  release
 ```
 
 ## Two scopes (optional)
 
 The kit itself lives in **project scope** — `<repo>/.claude/` + `CLAUDE.md`, committed and shared. **User scope**
-`~/.claude/` (auto-applies everywhere, not committed) is for personal defaults only:
-
-```bash
-mkdir -p ~/.claude/rules
-cp .claude/rules/principles.md .claude/rules/git-operations.md ~/.claude/rules/   # personal working habits
-```
+`~/.claude/` (auto-applies everywhere, not committed) is for personal defaults only — e.g. your own `~/.claude/CLAUDE.md`
+with personal working habits.
 
 > **Gotcha:** path-scoped rules (`paths:` frontmatter) are ignored in user scope `~/.claude/rules/` — keep them in the
 > project (if one still won't load, try `paths:` → `globs:`). And don't copy skills/agents to `~/.claude/`: their
@@ -177,7 +171,7 @@ chmod +x .git/hooks/pre-commit
 ## Playwright MCP (optional, per developer)
 
 The kit doesn't commit an `.mcp.json` — a browser for the agent is a personal choice, not shared repo config. To give
-the browser-capable agents (`ui-reviewer`, `accessibility-auditor`, `debugger`) a real rendered UI to judge, install
+the browser-capable agents (`ui-reviewer`, `accessibility-auditor`) a real rendered UI to judge, install
 the [Playwright MCP](https://github.com/microsoft/playwright-mcp) locally:
 
 ```bash
@@ -209,14 +203,13 @@ free — enable it by adding to `"hooks"` in `settings.json`:
 
 - **Lean context** — path-scoped rules load only for the files they match.
 - **Least-privilege agents** — each declares an explicit `tools:` list; reviewers and auditors are read-only.
-- **Model tiers as a cost dial** — `opus` for the judgment-heavy chain (`planner`, `devil`, `frontend-developer`,
-  `debugger`, `security-scanner`), `sonnet` for the bounded auditors, `haiku` for `docs-writer`. Fable-class models earn
-  their premium as the **lead session** (pipeline orchestration, epics) or as a one-off `debugger` escalation — not as
-  a default agent tier. Exception: keep `security-scanner` off Fable — its cyber safety classifiers false-positive on
-  security-review work. Prefer following the session instead? Set `model: inherit` on the judgment chain and pick the
-  tier per session.
-- **Skill vs agent** — same-named pairs (`a11y-audit` / `accessibility-auditor`) are deliberate: the **skill** runs
-  inline and is the default; the **agent** is the isolated specialist for the parallel quality gate and delegated work.
+- **Model tiers as a cost dial** — `sonnet` for the bounded auditors and `test-engineer`, `opus` for
+  `security-scanner` (judgment-heavy; kept off Fable — its cyber safety classifiers false-positive on security-review
+  work). Fable-class models earn their premium as the **lead session** (pipeline orchestration, epics), not as a
+  default agent tier.
+- **Agents are not personas** — they exist for context isolation (read-heavy audits don't flood the lead's context),
+  parallelism (the quality-gate board), and least privilege (auditors physically can't edit). Each carries method +
+  checklist pointers, not a role prompt.
 - **One home per rule** — a convention lives in exactly one rule file; skills and agents carry the *process* and point
   at the owning rule instead of restating it.
 - **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and (most) a dedicated auditor.

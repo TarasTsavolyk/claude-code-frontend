@@ -9,6 +9,19 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-07-14
+
+Surface trim (team review): agents 12 → 5, skills 15 → 7, rules 16 → 13 files.
+
+### Changed
+- Agents are now only the quality-gate board — 4 read-only auditors (`ui-reviewer`, `accessibility-auditor`, `performance-auditor`, `security-scanner`) + `test-engineer`; the lead plans, builds, debugs, and refactors inline (`workflow.md` rewritten accordingly).
+- `principles.md` and `git-operations.md` folded into CLAUDE.md (Working principles / Git sections); `observability.md` merged into `error-handling.md` (same path scope, adjacent domain).
+- `/verify` hands deeper passes to the auditor agents; `/prune` unit map rebuilt for the new surface (11 units).
+
+### Removed
+- Agents `planner`, `devil`, `frontend-developer`, `refactoring-expert`, `debugger`, `ci-cd-engineer`, `docs-writer` — persona-shaped delegation the lead does inline; isolation/parallelism/least-privilege stays with the auditors.
+- Skills `a11y-audit`, `perf-audit`, `security-audit`, `code-review`, `debug-frontend`, `add-tests`, `refactor`, `upgrade-deps` — their checklists live in the owning rules; the agents execute them.
+
 ## [0.21.0] - 2026-07-14
 
 Security trim (team review): smaller allowlist, one wired hook, no committed MCP config.

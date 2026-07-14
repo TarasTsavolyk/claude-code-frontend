@@ -29,7 +29,7 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
      - **Project name** — detected `projectName` first, the repo folder name second.
    - Skip a question only when the value is certain **and** there's nothing to confirm; when in doubt, ask.
 
-4. **Apply the confirmed values to CLAUDE.md.** Surgical edits only — the file may already be hand-edited (see `rules/principles.md`):
+4. **Apply the confirmed values to CLAUDE.md.** Surgical edits only — the file may already be hand-edited (see CLAUDE.md → Working principles):
    - Title `# <PROJECT_NAME>` → the project name.
    - **Stack** section — the first line stays Vue, with its version **only if `vueVersion` is non-null**, stripping the semver range sigil (`^3.4.0` → 3.4); don't fabricate one — on a Nuxt project the Vue version isn't readable, so write e.g. "Vue (via Nuxt `metaFrameworkVersion`)" instead of guessing. Keep tooling lines (state / router / i18n / test libs) only where the facts confirm them — `uses` and `testing` in `facts.json` name what's actually installed; don't re-infer from memory. Never assert tools the facts don't show.
    - **Language** section: collapse `**TypeScript** | **JavaScript** ← set one for this repo.` to the chosen one, and keep only the relevant guidance sentence.
@@ -56,6 +56,6 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
 
 8. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack (e.g. `2026-06-26 · vue · pnpm · TypeScript · Tailwind · layer-first`). It **is** committed, so teammates can see the repo is onboarded and skip `/wizard`.
 
-9. **Summarize.** Tell the user exactly what changed in CLAUDE.md — placeholders resolved, structure synced, commands reconciled. Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see `rules/git-operations.md`).
+9. **Summarize.** Tell the user exactly what changed in CLAUDE.md — placeholders resolved, structure synced, commands reconciled. Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see CLAUDE.md → Git).
 
 10. **Offer to prune (opt-in).** The kit still ships **every** agent, skill, and rule — nothing was removed. Ask the user via `AskUserQuestion` (yes/no) whether to remove the capabilities this project won't use now. If **yes**, run the `/prune` skill — it presents the removable units as checkboxes, is graph-aware, and fixes every cross-reference. Note that `/prune` wants a clean tree, so recommend committing the onboarding first. If **no**, remind them `/prune` is available anytime later. Never remove anything without this explicit go-ahead.

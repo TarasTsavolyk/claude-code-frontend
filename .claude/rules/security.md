@@ -11,7 +11,7 @@ paths:
 
 # Security
 
-Security is part of "done". Anchored to the **OWASP Top 10:2025** — per-finding OWASP/CWE mappings are the `security-scanner` / `/security-audit` job, not repeated per bullet here. The browser is hostile territory: **the server is the only trust boundary**, so everything here is defense-in-depth — never the sole control.
+Security is part of "done". Anchored to the **OWASP Top 10:2025** — per-finding OWASP/CWE mappings are the `security-scanner` job, not repeated per bullet here. The browser is hostile territory: **the server is the only trust boundary**, so everything here is defense-in-depth — never the sole control.
 
 ## The cardinal rule — the client never enforces security
 - Route guards (`beforeEach`/`beforeEnter`), `v-if`-on-role, and disabled buttons are **UX only** — trivially bypassed via devtools or direct API calls. The server authorizes **every** request independently.
@@ -51,7 +51,7 @@ Vue auto-escapes `{{ }}` and attribute bindings; these escape hatches do not.
 - **CORS** is a server control, but from the client: never send credentialed (`credentials: 'include'`) cross-origin requests to a permissive API, and flag a backend that reflects `Origin` together with `Access-Control-Allow-Credentials: true`.
 
 ## Supply chain
-- Question every dependency; pin versions and commit the lockfile. Run `<pm> audit`, treat known high/critical vulns as blockers, and watch transitive packages. This is automated in CI (see `ci-cd-engineer`), not an optional manual step.
+- Question every dependency; pin versions and commit the lockfile. Run `<pm> audit`, treat known high/critical vulns as blockers, and watch transitive packages. Automate this in CI, not as an optional manual step.
 
 ## SSR / SSG
 > Applies only when the project server-renders (Nuxt or a custom renderer). Skip for pure client-side SPAs.

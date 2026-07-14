@@ -7,9 +7,10 @@ paths:
   - "src/**/*.jsx"
 ---
 
-# Error Handling
+# Error Handling & Observability
 
-Failures are part of the contract. Handle them deliberately; make them visible to the user and to your tooling (see `observability.md`).
+Failures are part of the contract. Handle them deliberately; make them visible to the user **and** to your tooling —
+if it breaks or slows down in production, you should know without a user telling you.
 
 ## Categorize first
 - **Expected** — validation failures, 4xx, "not found", offline. Handle inline with a clear, actionable user message and a path forward (retry, fix input).
@@ -33,5 +34,21 @@ Failures are part of the contract. Handle them deliberately; make them visible t
 ## User experience
 - Preserve user input on failure (don't clear the form). Offer retry for transient errors. Field-level vs form-level error placement follows `forms.md`.
 
+## Logging
+- Go through a small logger wrapper, not raw `console.*` (`console.log` is banned in committed code — see `code-style.md`). The wrapper gates by level and can be silenced in production.
+- Log with structured context (what failed, which ids) — never tokens, passwords, or PII.
+
+## Error reporting
+- Wire an error tracker (Sentry-style) at the app boundary via `app.config.errorHandler` and an `unhandledrejection` listener (the same last-resort nets as above). Report unexpected errors; don't double-report ones already handled inline.
+- Tag events with the release/version and upload source maps **privately** to the tracker — never ship them publicly (`build.sourcemap: 'hidden'`, see `security.md`). Scrub request bodies/headers of sensitive data before sending.
+
+## Field performance (RUM)
+- Measure Core Web Vitals in the field — LCP, INP, CLS — with the `web-vitals` library and send them to your analytics/monitoring. Lab budgets live in `performance.md`; this is the real-user counterpart.
+
+## Analytics & privacy
+- Send analytics through one typed event helper, not ad-hoc calls. Events carry no PII, tokens, or secrets.
+- Respect consent and Do-Not-Track; gate non-essential tracking behind it. Sample high-volume logs/events instead of sending everything.
+
 ## Verify
 - New async paths handle rejection (no empty catches), and the error branch is rendered and tested — not just success.
+- No PII/secrets in logs, breadcrumbs, or analytics payloads; unexpected errors reach the tracker.

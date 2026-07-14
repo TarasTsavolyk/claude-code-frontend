@@ -1,7 +1,6 @@
 # Release automation
 
-Two ready patterns. Pick the one that matches how the project versions itself; the
-`ci-cd-engineer` agent follows the same guidance. Whichever you use, keep it
+Two ready patterns. Pick the one that matches how the project versions itself. Whichever you use, keep it
 least-privilege, pin every `uses:` to a full commit SHA, and pass release notes via
 `--notes-file` (never interpolate text or `${{ }}` into a `run:` body).
 
