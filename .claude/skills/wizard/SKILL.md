@@ -43,7 +43,7 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
    - **Commands** — the script names are already in facts (`scripts`); cross-check `package.json` for what they run. Keep a documented command line only if its script actually exists; drop the rest. Add any project-specific scripts that matter (e.g. `storybook`, `test:unit`, `test:coverage`). Keep the `<pm>` prefix token (don't expand it). Don't invent scripts the project doesn't have.
    - If something genuinely can't be determined, leave the template line and say so in the summary — never fabricate structure or commands.
 
-6. **Confirm the machine-local paths are ignored.** The SessionStart hook auto-adds `.claude/.wizard/` to `.gitignore` on every run (`ensureWizardIgnored` in `detect-stack.mjs`) — confirm it, and append it manually only if the hook hasn't run yet (it holds the machine-local detection cache, which must not be committed). Also ensure the other two machine-local entries from the README quick-start: `.claude/settings.local.json` and `.claude/worktrees/` — append any that are missing. Do **not** ignore `.claude/.onboarded` (it's the committed marker teammates rely on).
+6. **Confirm the machine-local paths are ignored.** Running `detect-stack.mjs` in step 1 auto-adds `.claude/.wizard/` to `.gitignore` (`ensureWizardIgnored`) — confirm it, and append it manually only if it's missing (it holds the machine-local detection cache, which must not be committed). Also ensure the other two machine-local entries from the README quick-start: `.claude/settings.local.json` and `.claude/worktrees/` — append any that are missing. Do **not** ignore `.claude/.onboarded` (it's the committed marker teammates rely on).
 
 7. **Offer the native pre-commit gate (opt-in).** The shipped `PreToolUse` hook gates only commits made *through
    Claude Code* — a commit from a plain terminal bypasses it. Ask via `AskUserQuestion` (yes/no) whether to install the
@@ -54,7 +54,7 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
    machine-local — teammates re-run `/wizard` or copy the snippet from the README. If **no**, mention the README
    documents the one-liner.
 
-8. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack (e.g. `2026-06-26 · vue · pnpm · TypeScript · Tailwind · layer-first`). This stops the SessionStart hook from prompting again, and it **is** committed so teammates skip onboarding.
+8. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack (e.g. `2026-06-26 · vue · pnpm · TypeScript · Tailwind · layer-first`). It **is** committed, so teammates can see the repo is onboarded and skip `/wizard`.
 
 9. **Summarize.** Tell the user exactly what changed in CLAUDE.md — placeholders resolved, structure synced, commands reconciled. Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see `rules/git-operations.md`).
 

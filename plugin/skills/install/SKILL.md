@@ -1,6 +1,6 @@
 ---
 name: install
-description: Install the claude-code-frontend kit into the current repo as an owned, committed copy (.claude/ + CLAUDE.md + .mcp.json), then hand off to the kit's first-run wizard. Use in a repo that doesn't have the kit yet.
+description: Install the claude-code-frontend kit into the current repo as an owned, committed copy (.claude/ + CLAUDE.md), then hand off to the kit's onboarding wizard. Use in a repo that doesn't have the kit yet.
 ---
 
 # Install the frontend kit
@@ -16,10 +16,10 @@ to edit/delete the files).
    `git clone --depth 1 https://github.com/TarasTsavolyk/claude-code-frontend <tmp>`
    To pin a version, add `--branch v<X.Y.Z>`.
 3. **Copy the owned files** from the clone into the repo root: `.claude/` (drop `settings.local.json`, `.wizard/`,
-   `worktrees/` if present in the clone), `CLAUDE.md`, `.mcp.json`. Do **not** copy `.claude-plugin/`, `plugin/`,
+   `worktrees/` if present in the clone), `CLAUDE.md`. Do **not** copy `.claude-plugin/`, `plugin/`,
    `docs/`, `README.md`, `CHANGELOG.md`, or `.github/` — those belong to the kit repo, not to adopters.
 4. **Ignore machine-local paths.** Ensure `.gitignore` has `.claude/settings.local.json`, `.claude/worktrees/`, and
    `.claude/.wizard/`. Keep `.claude/.onboarded` tracked (it won't exist until the wizard runs).
-5. **Hand off.** Tell the user to start a new session (or `/clear`) so the kit's hooks and skills load — the first-run
-   hook will offer the kit's `/wizard`, which syncs CLAUDE.md to the real project and offers `/prune`. Suggest
-   committing `.claude/` + `CLAUDE.md` + `.mcp.json` on a branch.
+5. **Hand off.** Tell the user to start a new session (or `/clear`) so the kit's hooks and skills load, then run the
+   kit's `/wizard`, which syncs CLAUDE.md to the real project and offers `/prune`. Suggest committing
+   `.claude/` + `CLAUDE.md` on a branch.

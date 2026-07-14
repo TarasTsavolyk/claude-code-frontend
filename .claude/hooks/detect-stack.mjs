@@ -2,11 +2,10 @@
 // Wizard — stack detector (Phase 1).
 //
 // Non-interactive, fail-open probe of the host project. Produces the facts the
-// /wizard skill and the SessionStart hook consume, so the wizard asks the user
-// ONLY what can't be detected. `detect()` never throws.
+// /wizard skill consumes, so the wizard asks the user ONLY what can't be
+// detected. `detect()` never throws.
 //
 // Run standalone:  node .claude/hooks/detect-stack.mjs   (detect + write + print)
-// Imported by the hook: session-start.mjs calls detect()/writeFacts() directly.
 
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -179,7 +178,7 @@ export function writeFacts(facts) {
 }
 
 // Ensure the machine-local wizard cache is git-ignored so it can never be
-// committed — runs on every detect (hook + CLI), before /wizard is ever invoked.
+// committed — runs on every CLI detect, before /wizard is ever invoked.
 // Idempotent and fail-open; only acts inside a git repo. Returns true if it
 // appended the rule. (`<root>/.git` is a dir in a normal clone, a file in a
 // worktree — `existsSync` covers both.)

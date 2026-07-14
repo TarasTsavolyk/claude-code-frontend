@@ -15,7 +15,7 @@ review the diff, git is the undo.
 3. **Report what changed.** Read the clone's `CHANGELOG.md` and summarize the entries the user hasn't seen (if the
    last synced version isn't known, show the most recent few and say so).
 4. **Sync kit-managed paths** — `.claude/agents/`, `.claude/skills/`, `.claude/rules/`, `.claude/hooks/`,
-   `.claude/settings.json`, `.mcp.json` — with these rules:
+   `.claude/settings.json` — with these rules:
    - A file exists in **both** → overwrite with the kit version. If `git diff` then shows local customizations being
      lost, surface those hunks and ask before keeping the overwrite.
    - A file exists **only in the kit** → it's either new upstream or was `/prune`d here. List these and ask which to

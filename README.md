@@ -51,14 +51,13 @@ itself always lives as an owned copy in your repo.
    ```bash
    cp -r .claude /path/to/your-app/.claude   # ⚠ overwrites an existing .claude/ — merge by hand if you have one
    cp CLAUDE.md  /path/to/your-app/CLAUDE.md
-   cp .mcp.json  /path/to/your-app/.mcp.json  # Playwright MCP (browser for agents) — merge by hand if you have one
    rm -f /path/to/your-app/.claude/settings.local.json   # machine-local, don't share
    rm -rf /path/to/your-app/.claude/.wizard /path/to/your-app/.claude/worktrees   # machine-local caches, present if you ran Claude Code in the kit clone
    ```
    Then add `.claude/settings.local.json` and `.claude/worktrees/` to your repo's `.gitignore` (`cp -r` doesn't carry
-   this repo's ignore rules). The first-run hook adds `.claude/.wizard/` (the machine-local cache) automatically. Keep
-   `.claude/.onboarded` **tracked**.
-3. **Open your repo in Claude Code.** A first-run hook **asks whether to run `/wizard`** — say yes and it detects your stack, syncs `CLAUDE.md` to your real project (structure + commands), and offers to `/prune` what you won't use.
+   this repo's ignore rules). The wizard's detector adds `.claude/.wizard/` (the machine-local cache) automatically.
+   Keep `.claude/.onboarded` **tracked**.
+3. **Open your repo in Claude Code and run `/wizard`.** It detects your stack, syncs `CLAUDE.md` to your real project (structure + commands), and offers to `/prune` what you won't use.
 4. **Commit** `.claude/` + `CLAUDE.md` on a branch.
 
 This installs **project scope** (the common case). For personal defaults shared across all your repos, see
@@ -66,14 +65,14 @@ This installs **project scope** (the common case). For personal defaults shared 
 
 ## Onboarding & pruning
 
-**`/wizard`** is offered on the first session — the hook asks whether to run it — and is re-runnable anytime (re-sync
-after a stack change). It **detects your stack** (package manager, TS/JS, styling, testing, layout — and verifies the
-repo is actually Vue), confirms it with checkbox prompts, guards your git tree (won't touch uncommitted work), and **syncs `CLAUDE.md` to the real project** — resolving
-placeholders, rewriting the project-structure block from your actual `src/` layout, and reconciling the Commands block
-against your real `package.json` scripts. It keeps `<pm>` as a token — Claude substitutes your package manager from the
-lockfile, so the config never hardcodes npm/pnpm/yarn/bun — offers to install the quality gate as a **native git
-hook** (see [Permissions](#permissions)), writes a committed `.claude/.onboarded` marker so teammates aren't
-re-prompted, and finishes by **offering `/prune`**.
+**`/wizard`** is the first thing to run after installing the kit, and is re-runnable anytime (re-sync after a stack
+change). It **detects your stack** (package manager, TS/JS, styling, testing, layout — and verifies the repo is
+actually Vue), confirms it with checkbox prompts, guards your git tree (won't touch uncommitted work), and **syncs
+`CLAUDE.md` to the real project** — resolving placeholders, rewriting the project-structure block from your actual
+`src/` layout, and reconciling the Commands block against your real `package.json` scripts. It keeps `<pm>` as a
+token — Claude substitutes your package manager from the lockfile, so the config never hardcodes npm/pnpm/yarn/bun —
+offers to install the quality gate as a **native git hook** (see [Permissions](#permissions)), writes a committed
+`.claude/.onboarded` marker so teammates see the repo is onboarded, and finishes by **offering `/prune`**.
 
 **`/prune`** removes agents/skills/rules a project won't use. It's **destructive** (commits on a branch, so git is the
 undo), tiered (safe opt-outs vs. warned essentials like security/a11y), driven by checkbox prompts, and fixes every
@@ -93,12 +92,11 @@ anytime once you're settled.
 
 ```
 CLAUDE.md                       # always-loaded project memory (the template)
-.mcp.json                       # Playwright MCP — a real browser for the lead and the browser-capable agents
 .claude-plugin/  plugin/        # marketplace + installer plugin (kit-repo only — adopters don't copy these)
 tests/hooks/                    # hook unit tests, zero-dep `node --test` (kit-repo only; CI runs them on every PR)
 .claude/
-  settings.json                 # permissions + agent-teams flag + hooks wiring (gate · onboarding)
-  hooks/                        # node helpers: detect-stack · session-start · check-refs · pre-commit-gate · post-edit-lint (opt-in)
+  settings.json                 # permissions + agent-teams flag + one hook wiring (the commit gate)
+  hooks/                        # node helpers: pre-commit-gate (wired) · detect-stack (wizard) · check-refs (prune) · post-edit-lint (opt-in)
   rules/                        # 13 path-scoped + 3 global
     architecture  code-style  styling  testing  forms
     accessibility  performance  i18n  security        # path-scoped
@@ -152,10 +150,13 @@ Edit `CLAUDE.md` by hand:
 
 ## Permissions
 
-`.claude/settings.json` pre-approves safe commands (npm/pnpm/yarn/bun install·run, plus npx for vitest/playwright/eslint), gates `git commit`/`push` behind
-`ask`, and denies destructive commands + `.env`/`.pem` reads. Matching is prefix-based, so treat `deny` as
-defense-in-depth behind the `ask` gates, not a hard guarantee. `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` runs the quality
-gate agents in parallel — remove it if your Claude Code version lacks agent teams.
+`.claude/settings.json` pre-approves a **short, explicit list** — the four quality-gate scripts (`run lint·test·typecheck·build` per package manager) and read-only git — everything
+else goes through Claude Code's own permission prompts. Deliberately **no wildcards and no `install`**: `run:*` would
+pre-approve every script in `package.json` and installs execute dependency lifecycle scripts — both are supply-chain
+vectors, and the first-party ask flow handles them better than a static allowlist. `git commit`/`push` sit behind
+`ask`; destructive commands and `.env`/`.pem` reads are denied (prefix-based matching — treat `deny` as
+defense-in-depth, not a hard guarantee). `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` runs the quality-gate agents in
+parallel — remove it if your Claude Code version lacks agent teams.
 
 A `PreToolUse` hook ([`pre-commit-gate.mjs`](.claude/hooks/pre-commit-gate.mjs)) additionally **blocks `git commit`
 until the quality gate passes** — lint → typecheck → test via your lockfile-detected package manager. It fails open:
@@ -172,6 +173,18 @@ chmod +x .git/hooks/pre-commit
 ```
 
 `.git/hooks/` is machine-local — each teammate installs it once (or lets `/wizard` do it).
+
+## Playwright MCP (optional, per developer)
+
+The kit doesn't commit an `.mcp.json` — a browser for the agent is a personal choice, not shared repo config. To give
+the browser-capable agents (`ui-reviewer`, `accessibility-auditor`, `debugger`) a real rendered UI to judge, install
+the [Playwright MCP](https://github.com/microsoft/playwright-mcp) locally:
+
+```bash
+claude mcp add playwright -s local -- npx -y @playwright/mcp@latest
+```
+
+Without it everything still works — those agents fall back to judging the code and running CLI checks.
 
 **Opt-in:** [`post-edit-lint.mjs`](.claude/hooks/post-edit-lint.mjs) silently runs `eslint --fix` on every file Claude
 edits (skipped when the project has no local eslint). It's not wired by default — eslint startup on every edit isn't
@@ -207,10 +220,10 @@ free — enable it by adding to `"hooks"` in `settings.json`:
 - **One home per rule** — a convention lives in exactly one rule file; skills and agents carry the *process* and point
   at the owning rule instead of restating it.
 - **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and (most) a dedicated auditor.
-- **See it, don't infer it** — `.mcp.json` ships the [Playwright MCP](https://github.com/microsoft/playwright-mcp)
-  (`npx`-run, pre-approved in `settings.json`), so with a dev server running, `/verify`, `/debug-frontend`,
-  `/a11y-audit` — and the `debugger` / `ui-reviewer` / `accessibility-auditor` agents — judge the **rendered** UI
-  (console, network, axe in a real browser), not just the code. Remove the file if you'd rather not grant a browser.
+- **See it, don't infer it** — with the [Playwright MCP](https://github.com/microsoft/playwright-mcp) connected (a
+  per-developer install, see [Playwright MCP](#playwright-mcp-optional-per-developer)) and a dev server running, the
+  browser-capable skills and agents judge the **rendered** UI (console, network, axe in a real browser), not just the
+  code.
 - **Lean descriptions** — agent/skill `description`s stay short and functional; they load into every session, so no keyword lists.
 - **Release automation** — CHANGELOG-driven via `.github/workflows/release.yml` (see [`docs/release-automation.md`](docs/release-automation.md)).
 - **Copy-and-adapt, delivered by a plugin** — the kit is meant to be *owned*: `/wizard` rewrites CLAUDE.md and

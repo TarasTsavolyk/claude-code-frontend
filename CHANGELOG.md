@@ -9,6 +9,18 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-07-14
+
+Security trim (team review): smaller allowlist, one wired hook, no committed MCP config.
+
+### Changed
+- `settings.json` allowlist: no more `run:*` wildcards or `install`/`npx` pre-approvals (supply-chain vectors) — only the four explicit gate scripts per package manager plus read-only git; everything else goes through first-party permission prompts.
+- Playwright MCP is now a per-developer local install (`claude mcp add playwright -s local …`, documented in README) — agents fall back to code review + CLI without it.
+
+### Removed
+- `.mcp.json` — personal preference, not shared repo config; `enabledMcpjsonServers` gone with it.
+- `session-start.mjs` hook (+ its test and `SessionStart` wiring) — onboarding is now "run `/wizard` after install", nothing executes automatically on session start.
+
 ## [0.20.0] - 2026-07-14
 
 Vue-3-only: the multi-framework surface is gone (team review decision).

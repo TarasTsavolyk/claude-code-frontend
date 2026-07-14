@@ -3,7 +3,6 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "enabledMcpjsonServers": ["playwright"],
   "hooks": {
     "PreToolUse": [
       {
@@ -16,41 +15,28 @@
           }
         ]
       }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "startup|resume|clear",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.mjs\""
-          }
-        ]
-      }
     ]
   },
   "permissions": {
     "allow": [
-      "Bash(npm install)",
-      "Bash(npm ci)",
-      "Bash(npm run:*)",
-      "Bash(pnpm install)",
-      "Bash(pnpm run:*)",
-      "Bash(yarn install)",
-      "Bash(yarn run:*)",
-      "Bash(bun install)",
-      "Bash(bun run:*)",
-      "Bash(npx vitest:*)",
-      "Bash(npx playwright:*)",
-      "Bash(npx eslint:*)",
-      "Bash(npm audit:*)",
-      "Bash(pnpm audit:*)",
-      "Bash(yarn npm audit:*)",
-      "Bash(yarn audit:*)",
-      "Bash(bun audit:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run test)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run build)",
+      "Bash(pnpm run lint)",
+      "Bash(pnpm run test)",
+      "Bash(pnpm run typecheck)",
+      "Bash(pnpm run build)",
+      "Bash(yarn run lint)",
+      "Bash(yarn run test)",
+      "Bash(yarn run typecheck)",
+      "Bash(yarn run build)",
+      "Bash(bun run lint)",
+      "Bash(bun run test)",
+      "Bash(bun run typecheck)",
+      "Bash(bun run build)",
       "Bash(git status)",
       "Bash(git diff:*)",
-      "Bash(git add:*)",
       "Bash(git log:*)"
     ],
     "ask": [

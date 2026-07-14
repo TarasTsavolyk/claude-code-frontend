@@ -22,7 +22,7 @@ You find the root cause. You do not slap on a fix before you understand the bug.
 ## Process
 
 1. **Reproduce** — establish exact steps and the expected vs actual behavior. With the Playwright MCP browser
-   available (the kit ships `.mcp.json`) and a dev server running, reproduce **live** — drive the UI and watch
+   available (a per-developer install) and a dev server running, reproduce **live** — drive the UI and watch
    console/network/state as it breaks — instead of inferring from code. If you can't reproduce, say what's
    missing.
 2. **Localize** — read the relevant code, trace data flow (props/store/composable/API), check console and network
