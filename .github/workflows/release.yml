@@ -1,12 +1,14 @@
 name: Release on CHANGELOG
 
-# When CHANGELOG.md lands on main with new "## [x.y.z] - date" sections, tag each
-# one and publish a GitHub Release from that section's notes.
+# When CHANGELOG.md lands on main with a new "## [x.y.z] - date" section, tag it and
+# publish a GitHub Release from that section's notes. Idempotent: a version that
+# already has a release is skipped.
 #
-# Every versioned section is considered, not just the newest: several versions can
-# land in a single push to main, and the old `grep -m1` only ever saw the first —
-# which is how v0.20.0 and v0.21.0 shipped with no tag and no release.
-# Idempotent: a version whose release already exists is skipped.
+# Scope is deliberately limited to versions introduced by THIS push. `GITHUB_TOKEN`
+# can create a tag at the commit that triggered the run, but creating one at an older
+# commit comes back `403 Resource not accessible by integration` — so a workflow that
+# tried to backfill history would fail on every run, forever, at something CI cannot
+# fix. Historical gaps are reported instead, with the command to close them locally.
 
 on:
   push:
@@ -23,17 +25,15 @@ jobs:
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
-          # Full history: the `git log -S` target lookup below needs it. At depth 1 it
-          # returns nothing and every tag silently falls back to HEAD — the outcome the
-          # code there calls worse than having no tag at all. (The skip check is a
-          # `gh release view` REST call and needs no local history.)
+          # Full history: the `git log -S` lookup below needs it to tell which versions
+          # this push introduced. At depth 1 it finds nothing and every version looks new.
           fetch-depth: 0
 
-      - name: Tag + release every CHANGELOG version that has none
+      - name: Tag + release the versions this push introduced
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
 
           # Every versioned heading, newest first (skips "## [Unreleased]").
           versions="$(grep -E '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md \
@@ -44,13 +44,27 @@ jobs:
           fi
 
           published=0
+          failed=""
+          stale=""
+
           for version in ${versions}; do
             # Defence-in-depth: the extraction regex already guarantees this shape.
             [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid version '${version}'"; exit 1; }
             tag="v${version}"
 
             if gh release view "${tag}" >/dev/null 2>&1; then
-              echo "= ${tag} already released — skipping."
+              echo "= ${tag} already released"
+              continue
+            fi
+
+            # The commit that added this section. Tagging it — rather than HEAD — is what
+            # makes `--branch vX.Y.Z` hand out the tree the version actually names.
+            target="$(git log --reverse --format=%H -S"## [${version}]" -- CHANGELOG.md | head -1)"
+
+            # Only this push's own commits are taggable by GITHUB_TOKEN (see header).
+            if [ "${target}" != "${GITHUB_SHA}" ]; then
+              echo "~ ${tag} has no release, and its commit predates this push — skipping"
+              stale="${stale} ${tag}"
               continue
             fi
 
@@ -61,21 +75,31 @@ jobs:
               capture { print }
             ' CHANGELOG.md > "${RUNNER_TEMP}/release-notes.md"
 
-            # Point the tag at the commit that introduced this section, not at HEAD:
-            # a backfilled tag on HEAD would make `--branch vX.Y.Z` hand out today's
-            # tree, which is worse than having no tag at all.
-            target="$(git log --reverse --format=%H -S"## [${version}]" -- CHANGELOG.md | head -1)"
-            if [ -z "${target}" ]; then
-              target="${GITHUB_SHA}"
-              echo "  (no introducing commit found for ${tag} — falling back to HEAD)"
+            if gh release create "${tag}" \
+                 --target "${target}" \
+                 --title "${tag}" \
+                 --notes-file "${RUNNER_TEMP}/release-notes.md"; then
+              echo "+ published ${tag}"
+              published=$((published + 1))
+            else
+              # One bad version must not strand the rest.
+              echo "::warning::could not publish ${tag}"
+              failed="${failed} ${tag}"
             fi
-
-            gh release create "${tag}" \
-              --target "${target}" \
-              --title "${tag}" \
-              --notes-file "${RUNNER_TEMP}/release-notes.md"
-            echo "+ published ${tag}"
-            published=$((published + 1))
           done
 
           echo "Done — ${published} new release(s)."
+
+          if [ -n "${stale}" ]; then
+            echo "::notice::Versions with no release that this workflow can't create:${stale}."
+            echo "  GITHUB_TOKEN cannot tag a commit older than the one that triggered the run."
+            echo "  Backfill locally with a user token — for each version:"
+            echo "    sha=\$(git log --reverse --format=%H -S\"## [X.Y.Z]\" -- CHANGELOG.md | head -1)"
+            echo "    gh release create vX.Y.Z --target \"\$sha\" --title vX.Y.Z --notes-file <notes>"
+          fi
+
+          # Fail only on something a re-run could fix.
+          if [ -n "${failed}" ]; then
+            echo "::error::failed to publish:${failed}"
+            exit 1
+          fi

@@ -19,7 +19,13 @@ Audit fixes: the two mechanisms that failed silently now work outside a stock cr
 - The gate no longer fires on commands that merely *mention* the command. This blocked more than it wasted: a `PreToolUse` exit 2 stops the call, so in a repo with red tests, writing a doc containing a `git commit` example was impossible. Quoted spans and heredoc bodies are now stripped before the command is parsed.
 - The gate resolves the script names projects actually use (`type-check`, `test:unit`) and prints the gate it resolved — on stock create-vue it had silently degraded to lint-only. When *no* script matches it now says so explicitly instead of exiting green in silence.
 - `detect-stack` checks for a monorepo package before a flat layout, and requires real evidence (Nuxt, or several app dirs) before claiming the repo root — a single stray top-level `api/` used to hijack `srcRoot` and hide the actual app.
-- `release.yml` tags **every** CHANGELOG version lacking a release, each pointed at the commit that introduced its section; the old single-heading read left v0.20.0 and v0.21.0 (plus six older) untagged forever.
+- `release.yml` no longer reads only the first CHANGELOG heading — that is how v0.20.0 and v0.21.0 (plus six older)
+  shipped with no tag and no release. It now publishes every version **this push** introduced, each tag pointed at the
+  commit that added its section so `--branch vX.Y.Z` hands out the tree that version names. Backfilling older versions
+  is deliberately *not* attempted: `GITHUB_TOKEN` may tag the triggering commit but gets
+  `403 Resource not accessible by integration` for anything older, so the workflow reports those gaps with the local
+  command to close them instead of failing on every run at something CI cannot fix. A single failure no longer strands
+  the versions behind it. The eight historical gaps were backfilled by hand.
 - `detect-stack` locates the app root outside `src/` and reports it as `srcRoot`; `/wizard` reads it instead of scanning a hardcoded `src`.
 - `/frontend-kit:update` passes the skipped slugs to `check-refs.mjs` (bare invocation is a usage error that checks nothing) and records `.claude/.kit-version` so the next update knows its starting point.
 
