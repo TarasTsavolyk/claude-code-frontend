@@ -4,6 +4,7 @@ description:
   'Audits changed views for accessibility (WCAG 2.2 AA): semantics, keyboard operability, focus management, labels,
   contrast, reduced motion. Can run axe.'
 model: sonnet
+effort: high # thoroughness IS this agent's value; don't let it inherit a low session effort
 color: green
 tools:
   - Read

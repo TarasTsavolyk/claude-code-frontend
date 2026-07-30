@@ -1,12 +1,8 @@
 ---
 paths:
-  - "src/**/*.vue"
-  - "src/**/*.tsx"
-  - "src/**/*.jsx"
-  - "src/**/*.css"
-  - "src/**/*.scss"
-  - "src/**/*.sass"
-  - "src/**/*.module.css"
+  - "{src,app,lib,resources/js,*/src,*/app,*/*/src,*/*/app}/**/*.{vue,tsx,jsx,css,scss,sass}"
+  - "{components,layouts,pages}/**/*.vue"
+  - "{assets,styles}/**/*.{css,scss,sass}"
 ---
 
 # Styling
@@ -26,6 +22,6 @@ Default approach: **Tailwind CSS 4** (CSS-first `@theme` tokens). The principles
 - No inline `style=""` for what your classes/stylesheet can express; reserve it for genuinely dynamic computed values — and never bind a raw user-supplied string to `:style` (CSS injection; see `security.md`).
 
 ## Your styling approach
-- **Tailwind 4 (default)** — tokens in `@theme { … }` in the CSS entry; semantic utilities (`bg-surface`, `text-muted`); responsive `sm: md: lg:`; `motion-reduce:`; reserve `@apply` for shared primitives.
+- **Tailwind 4 (default)** — tokens in `@theme { … }` in the CSS entry; semantic utilities (`bg-surface`, `text-muted`); responsive `sm: md: lg:`; `motion-reduce:`. A named reusable style is `@utility`; a custom variant is `@custom-variant`. Reserve `@apply` for markup you don't control (third-party/CDN widgets) — reaching for it first is what produces the soup banned above.
 - **Sass/SCSS** — tokens as variables/maps (`$color-surface`, `$space-*`) in `variables.scss`/`_tokens.scss`, shared via `@use`; reuse via `@mixin`/`@include` or `%placeholder`/`@extend`; responsive via `@media (min-width …)`.
 - **CSS Modules / scoped `<style>`** — tokens as `:root { --color-surface; --space-* }` custom properties used via `var(--token)`; reuse via `composes` (Modules) or a shared component; reduced-motion via `@media (prefers-reduced-motion: reduce)`.

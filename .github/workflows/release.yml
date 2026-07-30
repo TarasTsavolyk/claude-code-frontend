@@ -1,8 +1,12 @@
 name: Release on CHANGELOG
 
-# When CHANGELOG.md lands on main with a new "## [x.y.z] - date" section,
-# tag vX.Y.Z and publish a GitHub Release using that section's notes.
-# Idempotent: if the release already exists, it does nothing.
+# When CHANGELOG.md lands on main with new "## [x.y.z] - date" sections, tag each
+# one and publish a GitHub Release from that section's notes.
+#
+# Every versioned section is considered, not just the newest: several versions can
+# land in a single push to main, and the old `grep -m1` only ever saw the first —
+# which is how v0.20.0 and v0.21.0 shipped with no tag and no release.
+# Idempotent: a version whose release already exists is skipped.
 
 on:
   push:
@@ -18,46 +22,60 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          # Full history: the `git log -S` target lookup below needs it. At depth 1 it
+          # returns nothing and every tag silently falls back to HEAD — the outcome the
+          # code there calls worse than having no tag at all. (The skip check is a
+          # `gh release view` REST call and needs no local history.)
+          fetch-depth: 0
 
-      - name: Resolve latest released version from CHANGELOG
-        id: changelog
-        run: |
-          set -euo pipefail
-          # First versioned heading (skips "## [Unreleased]"), e.g. "## [0.1.0] - 2026-06-10".
-          version="$(grep -m1 -E '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md \
-            | sed -E 's/^## \[([0-9]+\.[0-9]+\.[0-9]+)\].*/\1/' || true)"
-          if [ -z "${version}" ]; then
-            echo "No released version section found — nothing to do."
-            echo "release=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # Notes = lines between this version's heading and the next "## [" heading.
-          awk -v ver="${version}" '
-            $0 ~ ("^## \\[" ver "\\]") { capture = 1; next }
-            capture && /^## \[/ { exit }
-            capture { print }
-          ' CHANGELOG.md > "${RUNNER_TEMP}/release-notes.md"
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-          echo "release=true" >> "$GITHUB_OUTPUT"
-          echo "Resolved v${version}; notes:"
-          cat "${RUNNER_TEMP}/release-notes.md"
-
-      - name: Create tag + release if it does not exist
-        if: steps.changelog.outputs.release == 'true'
+      - name: Tag + release every CHANGELOG version that has none
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ steps.changelog.outputs.version }}
         run: |
           set -euo pipefail
-          # Defence-in-depth: the extraction regex already guarantees this shape.
-          [[ "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid version '${VERSION}'"; exit 1; }
-          tag="v${VERSION}"
-          if gh release view "${tag}" >/dev/null 2>&1; then
-            echo "Release ${tag} already exists — nothing to do."
+
+          # Every versioned heading, newest first (skips "## [Unreleased]").
+          versions="$(grep -E '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md \
+            | sed -E 's/^## \[([0-9]+\.[0-9]+\.[0-9]+)\].*/\1/' || true)"
+          if [ -z "${versions}" ]; then
+            echo "No released version section found — nothing to do."
             exit 0
           fi
-          gh release create "${tag}" \
-            --target "${GITHUB_SHA}" \
-            --title "${tag}" \
-            --notes-file "${RUNNER_TEMP}/release-notes.md"
-          echo "Published ${tag}."
+
+          published=0
+          for version in ${versions}; do
+            # Defence-in-depth: the extraction regex already guarantees this shape.
+            [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid version '${version}'"; exit 1; }
+            tag="v${version}"
+
+            if gh release view "${tag}" >/dev/null 2>&1; then
+              echo "= ${tag} already released — skipping."
+              continue
+            fi
+
+            # Notes = lines between this version's heading and the next "## [" heading.
+            awk -v ver="${version}" '
+              $0 ~ ("^## \\[" ver "\\]") { capture = 1; next }
+              capture && /^## \[/ { exit }
+              capture { print }
+            ' CHANGELOG.md > "${RUNNER_TEMP}/release-notes.md"
+
+            # Point the tag at the commit that introduced this section, not at HEAD:
+            # a backfilled tag on HEAD would make `--branch vX.Y.Z` hand out today's
+            # tree, which is worse than having no tag at all.
+            target="$(git log --reverse --format=%H -S"## [${version}]" -- CHANGELOG.md | head -1)"
+            if [ -z "${target}" ]; then
+              target="${GITHUB_SHA}"
+              echo "  (no introducing commit found for ${tag} — falling back to HEAD)"
+            fi
+
+            gh release create "${tag}" \
+              --target "${target}" \
+              --title "${tag}" \
+              --notes-file "${RUNNER_TEMP}/release-notes.md"
+            echo "+ published ${tag}"
+            published=$((published + 1))
+          done
+
+          echo "Done — ${published} new release(s)."

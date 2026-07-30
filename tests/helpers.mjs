@@ -1,7 +1,7 @@
-// Shared helpers for hook tests. Zero dependencies: node:test + fixtures in
-// mkdtemp dirs. Hooks under test are spawned as real subprocesses (they are
-// stdin/exit-code programs), except detect-stack.mjs whose pure functions are
-// imported directly.
+// Shared helpers for hook and script tests. Zero dependencies: node:test +
+// fixtures in mkdtemp dirs. Hooks and CLI scripts are spawned as real
+// subprocesses (they are stdin/argv/exit-code programs), except detect-stack.mjs
+// whose pure functions are imported directly.
 
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
@@ -9,7 +9,8 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const HOOKS = fileURLToPath(new URL('../../.claude/hooks/', import.meta.url))
+export const HOOKS = fileURLToPath(new URL('../.claude/hooks/', import.meta.url))
+export const SCRIPTS = fileURLToPath(new URL('../.claude/scripts/', import.meta.url))
 
 const created = []
 
@@ -42,17 +43,21 @@ export function gitInit(root, stage = []) {
   if (stage.length) run('git', ['add', ...stage], root)
 }
 
-// Spawn a hook script. `stdin` objects are JSON-stringified (hook payloads);
-// `root` becomes CLAUDE_PROJECT_DIR (unset when omitted, so the hook falls
-// back to its own cwd/payload logic).
-export function runHook(script, { stdin, args = [], root, cwd } = {}) {
+// Spawn a hook or CLI script. `stdin` objects are JSON-stringified (hook
+// payloads); `root` becomes CLAUDE_PROJECT_DIR (unset when omitted, so the
+// program falls back to its own cwd/payload logic). `dir` selects which of
+// .claude/hooks or .claude/scripts the program lives in.
+function spawnProgram(dir, script, { stdin, args = [], root, cwd } = {}) {
   const env = { ...process.env }
   if (root) env.CLAUDE_PROJECT_DIR = root
   else delete env.CLAUDE_PROJECT_DIR
-  return spawnSync(process.execPath, [join(HOOKS, script), ...args], {
+  return spawnSync(process.execPath, [join(dir, script), ...args], {
     encoding: 'utf8',
     cwd: cwd ?? root ?? process.cwd(),
     input: stdin === undefined ? '' : typeof stdin === 'string' ? stdin : JSON.stringify(stdin),
     env,
   })
 }
+
+export const runHook = (script, opts) => spawnProgram(HOOKS, script, opts)
+export const runScript = (script, opts) => spawnProgram(SCRIPTS, script, opts)

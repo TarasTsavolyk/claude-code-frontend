@@ -21,6 +21,15 @@ import { join } from 'node:path';
 
 const native = process.argv.includes('--native');
 
+// Shell syntax and command wrappers that can precede the real command. Declared up
+// here, not next to isGitCommit: `const` has no hoisting, and the top-level code
+// below calls that function before a later declaration would be initialized.
+const HEAD_NOISE = new Set([
+  'if', 'then', 'else', 'elif', 'fi', 'while', 'until', 'for', 'do', 'done',
+  'case', 'esac', '{', '}', '(', ')', '!', 'time', 'sudo', 'exec', 'command',
+  'nohup', 'nice', 'env', 'builtin', 'eval',
+]);
+
 let payload;
 let command = '';
 if (!native) {
@@ -58,8 +67,37 @@ if (files.length === 0) process.exit(0); // nothing staged — let git report th
 const CODE = /\.(vue|ts|tsx|js|jsx|mjs|cjs|css|scss|sass|json)$/;
 if (!files.some((f) => CODE.test(f) && !f.startsWith('.claude/'))) process.exit(0);
 
-const steps = ['lint', 'typecheck', 'test'].filter((step) => scripts[step]);
-if (steps.length === 0) process.exit(0);
+// Resolve each stage against the names projects actually use: create-vue
+// generates `type-check` and `test:unit`, so matching `typecheck`/`test`
+// name-for-name silently degraded the whole gate to lint-only.
+const STAGES = [
+  ['lint', ['lint']],
+  ['typecheck', ['typecheck', 'type-check', 'types']],
+  ['test', ['test', 'test:unit']],
+];
+const steps = [];
+const skipped = [];
+for (const [stage, aliases] of STAGES) {
+  const found = aliases.find((name) => scripts[name]);
+  if (found) steps.push(found);
+  else skipped.push(stage);
+}
+// Say what is actually running — including when that is nothing. The failure this
+// replaces was silent: a repo whose scripts are named outside the alias lists got a
+// green gate that checked nothing, with no output at all.
+if (steps.length === 0) {
+  console.error(
+    `Quality gate: no script matched, so nothing was checked. Looked for ` +
+      `${STAGES.map(([, aliases]) => aliases.join('|')).join(', ')} in package.json. ` +
+      `Add one of those names, or run your own checks before committing.`,
+  );
+  process.exit(0); // still fail-open: it can't know which of your scripts is the gate
+}
+
+console.error(
+  `Quality gate: ${steps.map((s) => `${pm} run ${s}`).join(' → ')}` +
+    (skipped.length ? ` (no script for: ${skipped.join(', ')})` : ''),
+);
 
 for (const step of steps) {
   // CI=1 + piped stdio keep vitest & friends in single-run (non-watch) mode.
@@ -79,19 +117,66 @@ for (const step of steps) {
 
 process.exit(0);
 
-/** `git commit` as the actual subcommand — not `git log --grep=commit`. */
+/**
+ * Blank out anything that is DATA rather than a command: heredoc bodies and
+ * quoted spans. Without this, `cat > docs/git.md <<'EOF' … git commit …` or
+ * `echo "step 1; git commit"` reads as a commit — and because a PreToolUse
+ * exit 2 blocks the call, a red-tests repo could not write documentation that
+ * merely mentions the command.
+ *
+ * Quotes are replaced rather than removed so token positions still make sense.
+ */
+function stripData(cmd) {
+  // Heredocs first: `<<EOF`, `<<-EOF`, `<<'EOF'`, `<<"EOF"` up to the terminator.
+  let out = cmd.replace(/<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1[\s\S]*?^\s*\2\s*$/gm, '<<REDACTED');
+  // An unterminated heredoc still shouldn't leak its body.
+  out = out.replace(/<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1[\s\S]*/, '<<REDACTED');
+  // Then quoted spans.
+  out = out.replace(/'[^']*'/g, "''").replace(/"[^"]*"/g, '""');
+  return out;
+}
+
+/**
+ * `git commit` as the actual subcommand — not `git log --grep=commit`, and not
+ * the word "commit" sitting inside a string.
+ *
+ * `git` must be the HEAD of a segment, after stripping `VAR=value` prefixes and
+ * shell keywords/wrappers — so `then git commit` and `time git commit` are caught
+ * while `echo git commit` is not. Segments split on every separator a shell treats
+ * as one, including the newline: `git add -A` + `git commit` on two lines is the
+ * shape this most often arrives in.
+ *
+ * Not a security boundary: `sh -c "git commit …"` and aliases go around it. The
+ * gate's job is to stop the ordinary path from skipping tests, and the `--native`
+ * git hook covers what this can't see.
+ */
 function isGitCommit(cmd) {
-  for (const segment of cmd.split(/&&|\|\||[|;]/)) {
-    const tokens = segment.trim().split(/\s+/);
-    const gitIdx = tokens.indexOf('git');
-    if (gitIdx === -1) continue;
+  for (const segment of stripData(cmd).split(/&&|\|\||[|;&\n\r]/)) {
+    const tokens = segment.trim().split(/\s+/).filter(Boolean);
+    let i = 0;
+    // Skip environment assignments and shell noise, in any order:
+    // `if`, `then`, `time`, `sudo -u x`, `GIT_EDITOR=true`, …
+    for (;;) {
+      const t = tokens[i];
+      if (t === undefined) break;
+      if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(t) || HEAD_NOISE.has(t)) {
+        i++;
+        continue;
+      }
+      break;
+    }
+    const head = tokens[i];
+    if (!head) continue;
+    // Accept a bare `git` or an absolute/relative path to it.
+    if (head !== 'git' && !/(^|\/)git$/.test(head)) continue;
+
     let skipValue = false;
-    for (const token of tokens.slice(gitIdx + 1)) {
+    for (const token of tokens.slice(i + 1)) {
       if (skipValue) {
         skipValue = false;
         continue;
       }
-      if (['-C', '-c', '--git-dir', '--work-tree'].includes(token)) {
+      if (['-C', '-c', '--git-dir', '--work-tree', '--namespace', '--exec-path'].includes(token)) {
         skipValue = true;
         continue;
       }

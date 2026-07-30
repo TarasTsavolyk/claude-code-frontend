@@ -11,7 +11,7 @@
 // Output is file:line:text so ambiguous hits (e.g. the common word "release"
 // vs the /release skill) can be eyeballed. Exit 1 if any hit, 0 if clean.
 //
-// Usage: node .claude/hooks/check-refs.mjs <removed-name> [<removed-name>...]
+// Usage: node .claude/scripts/check-refs.mjs <removed-name> [<removed-name>...]
 
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

@@ -9,6 +9,75 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-07-29
+
+Audit fixes: the two mechanisms that failed silently now work outside a stock create-vue layout.
+
+### Fixed
+- Rule `paths:` no longer anchor to a bare `src/` — a multi-root brace glob covers create-vue, Nuxt 3 (flat), Nuxt 4 (`app/`), Laravel (`resources/js`), app-in-a-subdir, and monorepos, where 10 of 13 rules previously loaded for zero files with no error.
+- `pre-commit-gate` recognizes `git commit` after a newline, `&`, an env-var prefix, or a shell keyword/wrapper (`then`, `do`, `{`, `time`, `sudo`, `exec`, `env`) — the multi-line `git add` + `git commit` shape went ungated entirely.
+- The gate no longer fires on commands that merely *mention* the command. This blocked more than it wasted: a `PreToolUse` exit 2 stops the call, so in a repo with red tests, writing a doc containing a `git commit` example was impossible. Quoted spans and heredoc bodies are now stripped before the command is parsed.
+- The gate resolves the script names projects actually use (`type-check`, `test:unit`) and prints the gate it resolved — on stock create-vue it had silently degraded to lint-only. When *no* script matches it now says so explicitly instead of exiting green in silence.
+- `detect-stack` checks for a monorepo package before a flat layout, and requires real evidence (Nuxt, or several app dirs) before claiming the repo root — a single stray top-level `api/` used to hijack `srcRoot` and hide the actual app.
+- `release.yml` tags **every** CHANGELOG version lacking a release, each pointed at the commit that introduced its section; the old single-heading read left v0.20.0 and v0.21.0 (plus six older) untagged forever.
+- `detect-stack` locates the app root outside `src/` and reports it as `srcRoot`; `/wizard` reads it instead of scanning a hardcoded `src`.
+- `/frontend-kit:update` passes the skipped slugs to `check-refs.mjs` (bare invocation is a usage error that checks nothing) and records `.claude/.kit-version` so the next update knows its starting point.
+
+### Changed
+- Neither plugin manifest declares a `version` — it is Claude Code's update cache key, so the published installer had been frozen six releases behind. CI asserts both stay version-free; CHANGELOG headings and git tags keep the history.
+- `settings.json` hook uses exec form with `${CLAUDE_PROJECT_DIR}` (bare `$CLAUDE_PROJECT_DIR` resolves to `$null` under PowerShell, disabling the gate outright).
+- `/prune`, `/wizard`, and `/release` are `disable-model-invocation: true` — destructive, one-shot, and publishing skills are now user-invocable by mechanism, not by prose; the two handoffs that assumed otherwise were reworded.
+- `effort: high` on `security-scanner` and `accessibility-auditor`, whose entire value is thoroughness.
+- **CLAUDE.md now holds only what the repo can't say for itself**, and its header states that as a governing rule so the
+  file can't quietly re-bloat. `## Stack`, `## Language`, `## Commands`, and `## Project structure` are all gone —
+  `detect-stack` already reads every one of them out of `package.json`/`tsconfig.json`, and the same `Read` a session
+  makes for script names reveals the stack for free. 145 → 93 lines. The `typescript@6` pin moved to `code-style.md`'s
+  TypeScript section, where it loads exactly when TS work happens, with its "pin to 6.x" directive restored (a reflow had
+  reduced it to describing the breakage without saying what to do). `/wizard` records the confirmed **styling** choice in
+  `rules/styling.md` instead — the one confirmed value `package.json` genuinely can't reveal, since CSS Modules and
+  scoped `<style>` are both built in.
+- **CLAUDE.md stops duplicating the repo.** `## Commands` and `## Project structure` are gone: script names live in
+  `package.json` and layout conventions in `architecture.md`, so copies in always-loaded memory only drift — the Commands
+  block already contradicted the gate's own alias resolution on a stock create-vue repo. `## Package manager` now says to
+  read `package.json` instead of assuming, and `## Quality gate` states the order (lint → typecheck → test, cheapest
+  failure first) without naming scripts the repo may not have. `/wizard` step 5 loses both sync jobs and becomes the
+  rules-attach smoke test; it is told **not** to re-add either block unless a curated command list genuinely earns it.
+- `/context` → Memory files, not `/memory`, is what shows which rules loaded — corrected in the README, the PR template,
+  and the bug-report template. `/memory` edits memory files; it was never the inspection command.
+- CLAUDE.md's **Project structure** placeholder no longer hardcoded `src/` — it shows `<app root>/` and names the roots
+  that actually occur, so the one remaining place in the kit that still asserted a create-vue layout is gone. Its caveat
+  blockquote dropped the by-type/by-feature guidance that `architecture.md` already owns, and `/wizard` was updated to
+  match: it now deletes the placeholder blockquote after syncing rather than hunting for a sentence that no longer exists.
+- CLAUDE.md's Core principles became a **cold-start index** of the rules rather than a summary of them. A rule loads on
+  glob match, which never fires when you're about to *create* a file — that gap is the table's only job, so its third
+  column answers "read it when" instead of restating the `paths:` scope. That old column was a second, unchecked copy of
+  the globs and had already drifted; `tests/rules/paths.test.mjs` now fails if the table and `.claude/rules/` disagree.
+  `workflow.md` is off the table (always loaded, never waiting to be found); the trust-boundary stance stays stated.
+- Dated facts corrected: pin TypeScript 6.x (`vue-tsc` can't use TS 7's `tsgo`), `onWatcherCleanup` for abort-on-input-change, Tailwind `@utility`/`@custom-variant`, Pinia Colada alongside TanStack Query, Vue Router 5 file-based routing, `v-memo` unsupported in Vapor SFCs, a Baseline browser floor, Node 22+.
+- Nuxt is supported rather than half-claimed: `config.md` and `security.md` name `runtimeConfig`/`NUXT_PUBLIC_*` as a distinct mechanism from `import.meta.env`.
+- `ci.yml` folded into `test.yml` (the config checks were PR-only), actions pinned to SHAs, Node 22/24 matrix, plus manifest validation.
+- CLI helpers moved to `.claude/scripts/` — `.claude/hooks/` now holds only what is actually wired.
+- Accurate wording: the auditors "report rather than edit" (three hold `Bash`), quality-gate re-checks **resume** the flagging auditor instead of spawning a cold one, and `globs:` is named as Cursor's field, not a Claude Code fallback.
+
+### Added
+- **Plan-first, enforced rather than requested.** `settings.json` sets `permissions.defaultMode: "plan"`, so sessions
+  start unable to edit until a plan is accepted; CLAUDE.md's first working principle states the same thing in one place
+  (understand → plan → wait, no small-change exemption) and the three `workflow.md` flows reference that stop instead of
+  paraphrasing it. "Trivial changes skip straight to build" is gone. It stays a default, not a lock — shift+tab, or
+  `defaultMode` in a personal `settings.local.json`, opts out.
+- `rules/ssr.md` — server/client escaping, request-scoped state, hydration; a `/prune` default-remove for SPAs.
+- `tests/rules/paths.test.mjs` — 15 zero-dependency tests pinning that every supported layout attaches the rules it should, so a mis-scoped glob can't fail silently again.
+- Gate regression tests for the newline/`&`/env-prefix shapes and the false-positive cases, written to fail before the fix.
+- `Edit(**/.env)` / `Edit(**/.env.*)` / `Edit(**/*.pem)` deny rules — `Read` deny covers Edit but not `Write`, so a forbidden-to-read `.env` could still be clobbered. `config.md` now states the consequence: `.env.example` is yours to edit, since permission rules can't carve an exception out of a deny.
+- A README section on `sandbox.enabled` as the layer that actually enforces, versus Bash patterns that only match prefixes.
+- CONTRIBUTING records the platform features deliberately declined, so they stop being re-proposed.
+
+### Removed
+- `/scaffold-feature` — all ten steps restated rules that now actually load in every layout; the fix above is what earned the deletion.
+- `post-edit-lint.mjs` (+ its test) — never wired, duplicated the gate's `lint` step, and its only documentation wasn't copied to adopters.
+- Five `## Verify` rule trailers, `config.md`'s Vite-docs restatement, and the Vue ≤3.4 fallback branches.
+- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` — the board reports to the lead; parallelism needs no flag.
+
 ## [0.22.0] - 2026-07-14
 
 Surface trim (team review): agents 12 → 5, skills 15 → 7, rules 16 → 13 files.
@@ -336,7 +405,18 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.23.0...HEAD
+[0.23.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.22.0...v0.23.0
+[0.22.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.21.0...v0.22.0
+[0.21.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.20.0...v0.21.0
+[0.20.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.19.0...v0.20.0
+[0.19.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.18.0...v0.19.0
+[0.18.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.17.0...v0.18.0
+[0.17.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.16.0...v0.17.0
+[0.16.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.15.0...v0.16.0
+[0.15.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.14.0...v0.15.0
+[0.14.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.13.0...v0.14.0
+[0.13.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.1...v0.11.0
 [0.10.1]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.10.0...v0.10.1

@@ -1,6 +1,9 @@
 ---
 name: release
 description: Cut a release — match the project's mechanism (CHANGELOG-driven or Changesets), derive notes, pick the SemVer bump, run the gate. Use when shipping a new version.
+# Publishes. Shipping is a call the user makes by name, not something a model
+# folds into the end of another task.
+disable-model-invocation: true
 ---
 
 # Cut a release
@@ -18,9 +21,9 @@ Detect the mechanism first, then follow that track. Always run the quality gate 
 2. **Classify** into Keep a Changelog groups (Added / Changed / Deprecated / Removed / Fixed / Security); write user-facing lines, not raw commit subjects.
 3. **Pick the bump** (SemVer): breaking → major, new capability → minor, fixes only → patch.
 4. **Write the section** — turn `## [Unreleased]` into `## [x.y.z] - YYYY-MM-DD`, leave a fresh empty `## [Unreleased]` above it, and refresh the version-compare links at the bottom.
-5. **Bump** any tracked version (`package.json`, etc.) to match the tag.
+5. **Bump** any tracked version (`package.json`, etc.) to match the tag. A distribute-by-copy kit may have nothing to bump — a plugin manifest deliberately omits `version` so installs track the default branch rather than a cached release; don't "fix" that by adding one.
 6. **Gate** — `<pm> run lint && <pm> run test` (+ `<pm> run typecheck` in TS projects).
-7. **Ship** — commit + PR via the approval flow. On merge to `main`, `release.yml` tags `vx.y.z` and publishes the GitHub Release (see `docs/release-automation.md`).
+7. **Ship** — commit + PR via the approval flow. On merge to `main`, `release.yml` tags and publishes **every** CHANGELOG version that has no release yet, each pointed at the commit that introduced its section (see `docs/release-automation.md`).
 
 ## Track B — Changesets
 

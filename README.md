@@ -17,7 +17,7 @@ invokable skills wired into a review pipeline.
 | Block | Lives in | What it is |
 | --- | --- | --- |
 | **Rules** | `.claude/rules/` | Conventions Claude follows. Path-scoped — each loads only for matching files, so context stays lean. |
-| **Agents** | `.claude/agents/` | Specialist subagents (reviewers, auditors, delegated builder) with least-privilege tools — for isolation and parallelism. |
+| **Agents** | `.claude/agents/` | Four auditors that report rather than edit, plus `test-engineer` — least-privilege tools, for isolation and parallelism. |
 | **Skills** | `.claude/skills/` | Invokable `/procedures` — scaffold, verify, release, onboard. |
 | **Pipeline** | `rules/workflow.md` | How they combine: **lead plans & builds inline → risk-scaled quality gate (parallel agents: review · a11y · tests · perf · security) → docs**. |
 
@@ -26,7 +26,7 @@ gate in parallel — and the rules keep every step on your conventions.
 
 ## Quick start
 
-**Requirements:** Claude Code CLI (installed + authenticated) · Node 18+ (the hooks are plain ESM) · a frontend repo.
+**Requirements:** Claude Code CLI (installed + authenticated) · Node 22+ (what CI verifies, and what current Vue/Vite tooling needs) · a Vue 3 repo.
 
 **Via the plugin installer (recommended — it gives you an update path):**
 
@@ -57,7 +57,7 @@ itself always lives as an owned copy in your repo.
    Then add `.claude/settings.local.json` and `.claude/worktrees/` to your repo's `.gitignore` (`cp -r` doesn't carry
    this repo's ignore rules). The wizard's detector adds `.claude/.wizard/` (the machine-local cache) automatically.
    Keep `.claude/.onboarded` **tracked**.
-3. **Open your repo in Claude Code and run `/wizard`.** It detects your stack, syncs `CLAUDE.md` to your real project (structure + commands), and offers to `/prune` what you won't use.
+3. **Open your repo in Claude Code and run `/wizard`.** It detects your stack, settles `CLAUDE.md` against it, checks the rules attach to your layout, and offers to `/prune` what you won't use.
 4. **Commit** `.claude/` + `CLAUDE.md` on a branch.
 
 This installs **project scope** (the common case). For personal defaults shared across all your repos, see
@@ -68,47 +68,49 @@ This installs **project scope** (the common case). For personal defaults shared 
 **`/wizard`** is the first thing to run after installing the kit, and is re-runnable anytime (re-sync after a stack
 change). It **detects your stack** (package manager, TS/JS, styling, testing, layout — and verifies the repo is
 actually Vue), confirms it with checkbox prompts, guards your git tree (won't touch uncommitted work), and **syncs
-`CLAUDE.md` to the real project** — resolving placeholders, rewriting the project-structure block from your actual
-`src/` layout, and reconciling the Commands block against your real `package.json` scripts. It keeps `<pm>` as a
+`CLAUDE.md` to the real project** — resolving placeholders, recording the one thing `package.json` can't reveal (your
+styling approach, into `rules/styling.md`), then smoke-testing that the rules actually attach to your layout. It keeps
+`<pm>` as a
 token — Claude substitutes your package manager from the lockfile, so the config never hardcodes npm/pnpm/yarn/bun —
 offers to install the quality gate as a **native git hook** (see [Permissions](#permissions)), writes a committed
 `.claude/.onboarded` marker so teammates see the repo is onboarded, and finishes by **offering `/prune`**.
 
 **`/prune`** removes agents/skills/rules a project won't use. It's **destructive** (commits on a branch, so git is the
 undo), tiered (safe opt-outs vs. warned essentials like security/a11y), driven by checkbox prompts, and fixes every
-cross-reference — verified by `.claude/hooks/check-refs.mjs`. `/wizard` offers it at the end of onboarding, or run it
+cross-reference — verified by `.claude/scripts/check-refs.mjs`. `/wizard` offers it at the end of onboarding, or run it
 anytime once you're settled.
 
 ## Daily use
 
 - **Feature** — the lead plans and builds inline → quality-gate board in parallel (risk-scaled) → docs.
 - **Bug** — the lead diagnoses to root cause (failing test first) → fix → verify with a regression test.
-- **Scaffold** — `/scaffold-component`, `/scaffold-feature`, `/from-figma`.
+- **Scaffold** — `/scaffold-component`, `/from-figma`.
 - **Verify** — `/verify` runs the quality gate + a rules sanity pass; the auditor agents go deeper on demand.
 - **Ship** — `/release`.
-- **Check what loaded** — `/memory` (open a component and a test file to watch path-scoped rules activate) · `/agents`.
+- **Check what loaded** — `/context` → Memory files (open a component and a test file to watch path-scoped rules activate) · `/agents`.
 
 ## Contents
 
 ```
-CLAUDE.md                       # always-loaded project memory (the template)
+CLAUDE.md                       # always-loaded memory — only what package.json/tsconfig/the tree can't say
 .claude-plugin/  plugin/        # marketplace + installer plugin (kit-repo only — adopters don't copy these)
-tests/hooks/                    # hook unit tests, zero-dep `node --test` (kit-repo only; CI runs them on every PR)
+tests/                          # zero-dep `node --test` — hooks · scripts · rule globs (kit-repo only; CI runs them on every push)
 .claude/
-  settings.json                 # permissions + agent-teams flag + one hook wiring (the commit gate)
-  hooks/                        # node helpers: pre-commit-gate (wired) · detect-stack (wizard) · check-refs (prune) · post-edit-lint (opt-in)
-  rules/                        # 12 path-scoped + 1 global
+  settings.json                 # permissions + the one hook wiring (the commit gate)
+  hooks/                        # actually wired: pre-commit-gate
+  scripts/                      # CLI helpers a skill invokes: detect-stack (wizard) · check-refs (prune)
+  rules/                        # 13 path-scoped + 1 global
     architecture  code-style  styling  testing  forms
-    accessibility  performance  i18n  security
+    accessibility  performance  i18n  security  ssr
     data-fetching  error-handling  config
     workflow                                          # global
   agents/                       # 5 least-privilege subagents (4 read-only auditors + test-engineer)
     ui-reviewer  accessibility-auditor  performance-auditor
     security-scanner  test-engineer
-  skills/                       # 7 invokable workflows
-    wizard  prune                                     # onboarding
-    scaffold-component  scaffold-feature  from-figma
-    verify  release
+  skills/                       # 6 invokable workflows
+    wizard  prune                                     # onboarding (user-invocable only)
+    scaffold-component  from-figma
+    verify  release                                   # release is user-invocable only
 ```
 
 ## Two scopes (optional)
@@ -117,8 +119,9 @@ The kit itself lives in **project scope** — `<repo>/.claude/` + `CLAUDE.md`, c
 `~/.claude/` (auto-applies everywhere, not committed) is for personal defaults only — e.g. your own `~/.claude/CLAUDE.md`
 with personal working habits.
 
-> **Gotcha:** path-scoped rules (`paths:` frontmatter) are ignored in user scope `~/.claude/rules/` — keep them in the
-> project (if one still won't load, try `paths:` → `globs:`). And don't copy skills/agents to `~/.claude/`: their
+> **Gotcha:** in user scope, a rule's globs resolve against the directory Claude was launched from, so `src/**`-style
+> patterns only match when you start in the app root — keep path-scoped rules in the project. `paths:` is the only
+> field name; `globs:` is Cursor's `.mdc` key and does nothing here. And don't copy skills/agents to `~/.claude/`: their
 > checklists have one home in the project's `.claude/rules/`, so outside the project they'd point at nothing.
 
 ## Multi-tool teams (AGENTS.md)
@@ -139,23 +142,33 @@ Edit `CLAUDE.md` by hand:
 
 1. Set `<PROJECT_NAME>` and the stack list.
 2. Set the **Language** flag (TypeScript / JavaScript) — TS adds the `typecheck` step; JS uses runtime prop validation + JSDoc.
-3. Confirm the **Commands** script names match your `package.json`. Leave `<pm>` as-is — it's your package manager, resolved from the lockfile.
-4. Adjust the **project-structure** block and **Core principles**.
+3. Leave `<pm>` as-is wherever it appears — it's your package manager, resolved from the lockfile.
+4. Trim **The rules** table to the rules you kept.
 
 ## Permissions
 
-`.claude/settings.json` pre-approves a **short, explicit list** — the four quality-gate scripts (`run lint·test·typecheck·build` per package manager) and read-only git — everything
-else goes through Claude Code's own permission prompts. Deliberately **no wildcards and no `install`**: `run:*` would
-pre-approve every script in `package.json` and installs execute dependency lifecycle scripts — both are supply-chain
-vectors, and the first-party ask flow handles them better than a static allowlist. `git commit`/`push` sit behind
-`ask`; destructive commands and `.env`/`.pem` reads are denied (prefix-based matching — treat `deny` as
-defense-in-depth, not a hard guarantee). `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` runs the quality-gate agents in
-parallel — remove it if your Claude Code version lacks agent teams.
+**Sessions start in plan mode.** `settings.json` sets `permissions.defaultMode: "plan"`, so Claude reads and proposes
+but cannot edit until you accept a plan — the mechanical form of CLAUDE.md's first working principle, instead of a
+written request that can be forgotten. It's a default, not a lock: shift+tab leaves it for the session, and a teammate
+who wants a different one sets `defaultMode` in their own `.claude/settings.local.json`. Drop the key if plan-first
+isn't how your team works.
+
+`.claude/settings.json` pre-approves a **short, explicit list** — the quality-gate scripts per package manager —
+and everything else goes through Claude Code's own permission prompts. Deliberately **no wildcards and no `install`**:
+`run:*` would pre-approve every script in `package.json`, and installs execute dependency lifecycle scripts — both are
+supply-chain vectors, and the first-party ask flow handles them better than a static allowlist. `git commit`/`push` sit
+behind `ask`; destructive commands and `.env`/`.pem` access are denied.
+
+**Treat the Bash patterns as guidance, not a boundary.** They match command prefixes, so another spelling walks
+through; see [Sandboxing](#sandboxing-optional-per-developer) for the layer that actually enforces. Running the
+quality-gate agents in parallel needs no flag or opt-in.
 
 A `PreToolUse` hook ([`pre-commit-gate.mjs`](.claude/hooks/pre-commit-gate.mjs)) additionally **blocks `git commit`
-until the quality gate passes** — lint → typecheck → test via your lockfile-detected package manager. It fails open:
-docs-only and `.claude/`-only commits, repos without a `package.json`/lockfile, or missing scripts skip the gate. Slow
-suite? Trim the `steps` list in the hook or raise its `timeout` in `settings.json`.
+until the quality gate passes** — lint → typecheck → test via your lockfile-detected package manager. It resolves the
+names projects actually use (`typecheck`/`type-check`, `test`/`test:unit`) and prints the gate it resolved, so a repo
+whose scripts don't match can't get a silent green. It fails open: docs-only and `.claude/`-only commits, repos without
+a `package.json`/lockfile, or no matching scripts skip the gate. Slow suite? Trim the `STAGES` list in the hook or
+raise its `timeout` in `settings.json`.
 
 **Honest limit:** the `PreToolUse` hook gates only commits made *through Claude Code* — a commit from your own
 terminal bypasses it. `/wizard` offers to install the same script as a **native git hook** (or add it to your
@@ -168,41 +181,47 @@ chmod +x .git/hooks/pre-commit
 
 `.git/hooks/` is machine-local — each teammate installs it once (or lets `/wizard` do it).
 
-## Playwright MCP (optional, per developer)
+## Optional MCP servers (per developer)
 
-The kit doesn't commit an `.mcp.json` — a browser for the agent is a personal choice, not shared repo config. To give
-the browser-capable agents (`ui-reviewer`, `accessibility-auditor`) a real rendered UI to judge, install
-the [Playwright MCP](https://github.com/microsoft/playwright-mcp) locally:
+The kit commits no `.mcp.json` — which servers you connect is a personal choice, not shared repo config. Two are worth
+having:
 
 ```bash
+# A real browser for ui-reviewer / accessibility-auditor to judge rendered UI
 claude mcp add playwright -s local -- npx -y @playwright/mcp@latest
 ```
 
-Without it everything still works — those agents fall back to judging the code and running CLI checks.
+- **Playwright** — without it, `ui-reviewer` falls back to reading code, and `accessibility-auditor` to a CLI axe run.
+- **Figma** — required by `/from-figma`; connect it via `/mcp`. Without it the skill asks you for exported specs or
+  screenshots and continues from step 2.
 
-**Opt-in:** [`post-edit-lint.mjs`](.claude/hooks/post-edit-lint.mjs) silently runs `eslint --fix` on every file Claude
-edits (skipped when the project has no local eslint). It's not wired by default — eslint startup on every edit isn't
-free — enable it by adding to `"hooks"` in `settings.json`:
+Want format-on-edit too? Point a `PostToolUse` hook with matcher `Edit|Write` at your own linter — the kit doesn't
+ship one, since the commit gate already runs `lint` and a linter spawn on every edit isn't free.
+
+## Sandboxing (optional, per developer)
+
+Permission patterns are guidance, not a boundary: `Bash` rules match command prefixes, so a deny rule is trivially
+routed around (`sh -c`, an alias, a different spelling of `rm`). The layer that actually *enforces* is the OS sandbox,
+and it also covers Bash run inside subagents. `Read`/`Edit` deny rules **merge into** the sandbox boundary rather than
+being replaced by it — so turning it on is what makes the kit's `.env`/`.pem` denies OS-enforced instead of advisory.
+
+It's opt-in and macOS/Linux/WSL2-only, so the kit ships it commented rather than on. In your own
+`.claude/settings.local.json`:
 
 ```json
-"PostToolUse": [
-  {
-    "matcher": "Edit|Write",
-    "hooks": [
-      {
-        "type": "command",
-        "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-lint.mjs\"",
-        "timeout": 30
-      }
-    ]
+{
+  "sandbox": {
+    "enabled": true,
+    "network": { "allowedDomains": ["registry.npmjs.org", "*.githubusercontent.com", "github.com"] },
+    "credentials": { "files": [{ "path": ".env", "mode": "deny" }] }
   }
-]
+}
 ```
 
 ## Design choices
 
-- **Lean context** — path-scoped rules load only for the files they match.
-- **Least-privilege agents** — each declares an explicit `tools:` list; reviewers and auditors are read-only.
+- **Scoped context** — a rule loads when you touch a file it matches, not at launch. Only `workflow.md` is unconditional. Touching a component still pulls most of the board, by design: those conventions all apply to components.
+- **Least-privilege agents** — each declares an explicit `tools:` list. The auditors are scoped to *report*; only `ui-reviewer` is genuinely write-incapable, since the other three need `Bash` for axe, a build, or a CVE lookup.
 - **Model tiers as a cost dial** — `sonnet` for the bounded auditors and `test-engineer`, `opus` for
   `security-scanner` (judgment-heavy; kept off Fable — its cyber safety classifiers false-positive on security-review
   work). Fable-class models earn their premium as the **lead session** (pipeline orchestration, epics), not as a
@@ -214,13 +233,13 @@ free — enable it by adding to `"hooks"` in `settings.json`:
   at the owning rule instead of restating it.
 - **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and (most) a dedicated auditor.
 - **See it, don't infer it** — with the [Playwright MCP](https://github.com/microsoft/playwright-mcp) connected (a
-  per-developer install, see [Playwright MCP](#playwright-mcp-optional-per-developer)) and a dev server running, the
+  per-developer install, see [Optional MCP servers](#optional-mcp-servers-per-developer)) and a dev server running, the
   browser-capable skills and agents judge the **rendered** UI (console, network, axe in a real browser), not just the
   code.
 - **Lean descriptions** — agent/skill `description`s stay short and functional; they load into every session, so no keyword lists.
 - **Release automation** — CHANGELOG-driven via `.github/workflows/release.yml` (see [`docs/release-automation.md`](docs/release-automation.md)).
 - **Copy-and-adapt, delivered by a plugin** — the kit is meant to be *owned*: `/wizard` rewrites CLAUDE.md and
-  `/prune` deletes files, and plugins can't ship rules/CLAUDE.md/settings at all. So the `frontend-kit` plugin is just
+  `/prune` deletes files, and plugins can't ship `.claude/rules/`, CLAUDE.md, or the permissions/hooks settings this kit needs. And `/prune` deletes a rule+agent+skill bundle atomically — a split delivery mechanism would break that. So the `frontend-kit` plugin is just
   the delivery vehicle (`/frontend-kit:install` copies the kit in, `/frontend-kit:update` syncs releases); the
   project's committed copy stays the source of truth.
 
@@ -236,8 +255,8 @@ Third-party, stack-agnostic — install only if you want them:
 
 ## Contributing
 
-PRs welcome — new rules, agents, and skills especially. Touching a hook? Run `node --test tests/hooks/*.test.mjs`
-(Node 18+, no install needed — CI runs it on every PR). See [CONTRIBUTING.md](CONTRIBUTING.md) for conventions (generic,
+PRs welcome — new rules, agents, and skills especially. Touching a hook, script, or a rule's `paths:`? Run
+`node --test "tests/**/*.test.mjs"` (no install needed — CI runs it on every push and PR). See [CONTRIBUTING.md](CONTRIBUTING.md) for conventions (generic,
 TypeScript-optional, package-manager-agnostic, least-privilege tools) and the
 [issue](.github/ISSUE_TEMPLATE) / [PR](.github/PULL_REQUEST_TEMPLATE.md) templates.
 

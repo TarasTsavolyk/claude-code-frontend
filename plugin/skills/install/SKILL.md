@@ -6,20 +6,25 @@ description: Install the claude-code-frontend kit into the current repo as an ow
 # Install the frontend kit
 
 Copies the kit into **this** repo. The committed copy is the source of truth afterwards — the plugin is only the
-delivery vehicle (plugins can't ship rules, CLAUDE.md, or settings, and the kit's `/wizard` and `/prune` must be able
-to edit/delete the files).
+delivery vehicle: plugins can't ship `.claude/rules/`, CLAUDE.md, or the permissions/hooks settings this kit needs, and
+the kit's `/wizard` and `/prune` must be able to edit and delete the files themselves.
 
 1. **Guard.** If `.claude/rules/` or a kit-looking `.claude/agents/` already exists here, stop and point to
    `/frontend-kit:update` instead. If `CLAUDE.md` or `.claude/` exists but isn't the kit, stop and tell the user to
    merge by hand — never overwrite someone's existing config. Require a clean git tree (git is the undo).
-2. **Fetch the kit** at its latest release into a temp dir (never into the repo):
+2. **Fetch the kit** into a temp dir (never into the repo):
    `git clone --depth 1 https://github.com/TarasTsavolyk/claude-code-frontend <tmp>`
-   To pin a version, add `--branch v<X.Y.Z>`.
-3. **Copy the owned files** from the clone into the repo root: `.claude/` (drop `settings.local.json`, `.wizard/`,
-   `worktrees/` if present in the clone), `CLAUDE.md`. Do **not** copy `.claude-plugin/`, `plugin/`,
-   `docs/`, `README.md`, `CHANGELOG.md`, or `.github/` — those belong to the kit repo, not to adopters.
+   That gives you the **latest `main`**, which is what the plugin tracks. To pin a published version instead, add
+   `--branch v<X.Y.Z>`.
+3. **Copy the owned files** from the clone into the repo root: `CLAUDE.md`, and everything under `.claude/` **except**
+   the machine-local paths (`settings.local.json`, `.wizard/`, `worktrees/`). Derive the list from what the clone
+   actually contains rather than a memorized set of directory names — that's how a deleted file kept getting copied
+   after it no longer existed. Do **not** copy `.claude-plugin/`, `plugin/`, `docs/`, `README.md`, `CHANGELOG.md`,
+   `CONTRIBUTING.md`, `tests/`, or `.github/` — those belong to the kit repo, not to adopters.
 4. **Ignore machine-local paths.** Ensure `.gitignore` has `.claude/settings.local.json`, `.claude/worktrees/`, and
    `.claude/.wizard/`. Keep `.claude/.onboarded` tracked (it won't exist until the wizard runs).
-5. **Hand off.** Tell the user to start a new session (or `/clear`) so the kit's hooks and skills load, then run the
-   kit's `/wizard`, which syncs CLAUDE.md to the real project and offers `/prune`. Suggest committing
-   `.claude/` + `CLAUDE.md` on a branch.
+5. **Record the source.** Write the clone's `git rev-parse --short HEAD` and the newest `CHANGELOG.md` version into a
+   tracked `.claude/.kit-version`, so `/frontend-kit:update` knows what this copy came from.
+6. **Hand off.** Tell the user to start a new session (or `/clear`) so the kit's hooks and skills load, then to type
+   `/wizard` themselves — it is user-invocable only (`disable-model-invocation`), so you cannot start it for them. It
+   syncs CLAUDE.md to the real project and offers `/prune`. Suggest committing `.claude/` + `CLAUDE.md` on a branch.

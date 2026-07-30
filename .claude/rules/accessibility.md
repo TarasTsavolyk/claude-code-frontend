@@ -1,8 +1,7 @@
 ---
 paths:
-  - "src/**/*.vue"
-  - "src/**/*.tsx"
-  - "src/**/*.jsx"
+  - "{src,app,lib,resources/js,*/src,*/app,*/*/src,*/*/app}/**/*.{vue,tsx,jsx}"
+  - "{components,layouts,pages}/**/*.vue"
 ---
 
 # Accessibility (target: WCAG 2.2 AA)
@@ -34,6 +33,6 @@ A11y is part of "done", reviewed like any other requirement.
 - Keep the focused element visible — sticky headers/footers must not obscure it (2.4.11).
 - Don't make users re-enter info already provided earlier in the same flow (3.3.7).
 
-## Verify
-- Run an axe check on changed views; resolve violations before review.
-- Sanity-check with keyboard-only navigation for any interactive component.
+## Checking your work
+- Run an axe check on changed views and resolve violations before review; axe is the floor, not the ceiling.
+- Operate any interactive component keyboard-only — that catches what no scanner does.

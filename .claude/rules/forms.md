@@ -1,9 +1,9 @@
 ---
 paths:
-  - "src/**/*.vue"
-  - "src/**/*.tsx"
-  - "src/**/*.jsx"
-  - "src/**/composables/**"
+  - "{src,app,lib,resources/js,*/src,*/app,*/*/src,*/*/app}/**/*.{vue,tsx,jsx}"
+  - "{components,layouts,pages}/**/*.vue"
+  - "{src,app,lib,resources/js,*/src,*/app}/**/composables/**"
+  - "composables/**/*.{ts,js}"
 ---
 
 # Forms
@@ -18,10 +18,10 @@ paths:
 - The form component owns no data fetching — submit goes through a composable / `api/` service. Map server-side field errors back onto the matching fields; show a form-level summary for non-field errors.
 - Reset dirty-tracking after a successful submit; warn on unsaved changes only where it genuinely matters.
 
-## Accessibility (see accessibility.md)
-- Every control labelled; mark invalid fields with `aria-invalid` and link the message via `aria-describedby`. Required state conveyed non-visually.
+## Accessibility — the form-specific parts
+The general bar (labels, contrast, no colour-only meaning) is `accessibility.md`. What only forms need:
+- Mark invalid fields with `aria-invalid` and link the message via `aria-describedby`; convey required state non-visually.
 - On a failed submit, move focus to the first invalid field (or an error summary) — don't leave the user hunting.
-- Errors are text, never color-only.
 
 ## Custom inputs
 - Custom field components support `v-model` via `defineModel`; expose `disabled`/`invalid` and forward the label association. Keep them presentational — validation lives in the form, not the input.

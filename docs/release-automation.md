@@ -10,9 +10,14 @@ Best when you hand-curate `CHANGELOG.md` ([Keep a Changelog](https://keepachange
 and want one tag + GitHub Release per version, with zero extra tooling.
 
 The kit ships this as [`.github/workflows/release.yml`](../.github/workflows/release.yml):
-on a push to `main` that touches `CHANGELOG.md`, it reads the latest `## [x.y.z] - date`
-section, then tags `vX.Y.Z` and publishes a Release from that section. It is idempotent —
-if the release already exists it does nothing.
+on a push to `main` that touches `CHANGELOG.md`, it walks **every** `## [x.y.z] - date`
+section — not just the newest — and for each one that has no GitHub Release yet, tags
+`vX.Y.Z` and publishes a Release from that section's notes. Reading only the first
+heading is how several versions landing in one push left the older ones untagged
+forever. Each tag points at the commit that introduced its section (found with
+`git log -S`), so a backfilled tag still describes the tree it names rather than
+today's HEAD — which is why the checkout needs full history. Idempotent: a version
+whose release already exists is skipped.
 
 **To release:** add a `## [x.y.z] - date` section to `CHANGELOG.md`, merge to `main`. Done.
 

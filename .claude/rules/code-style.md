@@ -11,11 +11,17 @@ paths:
 
 # Code Style
 
-ESLint + Prettier are the source of truth for formatting — never hand-format against them. These rules cover what tooling can't enforce.
+The project's linter and formatter are the source of truth for formatting — never hand-format against them, and don't argue with a rule they enforce. These rules cover what tooling can't.
 
 > **TypeScript is optional.** The TypeScript section applies only when the project uses TS (a `tsconfig.json` exists or SFCs use `lang="ts"`). For JavaScript projects, follow the JavaScript section instead and ignore the type-only rules.
 
 ## TypeScript (when the project uses TypeScript)
+
+> **Pin `typescript` to 6.x.** `typescript@latest` is 7.x, whose `tsgo` compiler doesn't ship the JS compiler API that
+> `vue-tsc` calls. `vue-tsc`'s peer range is `*`, so the install is silent and only `<pm> run typecheck` breaks —
+> `ERR_PACKAGE_PATH_NOT_EXPORTED: './lib/tsc'`. Adding or upgrading TypeScript is the moment this bites. Revisit when a
+> `vue-tsc` release ships native/tsgo support.
+
 - `strict: true`. Never use `any`; prefer `unknown` and narrow, or a precise type.
 - Exported functions and composables have explicit return types. Internal helpers may infer.
 - Prefer `type` for object shapes and unions; use `interface` only when declaration merging is needed.
@@ -31,9 +37,9 @@ ESLint + Prettier are the source of truth for formatting — never hand-format a
 ## Vue SFC
 - Always `<script setup>`; in TS projects use `<script setup lang="ts">`. Order: `<script setup>`, then `<template>`, then `<style scoped>`.
 - TS: type props/emits with the generic form — `defineProps<Props>()`, `defineEmits<{ change: [value: string] }>()`. JS: use the runtime form with validators — `defineProps({ value: { type: String, required: true } })`, `defineEmits(['change'])`.
-- Optional-prop defaults: on Vue 3.5+ prefer reactive props destructure — `const { size = 'md' } = defineProps<Props>()`; use `withDefaults` only on Vue ≤3.4. Required props get no default.
-- Two-way binding: prefer `defineModel()` (Vue 3.4+) over a manual `modelValue` prop + `update:modelValue` emit.
-- Template refs: `useTemplateRef('name')` (Vue 3.5+). Generate stable ids for label/input wiring with `useId()`.
+- Optional-prop defaults: reactive props destructure — `const { size = 'md' } = defineProps<Props>()`. Required props get no default.
+- Two-way binding: `defineModel()`, not a manual `modelValue` prop + `update:modelValue` emit.
+- Template refs: `useTemplateRef('name')`. Generate stable ids for label/input wiring with `useId()`.
 - Slots are the API for injecting *markup*: expose named slots for structural regions (`#header`/`#footer`), scoped slots (`<slot :item="item" />`) to hand data back to the caller, and a default slot for the main body. Reach for a slot before a prop that carries renderable content or toggles a chunk of template. In TS, declare the contract with `defineSlots<{ default(props: { item: T }): any }>()`.
 - One component per file. Filename matches the component name.
 

@@ -5,13 +5,11 @@
 // /wizard skill consumes, so the wizard asks the user ONLY what can't be
 // detected. `detect()` never throws.
 //
-// Run standalone:  node .claude/hooks/detect-stack.mjs   (detect + write + print)
+// Run standalone:  node .claude/scripts/detect-stack.mjs   (detect + write + print)
 
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-
-const SCHEMA_VERSION = 4
 
 // Project root: explicit arg > $CLAUDE_PROJECT_DIR (set in hooks) > cwd.
 export function resolveRoot(arg) {
@@ -110,9 +108,49 @@ export function detect(root) {
   }
 
   // --- structure paradigm + real source layout -------------------------------
-  // `srcDirs` is the actual immediate layout under src/ — the wizard reflects it
-  // into CLAUDE.md's "Project structure" block instead of the template example.
-  const srcDirs = fileExists('src') ? listDirs('src') : []
+  // The app root is NOT always `src/`: Nuxt 4 uses `app/`, Nuxt 3 keeps its dirs
+  // at the repo root with no wrapper, Laravel uses `resources/js`, and monorepos
+  // nest it a level down. `srcRoot` records which one this repo actually uses;
+  // `srcDirs` is its immediate layout, which the wizard reflects into CLAUDE.md's
+  // "Project structure" block instead of the template example.
+  const APP_ROOTS = ['src', 'app', 'resources/js']
+  // Dir names that identify a Vue app root wherever it sits.
+  const APP_DIRS = [
+    'api', 'components', 'composables', 'features', 'layouts', 'middleware', 'pages',
+    'plugins', 'router', 'routes', 'services', 'stores', 'types', 'utils', 'views',
+  ]
+  const segs = (candidate) => candidate.split('/')
+  const looksLikeApp = (...path) => listDirs(...path).some((d) => APP_DIRS.includes(d))
+
+  let srcRoot = APP_ROOTS.find((c) => looksLikeApp(...segs(c))) ?? null
+  // Monorepo: probe one level down BEFORE considering a flat layout. A full-stack
+  // repo with a top-level `api/` next to `apps/web/src` is not a flat Vue app, and
+  // checking flat first would claim the repo root and never reach here.
+  if (!srcRoot) {
+    for (const parent of ['apps', 'packages']) {
+      const child = listDirs(parent).find((c) => looksLikeApp(parent, c, 'src') || looksLikeApp(parent, c, 'app'))
+      if (child) {
+        srcRoot = looksLikeApp(parent, child, 'src') ? `${parent}/${child}/src` : `${parent}/${child}/app`
+        break
+      }
+    }
+  }
+  // Flat layout (Nuxt 3 keeps its dirs at the repo root). Needs *evidence*, because
+  // APP_DIRS contains generic names — one stray top-level `api/` or `utils/` must not
+  // be enough. Accept it when Nuxt is present, or when several app dirs cluster there.
+  if (!srcRoot) {
+    const rootAppDirs = listDirs().filter((d) => APP_DIRS.includes(d))
+    const isNuxtFlat =
+      metaFramework === 'nuxt' || ['ts', 'js', 'mjs', 'mts'].some((ext) => fileExists(`nuxt.config.${ext}`))
+    if (rootAppDirs.length >= 2 || (isNuxtFlat && rootAppDirs.length >= 1)) srcRoot = '.'
+  }
+  // A root that exists but holds nothing recognizable still beats reporting none.
+  if (!srcRoot) srcRoot = APP_ROOTS.find((c) => fileExists(...segs(c))) ?? null
+
+  const srcDirs =
+    srcRoot === '.' ? listDirs().filter((d) => APP_DIRS.includes(d)) : srcRoot ? listDirs(...segs(srcRoot)) : []
+  if (isVue && !srcRoot)
+    warnings.push('Could not locate the app source root (no src/, app/, resources/js, or root-level app dirs); confirm it manually.')
   const hasSrcDir = (name) => srcDirs.includes(name)
   let structure = 'unknown'
   if (hasSrcDir('features')) structure = 'feature-first'
@@ -130,9 +168,10 @@ export function detect(root) {
     /* no CLAUDE.md — leave false */
   }
 
+  // No schemaVersion/generatedAt: nothing read them, and the version drifted for
+  // six releases without consequence — which was the proof they weren't load-bearing.
+  // The wizard regenerates this file at the start of every run instead.
   return {
-    schemaVersion: SCHEMA_VERSION,
-    generatedAt: new Date().toISOString(),
     root,
     isProject: hasPkgFile,
     projectName: typeof pkg?.name === 'string' ? pkg.name : null,
@@ -146,6 +185,7 @@ export function detect(root) {
     styling,
     testing,
     structure,
+    srcRoot,
     srcDirs,
     isWorkspaceRoot,
     // Vue-ecosystem companion libs — the value is the detected package name

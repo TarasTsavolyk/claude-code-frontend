@@ -5,9 +5,13 @@ description: Create a new Vue 3 component the project's way — props/emits cont
 
 # Scaffold a component
 
+> **Read the rules first, don't scaffold from memory.** Path-scoped rules fire when you *read* a matching file, so a
+> create-first pass can run with none of them loaded. Open `architecture.md`, `styling.md`, and `accessibility.md`
+> before step 2, and `testing.md` before step 5.
+
 1. **Decide placement.** Put it where your layout keeps components — `src/components/` (layer-first), a feature's `components/` (feature-first), or a shared `components/` if it's reused widely. Confirm a similar component doesn't already exist (search first; reuse beats rebuild).
 2. **Create `<Name>.vue`** with `<script setup>` (add `lang="ts"` in TS projects):
-   - TS: define a `Props` type and `defineProps<Props>()` (defaults via reactive props destructure on Vue 3.5+, `withDefaults` on ≤3.4); type emits with `defineEmits<{ ... }>()`. JS: use runtime validators — `defineProps({ ... })` with `type`/`required`/`default`/`validator` — and `defineEmits([...])`.
+   - TS: define a `Props` type and `defineProps<Props>()`, defaults via reactive props destructure; type emits with `defineEmits<{ ... }>()`. JS: use runtime validators — `defineProps({ ... })` with `type`/`required`/`default`/`validator` — and `defineEmits([...])`. (Full form in `code-style.md` → Vue SFC.)
    - Keep it presentational: state in, events out. No data fetching here.
 3. **Template** — semantic native elements; labels for any control; keyboard-operable; visible focus. Style with the project's design tokens — no magic values (Tailwind utilities by default; Sass variables or `var(--token)` custom properties otherwise).
 4. **Logic** — if there's non-trivial logic, extract a `useX` composable instead of inlining it.

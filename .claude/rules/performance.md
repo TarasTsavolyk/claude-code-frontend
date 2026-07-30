@@ -1,11 +1,8 @@
 ---
 paths:
-  - "src/**/*.vue"
-  - "src/**/*.ts"
-  - "src/**/*.tsx"
-  - "src/**/*.js"
-  - "src/**/*.jsx"
-  - "vite.config.*"
+  - "{src,app,lib,resources/js,*/src,*/app,*/*/src,*/*/app}/**/*.{vue,ts,tsx,js,jsx}"
+  - "{components,composables,layouts,middleware,pages,plugins,stores,utils}/**/*.{vue,ts,js}"
+  - "{vite,nuxt}.config.*"
 ---
 
 # Performance
@@ -20,7 +17,7 @@ paths:
 - Virtualize long lists (hundreds+ rows) instead of rendering everything.
 - Use `computed` for derived state; avoid `watch` that recomputes what a `computed` could.
 - Keep expensive work out of render: no heavy computation in template expressions or on every re-render — precompute in a `computed` or memoize.
-- Reach for `v-once`/`v-memo` only on proven-expensive static subtrees.
+- Reach for `v-once`/`v-memo` only on proven-expensive static subtrees (`v-memo` is unsupported in Vapor-compiled SFCs).
 - Debounce/throttle high-frequency handlers (input, scroll, resize).
 - Large or deeply-nested data that doesn't need per-property reactivity → `shallowRef`/`shallowReactive`; wrap inert data (config, big lookups) with `markRaw` to skip proxying. Avoid needless deep clones of large structures.
 
@@ -30,5 +27,6 @@ paths:
 
 ## Budget & verify
 - Targets (Core Web Vitals): LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1.
+- **Browser floor** = Vite's `build.target` default (`baseline-widely-available`). A CSS or JS feature outside Baseline Widely Available (`@container` is in; check anything newer) needs an explicit fallback or a deliberately raised target — don't decide it per component.
 - Set a per-project initial-route JS budget and treat a notable bundle-size regression as a blocker; watch size on every change.
 - Optimize based on measurement (build analysis / Lighthouse / field RUM), not guesses.

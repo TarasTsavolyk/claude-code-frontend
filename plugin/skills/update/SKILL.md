@@ -12,10 +12,11 @@ review the diff, git is the undo.
    point to `/frontend-kit:install`. Work on a branch (`chore/kit-update`).
 2. **Fetch the latest kit** into a temp dir (never into the repo):
    `git clone --depth 1 https://github.com/TarasTsavolyk/claude-code-frontend <tmp>`
-3. **Report what changed.** Read the clone's `CHANGELOG.md` and summarize the entries the user hasn't seen (if the
-   last synced version isn't known, show the most recent few and say so).
+3. **Report what changed.** Read the clone's `CHANGELOG.md` and summarize the entries the user hasn't seen. To know
+   where to start, read `.claude/.kit-version` in the repo (written by step 5) — if it's absent, this copy predates the
+   marker: show the most recent few entries and say the starting point is unknown.
 4. **Sync kit-managed paths** — `.claude/agents/`, `.claude/skills/`, `.claude/rules/`, `.claude/hooks/`,
-   `.claude/settings.json` — with these rules:
+   `.claude/scripts/`, `.claude/settings.json` — with these rules:
    - A file exists in **both** → overwrite with the kit version. If `git diff` then shows local customizations being
      lost, surface those hunks and ask before keeping the overwrite.
    - A file exists **only in the kit** → it's either new upstream or was `/prune`d here. List these and ask which to
@@ -23,6 +24,12 @@ review the diff, git is the undo.
    - A file exists **only in the repo** → a local addition; leave it alone.
    - **Never touch** `CLAUDE.md` (it's project-owned after `/wizard` — re-run `/wizard` if the template gained
      something important), `.claude/.onboarded`, `.claude/settings.local.json`, `.claude/.wizard/`.
-5. **Verify and hand back.** Show `git diff --stat`, run `node .claude/hooks/check-refs.mjs` sanity only if files were
-   skipped in step 4 (pruned units may be referenced by newly added ones — fix or drop the reference). Let the user
-   review and commit; don't push without confirmation.
+5. **Verify and hand back.** Show `git diff --stat`. If any file was skipped in step 4, run the reference check with
+   the skipped slugs as arguments — it takes names, and bare `check-refs.mjs` is a usage error that checks nothing:
+   ```bash
+   node .claude/scripts/check-refs.mjs <skipped-slug> [<skipped-slug>...]
+   ```
+   A newly added upstream file may legitimately reference a unit this project pruned — fix or drop the reference.
+   Record what this copy was synced to: write the clone's `git rev-parse --short HEAD` and the newest CHANGELOG version
+   into `.claude/.kit-version` (tracked), so the next update knows where to start. Let the user review and commit;
+   don't push without confirmation.

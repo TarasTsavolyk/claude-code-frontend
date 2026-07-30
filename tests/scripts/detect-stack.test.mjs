@@ -2,8 +2,8 @@ import { after, test } from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { detect, ensureWizardIgnored, resolveRoot } from '../../.claude/hooks/detect-stack.mjs'
-import { cleanup, fixture, write } from './helpers.mjs'
+import { detect, ensureWizardIgnored, resolveRoot } from '../../.claude/scripts/detect-stack.mjs'
+import { cleanup, fixture, write } from '../helpers.mjs'
 
 after(cleanup)
 
@@ -102,6 +102,58 @@ test('src/features → feature-first; kit state read from CLAUDE.md and marker',
   write(root, '.claude/.onboarded', '2026-07-05 · vue\n')
   facts = detect(root)
   assert.equal(facts.kit.onboarded, true)
+})
+
+test('app source root is found outside src/ — nuxt 4, nuxt 3 flat, laravel, monorepo', () => {
+  const nuxt4 = detect(fixture({ 'package.json': { dependencies: { nuxt: '^4.0.0' } }, 'app/pages/.keep': '', 'app/components/.keep': '' }))
+  assert.equal(nuxt4.srcRoot, 'app')
+  assert.equal(nuxt4.structure, 'layer-first')
+  assert.ok(nuxt4.srcDirs.includes('pages'))
+
+  // Nuxt 3 keeps its dirs at the repo root; only recognized app dirs are reported,
+  // so build output and tooling dirs never leak into the structure block.
+  const nuxt3 = detect(fixture({ 'package.json': { dependencies: { nuxt: '^3.10.0' } }, 'pages/.keep': '', 'composables/.keep': '', 'dist/.keep': '' }))
+  assert.equal(nuxt3.srcRoot, '.')
+  assert.deepEqual(nuxt3.srcDirs, ['composables', 'pages'])
+  assert.ok(!nuxt3.srcDirs.includes('dist'))
+
+  const laravel = detect(fixture({ 'package.json': { dependencies: { vue: '^3.5.0' } }, 'resources/js/components/.keep': '' }))
+  assert.equal(laravel.srcRoot, 'resources/js')
+
+  const monorepo = detect(fixture({ 'package.json': { workspaces: ['apps/*'] }, 'apps/web/src/views/.keep': '' }))
+  assert.equal(monorepo.srcRoot, 'apps/web/src')
+  assert.equal(monorepo.structure, 'layer-first')
+})
+
+test('a stray top-level app-ish dir does not hijack srcRoot from the real root', () => {
+  // APP_DIRS holds generic names (api, utils, types), so a full-stack monorepo with a
+  // top-level `api/` used to be reported as a flat layout at '.', hiding the real app.
+  const fullStack = detect(fixture({
+    'package.json': { workspaces: ['apps/*'] },
+    'api/server.ts': '',
+    'apps/web/src/views/.keep': '',
+  }))
+  assert.equal(fullStack.srcRoot, 'apps/web/src')
+
+  // One generic dir at the root, no Vue app anywhere: not enough to claim a layout.
+  const onlyStray = detect(fixture({ 'package.json': {}, 'utils/helpers.ts': '' }))
+  assert.equal(onlyStray.srcRoot, null)
+
+  // Nuxt present makes a single root app dir sufficient evidence.
+  const nuxtOneDir = detect(fixture({ 'package.json': {}, 'nuxt.config.ts': '', 'pages/.keep': '' }))
+  assert.equal(nuxtOneDir.srcRoot, '.')
+})
+
+test('src/ that holds nothing recognizable is still reported as the root', () => {
+  const facts = detect(fixture({ 'package.json': {}, 'src/main.ts': '' }))
+  assert.equal(facts.srcRoot, 'src')
+  assert.deepEqual(facts.srcDirs, [])
+})
+
+test('Vue project with no locatable source root warns instead of going silent', () => {
+  const facts = detect(fixture({ 'package.json': { dependencies: { vue: '^3.5.0' } } }))
+  assert.equal(facts.srcRoot, null)
+  assert.ok(facts.warnings.some((w) => w.includes('app source root')))
 })
 
 test('ensureWizardIgnored: only in git repos, appends once, tolerates slash variants', () => {

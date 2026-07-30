@@ -20,5 +20,5 @@ The motivation — the problem it solves.
 - [ ] Package-manager-agnostic (`<pm> run <script>`, never hardcoded npm/pnpm/yarn)
 - [ ] Agents declare an explicit, least-privilege `tools:` list
 - [ ] Bilingual EN/UA triggers kept on any new/changed agent
-- [ ] Verified in a real Vue project: `/memory` (rules load per file type), `/agents`, invoked the skill
+- [ ] Verified in a real Vue project: `/context` → Memory files (rules load per file type), `/agents`, invoked the skill
 - [ ] Updated `CHANGELOG.md`, and `README.md` if structure or counts changed

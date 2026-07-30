@@ -1,10 +1,7 @@
 ---
 paths:
-  - "src/**/*.vue"
-  - "src/**/*.ts"
-  - "src/**/*.tsx"
-  - "src/**/*.js"
-  - "src/**/*.jsx"
+  - "{src,app,lib,resources/js,*/src,*/app,*/*/src,*/*/app}/**/*.{vue,ts,tsx,js,jsx}"
+  - "{components,composables,layouts,middleware,pages,plugins,stores,utils}/**/*.{vue,ts,js}"
 ---
 
 # Architecture
@@ -50,14 +47,17 @@ Design the public surface — props, events, slots — like any API: small, pred
 
 ## Logic placement
 - Reusable stateful logic → composables (`useX`) returning refs/computed/handlers. Accept reactive inputs as `MaybeRefOrGetter<T>` (TS) and read them with `toValue` so refs *and* getters work — `useX(() => props.id)`; return `readonly()` refs when callers shouldn't mutate them.
-- Shared cross-component state → Pinia store. Prefer setup-style stores (`defineStore('x', () => {…})`); destructure store state via `storeToRefs(store)` to keep reactivity (actions destructure directly). Component-only state stays local with `ref`/`reactive`.
+- Shared cross-component state → Pinia store. Prefer setup-style stores (`defineStore('x', () => {…})`); destructure store state via `storeToRefs(store)` to keep reactivity (actions destructure directly). Component-only state stays local with `ref`/`reactive` — a global store holding state one component reads is the anti-pattern, not the shortcut.
 - Data fetching never happens directly in a component — a composable or thin `api/` service owns the request (see `data-fetching.md` for the how, including response shape and validation).
 - Side effects (subscriptions, timers, listeners) are set up in lifecycle hooks and always cleaned up — use `onScopeDispose` so cleanup also fires when a composable is used outside a component.
 
 ## Routing
-- Routes are lazy-loaded: `component: () => import('...')`.
+Settle these per project and keep them consistent — they're what actually differs between Vue codebases:
+- **Where a route comes from.** Hand-written route objects (lazy-loaded: `component: () => import('...')`) or file-based routing — on Vue Router 5 the route *is* the page file's location and the generated `typed-router.d.ts` owns the types, so hand-adding a route object fights the generator. Don't mix the two.
+- **Naming.** Navigate by `name` or by path — pick one. Named routes survive path changes; paths read better in templates.
+- **What belongs in `meta`.** The usual set is auth requirement, title, and layout. Keep it a declared shape, not a grab bag.
+- **The 404 / redirect pattern.** One catch-all, one place that decides where an unauthenticated user lands.
 - Route-level guards gate navigation for UX — they are **not** a security boundary (see `security.md`). Components may assume they are reached legitimately.
 
 ## Anti-patterns to reject
-- A global store holding state only one component uses.
 - Prop drilling more than 2 levels — use provide/inject or a store instead.

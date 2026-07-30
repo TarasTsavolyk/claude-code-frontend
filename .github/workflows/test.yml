@@ -1,16 +1,87 @@
 name: test
 
+# One workflow for everything checkable without a host project: the
+# hook/script/rule tests, manifest validity, and config integrity.
+# (Previously split across test.yml + a PR-only ci.yml, so the config checks
+# never ran on pushes to main.)
+
 on:
   push:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  hooks:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22 is the floor the kit documents; 24 is current. The rules tests use
+        # `path.matchesGlob`, which needs 22.5+.
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Hook, script, and rule tests
+        run: node --test "tests/**/*.test.mjs"
+
+  config:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: node --test tests/hooks/*.test.mjs
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+
+      - name: JSON parses
+        run: |
+          set -euo pipefail
+          for f in $(git ls-files '*.json'); do
+            jq empty "$f"
+            echo "ok  $f"
+          done
+
+      - name: YAML frontmatter parses
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for f in .claude/agents/*.md .claude/rules/*.md .claude/skills/*/SKILL.md plugin/skills/*/SKILL.md; do
+            ruby -ryaml -e '
+              c = File.read(ARGV[0])
+              unless c.start_with?("---")
+                puts "skip #{ARGV[0]} (no frontmatter)"
+                exit 0
+              end
+              fm = c.split(/^---\s*$/)[1]
+              YAML.safe_load(fm)
+              puts "ok   #{ARGV[0]}"
+            ' "$f"
+          done
+
+      - name: Neither plugin manifest declares a version
+        # Deliberate: plugin.json's version is Claude Code's update cache key, so
+        # declaring one freezes every marketplace user until it is bumped. Omitting
+        # it makes installs track the default branch. See CONTRIBUTING.
+        run: |
+          set -euo pipefail
+          for f in plugin/.claude-plugin/plugin.json .claude-plugin/marketplace.json; do
+            if grep -q '"version"' "$f"; then
+              echo "::error file=$f::declares a version — that freezes plugin updates; remove it"
+              exit 1
+            fi
+            echo "ok  $f declares no version"
+          done
+
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - name: Validate plugin + marketplace manifests
+        # Deliberately not --strict: the intentionally absent `version` is reported
+        # as a warning, and --strict would turn that into a failure.
+        run: |
+          set -euo pipefail
+          npx -y @anthropic-ai/claude-code plugin validate ./plugin
+          npx -y @anthropic-ai/claude-code plugin validate .

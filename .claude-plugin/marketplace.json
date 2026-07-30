@@ -7,7 +7,6 @@
       "name": "frontend-kit",
       "source": "./plugin",
       "description": "Install and update the claude-code-frontend kit in the current repo",
-      "version": "0.16.0",
       "license": "MIT",
       "homepage": "https://github.com/TarasTsavolyk/claude-code-frontend"
     }

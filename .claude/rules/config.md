@@ -1,8 +1,7 @@
 ---
 paths:
-  - "src/**/*.ts"
-  - "src/**/*.js"
-  - "vite.config.*"
+  - "{src,app,lib,resources/js,*/src,*/app,*/*/src,*/*/app}/**/*.{ts,js}"
+  - "{vite,nuxt,vitest}.config.*"
   - ".env*"
 ---
 
@@ -10,21 +9,14 @@ paths:
 
 One typed, validated source of config. No hardcoded hosts, keys, or magic environment reads scattered across the app.
 
-## Source of truth
-- All environment config comes from `import.meta.env` (Vite) — never `process.env` in client code, never a hardcoded URL/key inline.
-- Only **`VITE_`-prefixed** vars are exposed to the client bundle, and everything exposed is **public** (see `security.md`). Real secrets have no `VITE_` prefix and stay server-side, reached through an API.
-
 ## Validate once, import everywhere
 - Parse and validate env at startup in a single module (e.g. `config.ts`): assert required vars are present, coerce types, and export a typed `config` object. Fail fast with a clear message if something required is missing — don't discover it at runtime three screens in.
-- The rest of the app imports `config`, not `import.meta.env` directly. That keeps reads typed, centralized, and mockable.
+- The rest of the app imports `config`, not the raw env object. That keeps reads typed, centralized, and mockable.
+- Document every required var in a committed `.env.example` — it's the only place a newcomer learns what the app needs to boot. Keep it **yours to edit**: `settings.json` denies reads and writes across `.env*` so a real secret can't leak or be clobbered, and permission rules can't carve out an exception. So when a var is added, say which line `.env.example` needs; don't try to write the file.
 
-## Files & modes
-- `.env` (shared, committable defaults) · `.env.local` (machine overrides, **git-ignored**) · `.env.[mode]` for `development`/`production`/test. Never commit `.env*.local` or any file with real secrets.
-- Document every required var in a committed `.env.example`. Use `import.meta.env.MODE`/`DEV`/`PROD` for mode branches.
-- **Build-time vs runtime:** `import.meta.env` is inlined at build. Values that must change per deployment without a rebuild come from a runtime source (an API or a served `config.json`), not baked-in vars.
+## Which mechanism (they are not interchangeable)
+- **Vite SPA** — `import.meta.env`; only **`VITE_`-prefixed** vars reach the client, and everything that reaches it is **public** (see `security.md`). Never `process.env` in client code.
+- **Nuxt** — `runtimeConfig`, read via `useRuntimeConfig()`; only `runtimeConfig.public` (overridable as `NUXT_PUBLIC_*`) reaches the client. `import.meta.env` cannot read `runtimeConfig`, so don't reach for the Vite mechanism in a Nuxt app.
 
-## Feature flags
-- Centralize flags in the typed config; default new flags **off**. Remove a flag once its rollout is complete — stale flags are dead branches.
-
-## Verify
-- Env reads live only in the config module — validated at startup, documented in `.env.example`; no `process.env` or inline secrets in client code.
+## Build-time vs runtime
+- `import.meta.env` is **inlined at build** — a value baked into the bundle can't change per deployment. Anything that must vary per environment without a rebuild comes from a runtime source: an API, a served `config.json`, or Nuxt's `runtimeConfig` (env-overridable at boot).

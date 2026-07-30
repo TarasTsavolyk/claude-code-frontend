@@ -27,7 +27,7 @@ File(s):
 1. …
 2. …
 
-If a rule didn't load as expected, paste the relevant part of the `/memory` output.
+If a rule didn't load as expected, paste the Memory files section of `/context` (`/memory` edits memory files; `/context` is what shows which loaded).
 
 ## Environment
 - Claude Code version (`claude --version`):

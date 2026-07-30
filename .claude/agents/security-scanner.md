@@ -4,6 +4,7 @@ description:
   'Read-only frontend security review against the OWASP Top 10:2025 — XSS/injection sinks, unsafe HTML, secret/token
   leakage, client-side access control, CSP/SRI, dependency vulnerabilities, auth/storage handling. Can look up CVEs.'
 model: opus # not fable — Fable's cyber safety classifiers false-positive on security-review work
+effort: high # thoroughness IS this agent's value; don't let it inherit a low session effort
 color: red
 tools:
   - Read

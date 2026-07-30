@@ -1,17 +1,14 @@
 ---
 paths:
-  - "src/**/*.vue"
-  - "src/**/*.ts"
-  - "src/**/*.tsx"
-  - "src/**/*.js"
-  - "src/**/*.jsx"
-  - "vite.config.*"
+  - "{src,app,lib,resources/js,*/src,*/app,*/*/src,*/*/app}/**/*.{vue,ts,tsx,js,jsx}"
+  - "{components,composables,layouts,middleware,pages,plugins,server,stores,utils}/**/*.{vue,ts,js}"
+  - "{vite,nuxt}.config.*"
   - "index.html"
 ---
 
 # Security
 
-Security is part of "done". Anchored to the **OWASP Top 10:2025** — per-finding OWASP/CWE mappings are the `security-scanner` job, not repeated per bullet here. The browser is hostile territory: **the server is the only trust boundary**, so everything here is defense-in-depth — never the sole control.
+Security is part of "done", and the bar is secure-by-default at authoring time — not a review that catches it later. Anchored to the **OWASP Top 10:2025**; per-finding OWASP/CWE mappings are the `security-scanner` job, not repeated per bullet here. The browser is hostile territory: **the server is the only trust boundary**, so everything here is defense-in-depth — never the sole control. For every untrusted-data sink you touch, confirm it is escaped, sanitized, or allow-listed before merge.
 
 ## The cardinal rule — the client never enforces security
 - Route guards (`beforeEach`/`beforeEnter`), `v-if`-on-role, and disabled buttons are **UX only** — trivially bypassed via devtools or direct API calls. The server authorizes **every** request independently.
@@ -30,7 +27,7 @@ Vue auto-escapes `{{ }}` and attribute bindings; these escape hatches do not.
 - **CSTI** — never compile a runtime template from user input; prefer the runtime-only build.
 
 ## Secrets & the client bundle
-- Everything in the bundle is public. Only **`VITE_`-prefixed env vars that are safe to expose** belong in client code (`VITE_API_BASE_URL`, publishable `pk_…` keys). Real secrets stay server-side (no `VITE_` prefix), reached through an API.
+- Everything in the bundle is public. Only vars explicitly marked client-exposed belong in client code — `VITE_`-prefixed in Vite, `runtimeConfig.public` in Nuxt (`VITE_API_BASE_URL`, publishable `pk_…` keys). Real secrets carry no client prefix, stay server-side, and are reached through an API (mechanics in `config.md`).
 - Never hardcode or commit credentials; keep `.env*.local` git-ignored. Don't put tokens/PII in URLs or query strings (they leak via `Referer`, history, logs, analytics), error messages, or client telemetry.
 - Disable production source maps (`build.sourcemap: false`, or `'hidden'` for private upload to an error tracker) so original source and logic aren't shipped.
 - Don't enable Vue Devtools in production (`__VUE_PROD_DEVTOOLS__`) — it exposes component state and Pinia stores to anyone.
@@ -53,10 +50,4 @@ Vue auto-escapes `{{ }}` and attribute bindings; these escape hatches do not.
 ## Supply chain
 - Question every dependency; pin versions and commit the lockfile. Run `<pm> audit`, treat known high/critical vulns as blockers, and watch transitive packages. Automate this in CI, not as an optional manual step.
 
-## SSR / SSG
-> Applies only when the project server-renders (Nuxt or a custom renderer). Skip for pure client-side SPAs.
-- Vue's auto-escaping covers component templates only. Escape any interpolation into the HTML shell (`<title>`, meta, manual markup), and serialize injected state with a `</script>`-safe serializer (`devalue`/`serialize-javascript`), not raw `JSON.stringify`.
-
-## Verify
-- For every untrusted-data sink touched above, confirm the input is escaped, sanitized, or allow-listed before merge.
-- The `security-scanner` agent maps findings to OWASP/CWE in the Quality Gate — but secure-by-default at authoring time is the goal, not bolted-on review.
+> Server-rendering (Nuxt or a custom renderer)? `ssr.md` covers the sinks that only exist there.

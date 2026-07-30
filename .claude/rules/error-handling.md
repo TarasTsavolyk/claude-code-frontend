@@ -1,10 +1,7 @@
 ---
 paths:
-  - "src/**/*.vue"
-  - "src/**/*.ts"
-  - "src/**/*.tsx"
-  - "src/**/*.js"
-  - "src/**/*.jsx"
+  - "{src,app,lib,resources/js,*/src,*/app,*/*/src,*/*/app}/**/*.{vue,ts,tsx,js,jsx}"
+  - "{components,composables,layouts,middleware,pages,plugins,stores,utils}/**/*.{vue,ts,js}"
 ---
 
 # Error Handling & Observability
@@ -48,7 +45,3 @@ if it breaks or slows down in production, you should know without a user telling
 ## Analytics & privacy
 - Send analytics through one typed event helper, not ad-hoc calls. Events carry no PII, tokens, or secrets.
 - Respect consent and Do-Not-Track; gate non-essential tracking behind it. Sample high-volume logs/events instead of sending everything.
-
-## Verify
-- New async paths handle rejection (no empty catches), and the error branch is rendered and tested — not just success.
-- No PII/secrets in logs, breadcrumbs, or analytics payloads; unexpected errors reach the tracker.
