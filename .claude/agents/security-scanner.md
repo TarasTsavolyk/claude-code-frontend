@@ -22,7 +22,8 @@ You review frontend changes for security issues against `.claude/rules/security.
 
 - Review the diff; grep the touched files for every sink the rule catalogs — raw-HTML sinks, dynamic execution (`:is`, `eval`-family), `$attrs`/object spread, unchecked `:href`/`:src` schemes, raw `:style`, `postMessage`, token storage, prototype-pollution vectors, SSR serialization.
 - Secrets: `grep -E 'VITE_.*(KEY|SECRET|TOKEN|PASSWORD)'` and `import.meta.env` reads that leak into the bundle; check sourcemap and devtools flags.
-- Supply chain: run `<pm> audit` on dependency changes; look up CVEs for anything suspicious.
+- Supply chain: on dependency changes, look up CVEs for what changed. `<pm> audit` is **not** pre-approved — it will
+  raise a permission prompt mid-audit, so ask for it only when a dependency change is actually in the diff.
 
 ## Output
 

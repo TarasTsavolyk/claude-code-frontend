@@ -21,15 +21,20 @@ Plan (lead, inline)  →  Build (lead, inline)  →  Quality Gate (parallel agen
 1. **Plan — lead, inline.** Scope, the components involved, where state lives, the edge cases, and the test plan.
 2. **Build — lead, inline.** The lead implements against the plan and the rules (`/scaffold-component` for a new
    component), writing/updating unit tests as it goes.
-3. **Quality Gate (risk-scaled; selected auditors run in parallel)** — this is where agents earn their keep: fresh
-   context, least-privilege tools (the auditors report; `test-engineer` alone edits — it fills test gaps itself
-   and reports only what it didn't fill), parallel execution. Scale the board to what the diff touches instead of
-   always running all five:
-   - Always: `ui-reviewer`; add `test-engineer` when the change ships new logic.
-   - Markup / styles / interaction touched → add `accessibility-auditor`.
+3. **Quality Gate (risk-scaled; selected auditors run in parallel).** One fresh reviewer is the default. Add an
+   auditor because the diff hits its trigger, **not** for breadth — measured on a two-file review, five parallel
+   specialists found no defect a single fresh reviewer missed, at 2.4× the cost and a third more findings to dedupe
+   (`tests/eval/results/`). Past its trigger, an extra auditor mostly adds duplicate findings.
+   - Always: `ui-reviewer` — one reviewer, every dimension, reading the rules the diff touches.
+   - New logic → add `test-engineer`. It earned its slot on evidence: it alone surfaced the execution-environment
+     traps (a jsdom canvas with no 2D context that throws before any assertion; a module-level `ref` that makes the
+     tests it asks for non-deterministic). It also edits — it fills the gaps itself and reports only what it didn't.
+   - Markup / styles / interaction touched → add `accessibility-auditor`. Its granular criteria (target size,
+     per-instance accessible names, canvas alternatives) are the ones a general pass folds away.
    - Untrusted data, auth/session, storage, raw-HTML-class sinks, or dependency changes → add `security-scanner`.
    - Lists, bundle-affecting changes, new dependencies, or asset handling → add `performance-auditor`.
-   - Large or release-bound changes → run the full board.
+   - A large diff spanning many files → the full board, for **surface coverage** rather than depth on any one file.
+     That case is untested; the measurement above covers two files, so treat it as judgment, not evidence.
    **Verify before bouncing** — auditor findings are claims, not facts. For each Critical/Important finding, the lead
    spawns one fresh instance of the flagging auditor's agent with a single job: *refute this finding against the
    actual code*. Confirmed findings the lead fixes; refuted ones are dropped with a one-line note; Nice-to-haves skip

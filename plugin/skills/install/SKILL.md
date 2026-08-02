@@ -25,6 +25,14 @@ the kit's `/wizard` and `/prune` must be able to edit and delete the files thems
    `.claude/.wizard/`. Keep `.claude/.onboarded` tracked (it won't exist until the wizard runs).
 5. **Record the source.** Write the clone's `git rev-parse --short HEAD` and the newest `CHANGELOG.md` version into a
    tracked `.claude/.kit-version`, so `/frontend-kit:update` knows what this copy came from.
-6. **Hand off.** Tell the user to start a new session (or `/clear`) so the kit's hooks and skills load, then to type
+6. **Surface the limits.** Point the user at [`.claude/LIMITS.md`](../../../.claude/LIMITS.md) and say plainly what it
+   covers: the permission lists are prefix matches and not a boundary, the one wired hook runs committed Node in every
+   teammate's session, the commit gate fails open and is bypassed by a terminal commit, and rule globs go dark silently
+   if they don't fit this layout. This is the one step that must not be skipped — the kit's README and test suite stay in
+   the kit repo, so `LIMITS.md` is the only place an adopter gets the caveats. A team taking on auto-executing config is
+   entitled to know its edges before it runs.
+7. **Hand off.** Tell the user to start a new session (or `/clear`) so the kit's hooks and skills load, then to type
    `/wizard` themselves — it is user-invocable only (`disable-model-invocation`), so you cannot start it for them. It
-   syncs CLAUDE.md to the real project and offers `/prune`. Suggest committing `.claude/` + `CLAUDE.md` on a branch.
+   syncs CLAUDE.md to the real project, verifies the rule globs actually match this layout
+   (`node .claude/scripts/check-rule-globs.mjs`), and offers `/prune`. Suggest committing `.claude/` + `CLAUDE.md` on a
+   branch.

@@ -21,8 +21,9 @@ You audit changed UI against `.claude/rules/accessibility.md` (WCAG 2.2 AA). Rea
 ## Method
 
 - Run an axe check on changed views when feasible — in the real browser via the Playwright MCP (a per-developer
-  install — see README "Playwright MCP") when a dev server is running, else via CLI (`<pm> exec` / `npx`); automated
-  findings are the floor, not the ceiling.
+  install — see README "Playwright MCP") when a dev server is running. The CLI route (`<pm> exec` / `npx`) is **not**
+  pre-approved and will raise a permission prompt, so treat it as opt-in rather than the default. Automated findings
+  are the floor, not the ceiling; the manual walk below is the substance.
 - Walk the changed markup against every section of the rule: semantics & labels (form specifics: `forms.md` → Accessibility), keyboard & focus (including the shared-overlay requirements), perceivable criteria, WCAG 2.2 specifics.
 - Operate the component keyboard-only — in the live browser when the MCP is available, mentally against the markup
   otherwise — and note any trap or unreachable control.

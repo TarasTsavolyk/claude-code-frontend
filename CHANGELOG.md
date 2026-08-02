@@ -9,6 +9,31 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-08-02
+
+Second round of colleague review. The findings that held up are fixed; the claims the kit made about itself are now
+tested rather than asserted.
+
+### Added
+- `.claude/LIMITS.md` — what this config does **not** guarantee, and the first honest doc adopters actually receive: the kit's README, CONTRIBUTING and tests stay in the kit repo, so every caveat was previously unavailable to the people running the machinery.
+- `.claude/scripts/check-rule-globs.mjs` — reports which rules would never load in a host project. A `paths:` glob that matches nothing is not an error, and the shipped globs enumerate their roots, so a project rooted at `client/` silently got `code-style.md` and nothing else. `/wizard` step 5 now runs it instead of asking for a manual `/context` check alone.
+- `tests/settings/wiring.test.mjs` — executes the commit gate **as wired in `settings.json`**, not by calling the script directly. Every prior test would have passed with the hook pointing at a nonexistent path; and since the kit repo has no `package.json`, the gate had never actually run end to end.
+- `tests/agents/frontmatter.test.mjs` — validates what the YAML *says*, where CI only checked that it parsed. Pins the least-privilege claim as a test: no auditor holds `Edit`/`Write`, `ui-reviewer` holds no `Bash`, no agent holds `Task`/`SendMessage`. An unknown `tools:` key silently grants every tool, which is the bug this catches.
+- `tests/eval/` — a fixture with 29 planted defects, ground truth, and a board-vs-inline harness. The kit had no evidence that any of it improves output; this is where that gets measured.
+
+### Changed
+- **The quality gate is narrower, because the board lost its own A/B.** On a two-file review the five-agent board found no defect a single fresh reviewer missed, cost 2.4× more, and emitted a third more findings to dedupe — two independent scorers agreed (`tests/eval/results/2026-08-02-board-vs-inline.md`). `workflow.md` now says: one fresh reviewer by default, a specialist added when the diff hits its trigger, and adding auditors past that buys duplication rather than recall. `test-engineer` and `accessibility-auditor` keep their slots on evidence — each produced findings nothing else did (a jsdom canvas with no 2D context that throws before any assertion; target-size and per-instance accessible-name criteria a general pass folds away).
+- README no longer claims parallel breadth as a reason agents exist; the two mechanisms that survive measurement are tool scoping and per-agent model/effort routing.
+- `architecture.md`'s single-bullet `## Anti-patterns to reject` folded into Component API design.
+
+### Fixed
+- `performance-auditor` named a `Reactivity` section of `performance.md` that has never existed.
+- `security-scanner` instructed `<pm> audit` and `accessibility-auditor` instructed `npx` — both dropped from the allowlist in v0.21.0 without updating the agents, so each stalled a parallel fan-out on a permission prompt.
+- README claimed auditors "physically can't edit" and "4 read-only auditors", contradicting `workflow.md` five lines away: three of four hold `Bash`. Only `ui-reviewer` is write-incapable.
+- `ui-reviewer` restated checks owned by six rule files — the one place the kit broke its own "one home per rule". Trimmed to pointers.
+- README described `deny` patterns as prefix matches only in the abstract; it now names the holes (`Bash(git push --force:*)` misses `git push origin --force`) and says plainly that the list is not a control.
+- Documented what the narrow allowlist does **not** close: `<pm> run` puts `node_modules/.bin` on `PATH`, so a shadowing dependency executes under an exact-match entry, and npm runs `pre`/`post` scripts, so one entry can execute three bodies. Dropping `run:*` closed a different hole, not this one.
+
 ## [0.23.0] - 2026-07-29
 
 Audit fixes: the two mechanisms that failed silently now work outside a stock create-vue layout.
@@ -411,7 +436,8 @@ Decomposition guidance, new rules, full skill↔agent symmetry, and multi-framew
 - `workflow.md` CI/CD flow references real agents (`ui-reviewer` + `security-scanner`).
 - `git-operations.md` typecheck made conditional on TS (to match `CLAUDE.md`).
 
-[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.23.0...HEAD
+[Unreleased]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.24.0...HEAD
+[0.24.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/TarasTsavolyk/claude-code-frontend/compare/v0.20.0...v0.21.0

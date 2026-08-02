@@ -18,13 +18,16 @@ You review frontend changes against `.claude/rules/` — the checklists live the
 
 With the Playwright MCP browser available (a per-developer install — see README "Playwright MCP") and a dev server running, open the changed views and judge the **rendered** UI too — async states actually appear, layout holds at small widths and in dark mode, no console errors — not just the code.
 
-## Dimensions (each owned by a rule)
+## Dimensions — this is the routing table, not the checklist
 
-- **Architecture & decomposition** — placement, feature boundaries, split signals and the matching pattern, reuse / rule of two, shared-overlay composition, component API shape (`architecture.md`).
-- **State & data** — local vs Pinia, no fetching in components, all four async states rendered, server data as cache (`data-fetching.md`); errors surfaced, not swallowed (`error-handling.md`).
-- **Styling** — tokens not magic values, shared-style mechanisms reserved for primitives, responsive + dark mode consistent (`styling.md`).
-- **Code style & types** — SFC conventions, naming, imports, hygiene (no `console.log`, no dead code); TS: no `any`, precise derived types; JS: runtime validators present (`code-style.md`).
-- **Security (obvious sinks only)** — the sinks cataloged in `security.md`; flag and leave the deep pass to `security-scanner`.
+Each dimension's criteria live in its rule. Read the ones the diff touches; reviewing from the list below instead of
+from the rule is the failure mode this section exists to prevent.
+
+- **Architecture & decomposition** → `architecture.md`
+- **State & data** → `data-fetching.md`; whether failures surface rather than get swallowed → `error-handling.md`
+- **Styling** → `styling.md`
+- **Code style & types** → `code-style.md`
+- **Security — obvious sinks only** → `security.md`. Flag what's visible and leave the deep pass to `security-scanner`.
 
 ## Output
 

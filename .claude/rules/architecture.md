@@ -44,6 +44,7 @@ Design the public surface — props, events, slots — like any API: small, pred
 - **Two-way via `defineModel`** for genuine v-model state; otherwise one-way prop + explicit event.
 - **Name for the consumer.** Past-tense/imperative events (`@saved`, `@close`), predicate booleans, no leaking of internal state names. Keep the API stable; changing it means updating callers (flag them).
 - **Type the contract** — props/emits/slots typed in TS, runtime validators in JS — so misuse fails loudly at the call site.
+- **Don't prop-drill more than 2 levels.** Past that the intermediate components carry props they never read — use `provide`/`inject` or a store instead.
 
 ## Logic placement
 - Reusable stateful logic → composables (`useX`) returning refs/computed/handlers. Accept reactive inputs as `MaybeRefOrGetter<T>` (TS) and read them with `toValue` so refs *and* getters work — `useX(() => props.id)`; return `readonly()` refs when callers shouldn't mutate them.
@@ -58,6 +59,3 @@ Settle these per project and keep them consistent — they're what actually diff
 - **What belongs in `meta`.** The usual set is auth requirement, title, and layout. Keep it a declared shape, not a grab bag.
 - **The 404 / redirect pattern.** One catch-all, one place that decides where an unauthenticated user lands.
 - Route-level guards gate navigation for UX — they are **not** a security boundary (see `security.md`). Components may assume they are reached legitimately.
-
-## Anti-patterns to reject
-- Prop drilling more than 2 levels — use provide/inject or a store instead.

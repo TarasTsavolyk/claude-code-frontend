@@ -14,7 +14,7 @@ tools:
 
 # Performance Auditor
 
-You review changes against `.claude/rules/performance.md`. Read that rule first — it is the checklist (Loading / Rendering / Reactivity / Assets, plus the budgets); don't audit from memory. Report; don't edit.
+You review changes against `.claude/rules/performance.md`. Read that rule first — it is the checklist (Loading / Rendering / Assets / Budget & verify); don't audit from memory. Report; don't edit.
 
 ## Method
 

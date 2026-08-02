@@ -93,17 +93,18 @@ anytime once you're settled.
 ```
 CLAUDE.md                       # always-loaded memory — only what package.json/tsconfig/the tree can't say
 .claude-plugin/  plugin/        # marketplace + installer plugin (kit-repo only — adopters don't copy these)
-tests/                          # zero-dep `node --test` — hooks · scripts · rule globs (kit-repo only; CI runs them on every push)
+tests/                          # zero-dep `node --test` — hook wiring · scripts · rule globs · agent frontmatter · eval (kit-repo only; CI runs them on every push)
 .claude/
   settings.json                 # permissions + the one hook wiring (the commit gate)
+  LIMITS.md                     # what this config does NOT guarantee — ships to adopters, since this README doesn't
   hooks/                        # actually wired: pre-commit-gate
-  scripts/                      # CLI helpers a skill invokes: detect-stack (wizard) · check-refs (prune)
+  scripts/                      # CLI helpers a skill invokes: detect-stack + check-rule-globs (wizard) · check-refs (prune)
   rules/                        # 13 path-scoped + 1 global
     architecture  code-style  styling  testing  forms
     accessibility  performance  i18n  security  ssr
     data-fetching  error-handling  config
     workflow                                          # global
-  agents/                       # 5 least-privilege subagents (4 read-only auditors + test-engineer)
+  agents/                       # 5 tool-scoped subagents (4 auditors that report + test-engineer)
     ui-reviewer  accessibility-auditor  performance-auditor
     security-scanner  test-engineer
   skills/                       # 6 invokable workflows
@@ -159,9 +160,12 @@ everything else goes through Claude Code's own permission prompts. Deliberately 
 supply-chain vectors, and the first-party ask flow handles them better than a static allowlist. `git commit`/`push` sit
 behind `ask`; destructive commands and `.env`/`.pem` access are denied.
 
-**Treat the Bash patterns as guidance, not a boundary.** They match command prefixes, so another spelling walks through;
-see [Sandboxing](#sandboxing-optional-per-developer) for the layer that actually enforces. Running the quality-gate
-agents in parallel needs no flag or opt-in.
+**Treat the Bash patterns as guidance, not a boundary** — and the `deny` list especially. Patterns match command
+_prefixes_, so a different argument order walks straight through: `Bash(git push --force:*)` does not match
+`git push origin --force`, and `Bash(git clean -fd:*)` does not match `git clean -df`. That is not a gap to be closed
+by enumerating spellings — it is what a static list can't do, and it is why `git push`/`git commit` sit behind `ask` and
+why the real enforcement is [Sandboxing](#sandboxing-optional-per-developer). Read `deny` as belt-and-braces against the
+common spelling, never as a control.
 
 A `PreToolUse` hook ([`pre-commit-gate.mjs`](.claude/hooks/pre-commit-gate.mjs)) additionally **blocks `git commit`
 until the quality gate passes** — lint → typecheck → test via your lockfile-detected package manager. It resolves the
@@ -169,6 +173,14 @@ names projects actually use (`typecheck`/`type-check`, `test`/`test:unit`) and p
 whose scripts don't match can't get a silent green. It fails open: docs-only and `.claude/`-only commits, repos without
 a `package.json`/lockfile, or no matching scripts skip the gate. Slow suite? Trim the `STAGES` list in the hook or raise
 its `timeout` in `settings.json`.
+
+**What the narrow allowlist does _not_ close.** Pre-approving `<pm> run lint` still means running whatever
+`package.json` defines for `lint` — and `<pm> run` puts `node_modules/.bin` on `PATH`, so a dependency that shadows
+`eslint`/`vitest`/`vue-tsc` executes under an exact-match entry. npm also runs `pre<script>`/`post<script>`, so one
+allow entry can execute three script bodies. Dropping `run:*` closed the "every script" hole, not this one; no allowlist
+shape can. Treat `package.json` script bodies and anything in `.claude/hooks/` as **review-critical** — a hook script
+runs in every teammate's session the moment they pull it — and turn on [Sandboxing](#sandboxing-optional-per-developer)
+if you want a boundary rather than a speed bump.
 
 **Honest limit:** the `PreToolUse` hook gates only commits made _through Claude Code_ — a commit from your own terminal
 bypasses it. `/wizard` offers to install the same script as a **native git hook** (or add it to your husky/lefthook
@@ -228,9 +240,15 @@ It's opt-in and macOS/Linux/WSL2-only, so the kit ships it commented rather than
 - **Model tiers as a cost dial** — `sonnet` for the bounded auditors and `test-engineer`, `opus` for `security-scanner`
   (judgment-heavy; kept off Fable — its cyber safety classifiers false-positive on security-review work). Fable-class
   models earn their premium as the **lead session** (pipeline orchestration, epics), not as a default agent tier.
-- **Agents are not personas** — they exist for context isolation (read-heavy audits don't flood the lead's context),
-  parallelism (the quality-gate board), and least privilege (auditors physically can't edit). Each carries method +
-  checklist pointers, not a role prompt.
+- **Agents are not personas** — each carries method + checklist pointers, not a role prompt. What they buy that an
+  inline pass can't: **tool scoping** (declared `tools:`, pinned by `tests/agents/`) and **per-agent model/effort
+  routing** (`opus` + `effort: high` for `security-scanner`, `sonnet` elsewhere). Note the limit stated above, though —
+  the auditors are scoped to _report_, and only `ui-reviewer` is actually write-incapable.
+- **Parallel breadth is not one of the wins, and we measured it.** On a two-file review the five-agent board found no
+  defect a single fresh reviewer missed, cost 2.4× more, and emitted a third more findings to dedupe — full method and
+  numbers in [`tests/eval/`](tests/eval/). The gate is risk-scaled for that reason: one reviewer by default, an auditor
+  added when the diff hits its trigger. `test-engineer` and `accessibility-auditor` are the two that earned their slots
+  on findings nothing else produced. Running whichever agents you do select in parallel needs no flag or opt-in.
 - **One home per rule** — a convention lives in exactly one rule file; skills and agents carry the _process_ and point
   at the owning rule instead of restating it.
 - **Frontend-native concerns first-class** — accessibility, performance, styling, and security each get a rule and
