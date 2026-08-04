@@ -38,13 +38,6 @@ Then open your repo and run `/frontend-kit:install` — same result as the manua
 `CLAUDE.md`). The plugin ships **only** the installer: plugins can't carry rules, `CLAUDE.md`, or settings, so the kit
 itself always lives as an owned copy in your repo.
 
-One consequence of that split: `/wizard` and `/prune` come from the copy in your repo, and slash commands register at
-**session start** — so in the session that just installed the kit they aren't commands yet, and typing `/wizard` lands
-on `/frontend-kit:install` instead (its description names the wizard), which reads as a demand to install what you just
-installed. Three ways out: **`/doctor`** re-scans and registers the copied-in skills without losing the session (the
-cheap fix), `/frontend-kit:wizard` reaches onboarding through the plugin, and the installer offers to walk the steps
-inline. A new session (or `/clear`) is the fallback.
-
 **Manually:**
 
 1. **Get the kit:**
@@ -62,9 +55,8 @@ inline. A new session (or `/clear`) is the fallback.
    Then add `.claude/settings.local.json` and `.claude/worktrees/` to your repo's `.gitignore` (`cp -r` doesn't carry
    this repo's ignore rules). The wizard's detector adds `.claude/.wizard/` (the machine-local cache) automatically.
    Keep `.claude/.onboarded` **tracked**.
-3. **Open your repo in Claude Code — in a session started _after_ the copy — and run `/wizard`.** Skills become slash
-   commands at session start, so a session older than the copy doesn't have it. It detects your stack, settles
-   `CLAUDE.md` against it, checks the rules attach to your layout, and offers to `/prune` what you won't use.
+3. **Open your repo in Claude Code and run `/wizard`.** It detects your stack, settles `CLAUDE.md` against it, checks
+   the rules attach to your layout, and offers to `/prune` what you won't use.
 4. **Commit** `.claude/` + `CLAUDE.md` on a branch.
 
 This installs **project scope** (the common case). For personal defaults shared across all your repos, see

@@ -31,17 +31,8 @@ the kit's `/wizard` and `/prune` must be able to edit and delete the files thems
    if they don't fit this layout. This is the one step that must not be skipped — the kit's README and test suite stay in
    the kit repo, so `LIMITS.md` is the only place an adopter gets the caveats. A team taking on auto-executing config is
    entitled to know its edges before it runs.
-7. **Hand off — and say plainly that `/wizard` does not exist in this session yet.** Slash commands register at
-   **session start**, so the kit you just copied in is not registered: if the user types `/wizard` now, Claude Code
-   sends it as plain text, and the closest match in the loaded skill list is *this* skill — its own description names
-   the wizard — so the kit appears to demand an install the user has already done. Name that trap before it happens,
-   then offer both paths:
-   - **Now, inline:** read `.claude/skills/wizard/SKILL.md` from the copy you just made and work its steps. The install
-     keystroke *is* the request to onboard, and the wizard's `disable-model-invocation` gate is against a model
-     choosing onboarding mid-task — not against the user who just asked for the kit.
-   - **Or register the commands in place:** `/doctor` re-scans and picks up what you just copied — confirmed in
-     practice, and cheaper than losing the session. A new session (or `/clear`) is the sure thing if it doesn't.
-
-   Either way, `/wizard` syncs CLAUDE.md to the real project, verifies the rule globs actually match this layout
+7. **Hand off.** Tell the user to start a new session (or `/clear`) so the kit's hooks and skills load, then to type
+   `/wizard` themselves — it is user-invocable only (`disable-model-invocation`), so you cannot start it for them. It
+   syncs CLAUDE.md to the real project, verifies the rule globs actually match this layout
    (`node .claude/scripts/check-rule-globs.mjs`), and offers `/prune`. Suggest committing `.claude/` + `CLAUDE.md` on a
    branch.

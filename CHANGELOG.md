@@ -9,25 +9,6 @@ app that adopts it.
 
 ## [Unreleased]
 
-## [0.25.1] - 2026-08-04
-
-### Changed
-- The installer, updater, and README name `/doctor` as the way to register copied-in skills without losing the session — confirmed in practice on the install that prompted 0.25.0, where the advice had been to start a new session.
-
-## [0.25.0] - 2026-08-04
-
-Onboarding reachability. A real install showed `/wizard` was unreachable in the session that installed it, and that the
-wizard asked for a name `package.json` already declares.
-
-### Added
-- `plugin/skills/wizard/SKILL.md` — a signpost (not a copy) to the repo's own wizard, so `/wizard` resolves in the session that installed the kit. Slash commands register at session start, so the copied-in skill isn't one yet: the keystroke arrived as plain text and matched `/frontend-kit:install`, whose description names the wizard — the kit demanding an install that had just happened. Same `disable-model-invocation` gate, or the plugin would become the hole in it.
-
-### Changed
-- `/wizard` resolves the CLAUDE.md title instead of asking for it: `name` from `package.json`, the repo folder name when that's absent, verbatim either way. The prompt offered exactly those two values and step 9 now names the one it used, so a wrong guess is a one-word edit rather than a question every run.
-- The wizard states that its gate is on the Skill tool, not on the file: a user asking for onboarding in words — the only form available before a restart — is the keystroke the gate wants, so the steps get worked instead of refused. Three refusals preceded a manual run in the install that prompted this.
-- Step 3 asks its four questions in one `AskUserQuestion` call rather than two, now that the name question is gone.
-- The installer and updater name the session-start registration trap and offer to work the onboarding inline from the copy they just wrote; the README quick start says the same.
-
 ## [0.24.0] - 2026-08-02
 
 Second round of colleague review. The findings that held up are fixed; the claims the kit made about itself are now
