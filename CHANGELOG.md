@@ -9,6 +9,11 @@ app that adopts it.
 
 ## [Unreleased]
 
+## [0.25.1] - 2026-08-04
+
+### Changed
+- The installer, updater, and README name `/doctor` as the way to register copied-in skills without losing the session — confirmed in practice on the install that prompted 0.25.0, where the advice had been to start a new session.
+
 ## [0.25.0] - 2026-08-04
 
 Onboarding reachability. A real install showed `/wizard` was unreachable in the session that installed it, and that the

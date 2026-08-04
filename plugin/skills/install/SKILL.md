@@ -39,8 +39,8 @@ the kit's `/wizard` and `/prune` must be able to edit and delete the files thems
    - **Now, inline:** read `.claude/skills/wizard/SKILL.md` from the copy you just made and work its steps. The install
      keystroke *is* the request to onboard, and the wizard's `disable-model-invocation` gate is against a model
      choosing onboarding mid-task — not against the user who just asked for the kit.
-   - **Or after a restart:** a new session (or `/clear`) registers `/wizard`, `/prune`, and the hooks, and the user
-     types `/wizard` themselves.
+   - **Or register the commands in place:** `/doctor` re-scans and picks up what you just copied — confirmed in
+     practice, and cheaper than losing the session. A new session (or `/clear`) is the sure thing if it doesn't.
 
    Either way, `/wizard` syncs CLAUDE.md to the real project, verifies the rule globs actually match this layout
    (`node .claude/scripts/check-rule-globs.mjs`), and offers `/prune`. Suggest committing `.claude/` + `CLAUDE.md` on a

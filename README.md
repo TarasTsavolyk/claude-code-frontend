@@ -41,8 +41,9 @@ itself always lives as an owned copy in your repo.
 One consequence of that split: `/wizard` and `/prune` come from the copy in your repo, and slash commands register at
 **session start** — so in the session that just installed the kit they aren't commands yet, and typing `/wizard` lands
 on `/frontend-kit:install` instead (its description names the wizard), which reads as a demand to install what you just
-installed. The installer offers to walk the onboarding inline for that reason; `/frontend-kit:wizard` reaches it too,
-and a new session (or `/clear`) makes plain `/wizard` work.
+installed. Three ways out: **`/doctor`** re-scans and registers the copied-in skills without losing the session (the
+cheap fix), `/frontend-kit:wizard` reaches onboarding through the plugin, and the installer offers to walk the steps
+inline. A new session (or `/clear`) is the fallback.
 
 **Manually:**
 

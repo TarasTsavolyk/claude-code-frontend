@@ -36,5 +36,6 @@ review the diff, git is the undo.
 6. **Say what won't work until a restart.** Skills and hooks register at **session start**: anything this update added
    or renamed under `.claude/skills/` is not a slash command in the current session, so the user's keystroke would land
    as plain text (typing `/wizard` most often matches `/frontend-kit:install`, which reads as a demand to install an
-   already-installed kit). List the skills whose availability changed, and offer to work a skill's steps from its file
-   directly if the user wants one now.
+   already-installed kit). List the skills whose availability changed, and point at `/doctor` — it re-scans in place, so
+   the session survives — with a new session as the fallback. Offer to work a skill's steps from its file directly if
+   the user wants one now.
