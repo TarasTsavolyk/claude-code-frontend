@@ -10,6 +10,12 @@ disable-model-invocation: true
 
 Adapts the kit to **this** project: detect the stack, confirm it with the user, sync [CLAUDE.md](../../../CLAUDE.md) to the real project, then optionally hand off to `/prune`. The wizard itself deletes no agents/skills/rules — pruning happens only if the user opts in at the end (step 10).
 
+> **The gate is on the Skill tool, not on this file.** `disable-model-invocation: true` stops a *model* from deciding to
+> run onboarding mid-task; it does not put the steps out of reach. Slash commands register at **session start**, so in
+> the session that copied the kit in, `/wizard` is not a command yet and the user's keystroke arrives as plain text
+> ("run /wizard"). That text **is** the request the gate asks for: read this file and work the steps. Don't refuse it,
+> and don't send the user away to restart.
+
 Work through the steps in order. Stop and ask whenever a value is ambiguous; never guess a stack choice silently. **Prefer `AskUserQuestion` (checkbox/radio prompts) over asking the user to type "1, 2, 3".**
 
 1. **Refresh the facts.** Run `node .claude/scripts/detect-stack.mjs` (cheap, fail-open), then read `.claude/.wizard/facts.json`.
@@ -22,18 +28,16 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
 
 2. **Guard the working tree.** Run `git status --short`. If it is **not** clean, tell the user the wizard will edit CLAUDE.md and ask whether to proceed anyway or stop to commit/stash first. Never edit a dirty tree without an explicit go-ahead (git is the only undo).
 
-3. **Confirm the stack — use `AskUserQuestion`, not free text.** Present each value as a radio question (`multiSelect: false`) with the **detected value first**, labelled `(detected)`; rely on the automatic "Other" for the long tail. The tool caps each call at **4 questions** and each question at **4 authored options** — the "Other" free-text choice is added automatically **on top** and costs no slot. Split into two calls:
-   - **Call 1 — basics:**
-     - **Package manager** — `npm｜pnpm｜yarn｜bun`. If `packageManagerAmbiguous` is true or it is `null`, the user **must** choose (surface any `warnings`).
-     - **Language** — TypeScript or JavaScript (default `language`).
-     - **Styling** — Tailwind / Sass-SCSS / CSS Modules / scoped `<style>` (default `styling`).
-   - **Call 2 — layout:**
-     - **Structure** — layer-first or feature-first (default `structure`; cross-check against the real `srcDirs`).
-     - **Project name** — detected `projectName` first, the repo folder name second.
-   - Skip a question only when the value is certain **and** there's nothing to confirm; when in doubt, ask.
+3. **Confirm the stack — use `AskUserQuestion`, not free text.** Present each value as a radio question (`multiSelect: false`) with the **detected value first**, labelled `(detected)`; rely on the automatic "Other" for the long tail. The tool caps each call at **4 questions** and each question at **4 authored options** — the "Other" free-text choice is added automatically **on top** and costs no slot. Four questions, one call:
+   - **Package manager** — `npm｜pnpm｜yarn｜bun`. If `packageManagerAmbiguous` is true or it is `null`, the user **must** choose (surface any `warnings`).
+   - **Language** — TypeScript or JavaScript (default `language`).
+   - **Styling** — Tailwind / Sass-SCSS / CSS Modules / scoped `<style>` (default `styling`).
+   - **Structure** — layer-first or feature-first (default `structure`; cross-check against the real `srcDirs`).
+
+   Skip a question only when the value is certain **and** there's nothing to confirm; when in doubt, ask. **Never ask for the project name** — `package.json` already declares it, and step 4 resolves it without a prompt.
 
 4. **Apply the confirmed values to CLAUDE.md.** Surgical edits only — the file may already be hand-edited (see CLAUDE.md → Working principles):
-   - Title `# <PROJECT_NAME>` → the project name.
+   - Title `# <PROJECT_NAME>` → **resolve it, don't ask**: `projectName` from facts, which is the `name` in `package.json`; when that is `null` (no `name` field, or a `package.json` too garbled to parse — which still reports `isProject: true`), the last segment of `facts.root`, i.e. the repo folder name. Use it **verbatim**, scope included (`@acme/web` stays `@acme/web`) — rewriting it is guessing at the project's own identity. Step 9 names the value it resolved to, which is the escape hatch for a monorepo root called `root`.
    - **Package manager** — *keep the `<pm>` token wherever it appears.* The kit is PM-agnostic by design (README: the config never hardcodes npm/pnpm/yarn/bun): the agent substitutes `<pm>` from the lockfile. In the Package-manager section, just state the detected manager (e.g. "Detected: **pnpm** (from `pnpm-lock.yaml`)") and drop the generic lockfile table. Do **not** rewrite `<pm>` to the concrete manager anywhere — in CLAUDE.md or the rules.
    - **JavaScript** projects: drop the TypeScript-only guidance wherever it appears — the `typecheck` step in Quality gate, and the `typescript`-6 pin in `code-style.md`. Match on meaning, not on a remembered sentence; the wording changes between kit releases.
    - Leave every other line untouched (surgical edits only).
@@ -59,6 +63,6 @@ Work through the steps in order. Stop and ask whenever a value is ambiguous; nev
 
 8. **Drop the marker.** Write `.claude/.onboarded` — one short line: the date and the resolved stack (e.g. `2026-06-26 · vue · pnpm · TypeScript · Tailwind · layer-first`). It **is** committed, so teammates can see the repo is onboarded and skip `/wizard`.
 
-9. **Summarize.** Tell the user exactly what changed in CLAUDE.md — placeholders resolved, structure synced, commands reconciled. Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see CLAUDE.md → Git).
+9. **Summarize.** Tell the user exactly what changed in CLAUDE.md — placeholders resolved, structure synced, commands reconciled. Name the title you resolved and where it came from (`package.json` `name`, or the repo folder name) — that line is what makes a wrong guess a one-word fix instead of a prompt nobody needed. Suggest they review `git diff CLAUDE.md` and the new `.claude/.onboarded`, then commit on a branch (never `main` — see CLAUDE.md → Git).
 
 10. **Offer to prune (opt-in).** The kit still ships **every** agent, skill, and rule — nothing was removed. Ask the user via `AskUserQuestion` (yes/no) whether to remove the capabilities this project won't use now. If **yes**, tell them to type `/prune` — it is user-invocable only (`disable-model-invocation`), so you cannot start it for them; that is deliberate for a destructive skill. Mention `/prune` wants a clean tree, so recommend committing the onboarding first. If **no**, remind them `/prune` is available anytime later. Never remove anything without this explicit go-ahead.
